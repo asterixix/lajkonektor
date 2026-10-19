@@ -44,6 +44,8 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 
 ## Narzędzia
 
+> **Aktualizacja 19.10 wieczór:** lista poniżej jest przestarzała. Zastąpiła ją architektura uniwersalna: katalog + `dane_zapytaj` + BDL + dane.gov.pl, patrz `narzedzia-uniwersalne.md`.
+
 **Gotowe (5):**
 - `parki_lista` — parki miejskie/kieszonkowe z OD (78 rekordów; bez geometrii).
 - `mpzp_w_punkcie` — przeznaczenia MPZP w punkcie (MSIP `Planowanie/BP_MPZP`, warstwy 1–3, wejście WGS84).

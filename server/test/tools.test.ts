@@ -128,3 +128,15 @@ test("dane.gov.pl: wyszukiwanie zbiorów zwraca tytuły i linki", async () => {
   const r = await daneGovSzukaj("Kraków parki", 3);
   assert.ok(r.zbiory.length > 0 && r.zbiory[0].url.startsWith("https://dane.gov.pl/"));
 });
+
+test("MSIP: warstwy z błędnym stronicowaniem (Studium K1, mapy powodziowe) nadal zwracają dane", async () => {
+  const r = await daneZapytaj({ id: "msip:Planowanie/BP_STUDIUM_K1/0", geometria: { punkt: { lat: 50.0198, lon: 20.01435 } }, limit: 3 });
+  assert.ok(r.wiersze_zwrocone >= 1, "Studium K1 w punkcie Telimeny 11");
+  const f = await daneZapytaj({ id: "msip:Mapy_powodziowe/Mapy_zagrozenia_powodziowego/43", geometria: { punkt: { lat: 50.0198, lon: 20.01435 } }, limit: 3 });
+  assert.ok(Array.isArray(f.wiersze));
+});
+
+test("katalog: tematy potoczne trafiają w warstwy planistyczne i transportowe", () => {
+  assert.ok(szukaj("plan zagospodarowania przestrzennego").some((p) => p.id.includes("Planowanie/")));
+  assert.ok(szukaj("komunikacja miejska przystanki").some((p) => p.id.includes("Transport/") || p.id.includes("KCK_przystanki")));
+});

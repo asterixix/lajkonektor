@@ -164,7 +164,24 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
   if (q.sortuj) params.orderByFields = q.sortuj;
   params.resultRecordCount = String(limit);
   if (q.offset) params.resultOffset = String(q.offset);
-  const r = await arcgisQuery(p.url, params);
+  // Część warstw nie obsługuje stronicowania albo przy resultRecordCount zwraca 0 obiektów z exceededTransferLimit:
+  // wtedy pytamy bez stronicowania i przycinamy po pobraniu.
+  const bezStronicowania = async () => {
+    delete params.resultRecordCount;
+    delete params.resultOffset;
+    const wynik = await arcgisQuery(p.url, params);
+    wynik.features = (wynik.features ?? []).slice(q.offset ?? 0, (q.offset ?? 0) + limit);
+    uwagi.push("Warstwa nie obsługuje stronicowania po stronie serwera: limit i offset zastosowano po pobraniu.");
+    return wynik;
+  };
+  let r: any;
+  try {
+    r = await arcgisQuery(p.url, params);
+    if (!(r.features?.length) && r.exceededTransferLimit) r = await bezStronicowania();
+  } catch (e) {
+    if (!/Pagination is not supported/.test((e as Error).message)) throw e;
+    r = await bezStronicowania();
+  }
   const daty = new Set(p.pola.filter((f) => f.endsWith(":Date")).map((f) => f.split(":")[0]));
   const wiersze = (r.features ?? []).map((f: any) => {
     const a = { ...f.attributes };
@@ -172,7 +189,7 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
     const g = q.zwroc_geometrie ? geomOut(f.geometry) : undefined;
     return g ? { ...a, _geometria: g } : a;
   });
-  if (r.exceededTransferLimit) uwagi.push(`Są kolejne wiersze: ponów z offset=${(q.offset ?? 0) + wiersze.length}.`);
+  if (r.exceededTransferLimit && wiersze.length) uwagi.push(`Są kolejne wiersze: ponów z offset=${(q.offset ?? 0) + wiersze.length}.`);
   return { wiersze, ile_zrodlo: null, nastepny_kursor: null as string | null, uwagi };
 }
 

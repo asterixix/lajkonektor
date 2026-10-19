@@ -19,9 +19,21 @@ const indeks = pozycje.map((p) => ({
   opis: norm(p.opis ?? ""),
 }));
 
+// Potoczne tematy -> słowa z nazw warstw (katalog ma nazwy urzędowe). Dopisujemy słowa, nie podmieniamy.
+const ALIASY: [RegExp, string][] = [
+  [/zagospodar|plan miejscow|mpzp|plan przestrz|co mozna budowac/, "przeznaczenia mpzp studium projekt planu ogolnego strefy planistyczne"],
+  [/transport|komunikac|autobus|tramwaj|dojazd/, "przystanki ztp komunikacja"],
+  [/bezrob|rynek pracy|praca/, "bezrobotni oferty pracy"],
+  [/ludnosc|demograf|mieszkan(cy|cow)|zameldow/, "mieszkancy statystyki zameldowania ludnosci"],
+  [/ziele|park|las|drzewa/, "parki zielen lasy"],
+  [/szkol|przedszk|zlob|edukac/, "szkoly przedszkola zlobki edukacja"],
+  [/halas|smog|powietrze|srodowisk/, "halas powietrze srodowisko"],
+];
+
 export function szukaj(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: number } = {}) {
+  const rozszerzony = ALIASY.reduce((t, [rx, dodaj]) => (rx.test(norm(temat)) ? `${t} ${dodaj}` : t), temat);
   // Przybliżony stemming polskiej fleksji: pierwsze 6 liter ("bezrobocie" ~ "bezrobotni", "cudzoziemcy" ~ "cudzoziemiec").
-  const tokens = norm(temat).split(" ").filter((t) => t.length >= 2).map((t) => t.slice(0, 6));
+  const tokens = [...new Set(norm(rozszerzony).split(" "))].filter((t) => t.length >= 2).map((t) => t.slice(0, 6));
   if (!tokens.length) return [];
   const wyniki = indeks
     .filter((x) => !opts.zrodlo || x.p.zrodlo === opts.zrodlo)
