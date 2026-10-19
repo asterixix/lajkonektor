@@ -34,3 +34,22 @@ Uwaga: w danych ZTP **nie ma przystanku o nazwie „Basztowa"**, więc zapytanie
 - Tramwaje: feed RT nie zawiera `route_id` ani opóźnień; linię rozpoznajemy po `trip_id` ze statycznego GTFS (mapa tylko dla tramwajów).
 - ZTP publikuje w `ServiceAlerts` komunikaty testowe („Ogólny tekst specjalny / TEST_1…"); są oznaczane (`testowy`) i pomijane w dopasowaniu.
 - Nie ma jeszcze mapy w czacie (MCP Apps) ani pozycji pojazdów (`VehiclePositions` są dostępne, nieużyte).
+
+---
+
+## Aktualizacja 19.10 (wieczór): gminy wokół Krakowa i pociągi
+
+**Zgłoszenie z testu w Claude:** „Staniątki 15” nie zostały znalezione, a planer odpowiadał, że działa tylko dla Krakowa. Dlatego:
+
+| Zmiana | Szczegóły |
+|---|---|
+| Geokodowanie poza Krakowem | `{tekst}` najpierw w Krakowie (ramka miasta), potem w Małopolsce (`18,9–21,5 E; 49,2–50,5 N`); adres, którego nie ma w punktach MSIP, trafia do OSM. Współrzędne w `miejsce` przyjmowane dla całej Małopolski. |
+| Promień dojścia | Gdy brak połączenia, `trasa` sama poszerza dojście z 800 do 1 500 i 3 000 m (wsie, stacje poza miastem); wynik niesie `promien_dojscia_m`. |
+| Stacje kolejowe | Do kandydatów dokładamy do 3 najbliższych stacji z promienia 3 km, bo pociąg bywa dużo szybszy niż dojście autobusem. |
+| **Feed K: pociągi** | Rozkłady PKP PLK w zbiorczym GTFS składanym dziennie przez mkuran.pl (`polish_trains.zip`, 33 MB; PolRegio, Koleje Małopolskie, Intercity, Arriva, Leo Express, RegioJet i in.). Czytany strumieniowo jak feedy ZTP; budowa 4 s CPU, wynik 0,6 MB JSON (796 przystanków, 1 843 wzorce z Małopolski). Cache pod `Last-Modified`. |
+| Dokładne godziny | Dla pociągów wzorzec ma listę odjazdów (minuty od północy, osobno dzień roboczy, sobota, niedziela). Planer czeka do najbliższego odjazdu (do 6 h), a `odjazdy` pokazują godziny z rozkładem oznaczone `rozkład PKP PLK (bez danych na żywo)`. |
+| Odporność | Awaria mkuran.pl nie blokuje komunikacji miejskiej: feed K jest opcjonalny (ostrzeżenie w logu). |
+
+**Wynik testowy (lokalnie, wieczór 19.10):** Dworzec Główny → Staniątki 15: pociąg SKA3 Kraków Główny → Podłęże 22:29, 70 min łącznie z dojściem; Rynek Główny → Wieliczka Rynek: tramwaj 1 + SKA1 Kraków Grzegórzki → Wieliczka Rynek-Kopalnia 22:40, 50 min; `odjazdy` z Krakowa Głównego: IC Świnoujście 22:19, SKA3 Tarnów 22:29 itd.
+
+**Czego to nie robi:** pociągi bez opóźnień na żywo (mkuran.pl publikuje `updates.pb`, ale „upstream bywa niestabilny”, nie podpięte); dalej maks. jedna przesiadka i transfery do 200 m; trasa na mapie to schemat odcinków między przystankami; zależność od zewnętrznego agregatora (licencja: dane PKP PLK, atrybucja w stopce karty). Realne połączenia nad ranem i z przesiadkami na dłuższych trasach (np. do Zakopanego) wymagają sprawdzenia w rozkładzie przewoźnika.

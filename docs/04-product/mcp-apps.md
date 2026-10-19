@@ -52,3 +52,33 @@ Stany wspólne: ładowanie (`ontoolinput`), błąd (z przyciskiem statusu źród
 - Jak karty wyglądają i zachowują się w prawdziwym Claude (claude.ai i aplikacja) oraz w ChatGPT: harness jest zgodny z SDK, ale hosty mogą inaczej liczyć wysokość, motyw (jasny/ciemny) i uprawnienia do wywołań narzędzi z karty. Karta parków dociąga kontury narzędziem `ui_kontury_parkow`, więc wymaga, by host pozwalał karcie wołać serwer.
 - Obsługę MCP Apps w poszczególnych klientach bierzemy z dokumentacji SDK, nie z własnych testów. Perplexity i Gemini: zakładamy tryb tekstowy.
 - Tryb ciemny: karta wymusza jasny motyw (`color-scheme: light`).
+
+---
+
+## Aktualizacja 19.10 (wieczór): po teście w prawdziwym Claude
+
+Pierwszy test w Claude (zrzuty od użytkownika) pokazał, że harness nie wystarczył. Zgłoszone i naprawione:
+
+| Zgłoszenie | Przyczyna | Naprawa |
+|---|---|---|
+| Biały pas z prawej strony karty, „problem z responsywnością” | Karta miała `max-width: 680px`, a `<meta name="color-scheme" content="light">` przy ciemnym motywie czatu daje nieprzezroczyste białe tło iframe | Karta zajmuje całą szerokość; motyw hosta ustawia `applyDocumentTheme`; mapa to SVG skalowany do szerokości (stałe obrysy `vector-effect`, napisy skalowane razem z widokiem) |
+| „MAPA” w `katalog_szukaj` nie działa | To była plakietka (typ źródła), nie przycisk | Prawdziwe przyciski: „Pokaż dane / Pokaż na mapie” (woła `dane_zapytaj`, dla warstw z konturami) i „Opis pól”, z przyciskiem „← Wróć”; to samo w karcie opisu zbioru |
+| „Nie ma mapy OSM” | Mapa rysowała tylko dane na szarym tle | Podkład OSM: kafelki przez **serwer Lajkonektora** (`/kafelki/{z}/{x}/{y}.png`; User-Agent z adresem aplikacji, cache brzegowy 7 dni, tylko Małopolska i zoom 9–18). CSP zasobu dopuszcza wyłącznie adres serwera (`resourceDomains`). Rzutowanie Web Mercator, podpis „© współtwórcy OpenStreetMap”, skala |
+| „Okno z prognozą się nie pojawiło” | Model sam zdecydował nie wołać `prognoza` (seria za krótka) | Instrukcje serwera i opis narzędzia: prognozę wołać od 3 punktów i przekazać ostrzeżenia, nie odmawiać z góry |
+| „Model sam ma generować widoki z komponentów” | Karty były przypisane 1:1 do narzędzi | Nowe narzędzie **`widok`** (patrz niżej) |
+
+### Narzędzie `widok`: karta składana przez model
+Model wybiera komponenty i podaje dane, a serwer je waliduje i (opcjonalnie) sam pobiera: w blokach `tabela`, `wykres`, `mapa` pole `z: {narzedzie, argumenty}` wykonuje `dane_zapytaj`, `plik_odczyt` albo `bdl_dane`, więc model nie przepisuje liczb. Komponenty: `tekst` (zwykły, uwaga, informacja), `metryki`, `tabela`, `wykres` (linia/słupki), `mapa` (punkty, linie, obszary albo konturów z `dane_zapytaj` z `kontury=true`), `lista`, `os_czasu`; do 8 bloków, wymagane `zrodlo`. Błędy mówią, który blok i co poprawić (np. „Blok 2 (tabela): wiersz 1 ma 1 komórek, a kolumn jest 2”). Kontury i adres kafelków trafiają tylko do `structuredContent` (dla karty), nie do tekstu dla modelu. Karty pojedynczych narzędzi działają jak dotąd; `widok` służy do zestawień i porównań.
+
+### Nowe w `dane_zapytaj`
+`kontury: true` (MSIP): uproszczone kontury obiektów (tolerancja ok. 3 m, do 200 obiektów), które karta rysuje na mapie OSM; w karcie tabeli pojawia się przełącznik **Tabela / Mapa / Słupki**.
+
+### Instrukcje serwera (`instructions`)
+Serwer podaje klientom skrót zasad pracy: przepływ katalog → opis → zapytanie, transport z pociągami i gminami wokół Krakowa, prognoza, kiedy użyć `widok`, oraz które tematy **nie istnieją** w danych miasta (odpady i PSZOK, kina, targowiska, wypadki drogowe).
+
+### Harness: czego uczy
+- Wolne pierwsze renderowanie i brak powiadomień o rozmiarze w harnessie to artefakt panelu przeglądarki (strona niewidoczna jest dławiona): po wysunięciu karty na wierzch wszystko działa.
+- Iframe z `sandbox="allow-scripts"` na `localhost` nie pobiera kafelków z lokalnego proxy (artefakt przeglądarki); w harnessie używaj `?kafelki=https://tile.openstreetmap.org/{z}/{x}/{y}.png` albo adresu wdrożonego serwera. `?same=1` dodaje `allow-same-origin` tylko do oglądania DOM w konsoli.
+
+### 🟡 Ryzyko: polityka kafelków OSM
+Standardowe kafelki `tile.openstreetmap.org` są do lekkiego użycia (UA z adresem, cache, atrybucja). Proxy w Workerze ogranicza obszar i zoom oraz cache'uje, ale przy ruchu pokazowym większym niż kilkaset kart dziennie trzeba przejść na własny hosting (PMTiles na R2) albo płatnego dostawcę (zmiana jednej stałej w `src/kafelki.ts`).

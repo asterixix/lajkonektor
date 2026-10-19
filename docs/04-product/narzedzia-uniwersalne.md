@@ -42,3 +42,11 @@ Usunięte jako zbędne: `parki_lista`, `mpzp_w_punkcie`, `ludnosc_w_promieniu` (
 - 🔴 Prognoza cudzoziemców 2026–2036 opiera się na 3 rocznych migawkach OD (2023–2025): przedział jest bardzo szeroki; potrzebny dłuższy szereg (BDL?) albo scenariusz.
 - 🟡 Opisy w katalogu to nazwy urzędowe + ręczny słownik aliasów (7 tematów). Warto rozszerzyć o opisy kuratorskie dla 30–50 najważniejszych zbiorów (skill „Badacz miejski").
 - 🟡 Złączenie przestrzenne z całym zbiorem obiektów (np. 2000 wielokątów) bywa wolne (parki: ~8 s). Potrzebny cache (KV) wyników agregacji.
+
+## Pokrycie tematów miasta (sprawdzone 19.10 na migawce katalogu)
+
+Katalog (1 203 pozycje: 130 tabel OD i 1 073 warstwy MSIP) pokrywa m.in.: parki i zieleń; plany miejscowe, warunki zabudowy i pozwolenia na budowę; działki, budynki i adresy; hałas, jakość powietrza, powodzie, ochronę przyrody, wycinkę drzew, stacje bazowe; ludność i zameldowania (w tym cudzoziemcy, siatka Hex 100 m); **ceny nieruchomości** (Rejestr cen, mediany m² wg dzielnic i miesięcy); żłobki, przedszkola, szkoły, uczelnie; szpitale, apteki, przychodnie, seniorzy; muzea, teatry, biblioteki, galerie, obiekty sportowe; parkomaty, strefę płatnego parkowania, P+R, infrastrukturę rowerową, stacje kolejowe; policję (posterunki, komisariaty, zasięgi); wybory i okręgi; ciepło MPEC, wodociągi, kanalizację, oświetlenie, toalety, pitniki.
+
+**Czego nie ma** (katalog mówi o tym polem `brak_w_katalogu`, zamiast podsuwać dane o czymś innym): harmonogramy wywozu odpadów i PSZOK (publikuje je MPO), kina, targowiska, wypadki drogowe, rejestr źródeł ogrzewania, stacje rowerów miejskich, wykaz dzielnicowych policjantów. Dane z dane.gov.pl o Krakowie to prawie wyłącznie ceny ofertowe deweloperów; Urząd Miasta nie ma tam własnych zbiorów (instytucja 7211: 0 zbiorów).
+
+**Wyszukiwanie** (zmiany po teście): dopasowanie po całych słowach (krótkie słowa dokładnie lub z jedną literą końcówki: „hałas” ~ „hałasu”, „parki” ≠ „parking”), ponad 30 potocznych aliasów (np. „ceny mieszkań” → Rejestr cen, „dzielnicowy” → komisariaty), pominięcie przyimków, kara dla tabel o cudzoziemcach w pytaniach o ludność ogólnie, wyniki z kolejnych lat jednej tabeli razem i od najnowszego roku.
