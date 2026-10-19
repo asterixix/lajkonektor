@@ -1,7 +1,8 @@
 // Testy integracyjne na żywych API miasta (wymagają internetu). Uruchom: npm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { listParks, mpzpAtPoint, populationWithin } from "../src/core.ts";
+import { addressToPoint, listParks, mpzpAtPoint, populationWithin } from "../src/core.ts";
+import { parkGeometry } from "../src/parki.ts";
 
 // Błonia Krakowskie
 const BLONIA = { lat: 50.0585, lon: 19.9186 };
@@ -30,4 +31,27 @@ test("ludność w promieniu rośnie wraz z promieniem", async () => {
   assert.ok(a.zameldowani > 0, "Rynek Główny ma zameldowanych");
   assert.ok(b.zameldowani >= a.zameldowani);
   assert.match(a.snapshot, /^\d{4}-\d{2}-\d{2}$/);
+});
+
+test("adres_na_punkt: Telimeny 11 i polskie litery bez diakrytyków", async () => {
+  const a = await addressToPoint({ ulica: "ul. Telimeny", numer: "11" });
+  assert.equal(a.liczba, 1);
+  assert.equal(a.kandydaci[0].kod_pocztowy, "30-838");
+  const b = await addressToPoint({ ulica: "Lojasiewicza", numer: "4" });
+  assert.ok(b.liczba >= 1, "ulica Łojasiewicza nie znaleziona bez diakrytyków");
+  const c = await addressToPoint({ ulica: "Nieistniejaca", numer: "999" });
+  assert.equal(c.liczba, 0);
+});
+
+test("parki_geometria: pokrycie jawne, Błonia mają środek w Krakowie", () => {
+  const r = parkGeometry({ nazwa: "Błonia" });
+  assert.ok(r.pokrycie.parki_z_geometria > 30 && r.pokrycie.parki_z_geometria < r.pokrycie.parki_ogolem);
+  const b = r.parki[0];
+  assert.ok(b.osm, "Błonia bez geometrii");
+  assert.ok(Math.abs(b.osm.srodek.lat - 50.058) < 0.01 && Math.abs(b.osm.srodek.lon - 19.918) < 0.01);
+});
+
+test("adres_na_punkt: ulica bez polskich liter (Dabrowskiego) też działa", async () => {
+  const r = await addressToPoint({ ulica: "Dabrowskiego", numer: "12" });
+  assert.ok(r.liczba >= 1, "Dąbrowskiego 12 nie znaleziona");
 });

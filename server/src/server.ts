@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
-import { listParks, mpzpAtPoint, populationWithin } from "./core.ts";
+import { addressToPoint, listParks, mpzpAtPoint, populationWithin } from "./core.ts";
+import { parkGeometry } from "./parki.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
 
@@ -57,6 +58,38 @@ export function createServer(): McpServer {
       annotations: readOnly,
     },
     ({ lat, lon, promien_m }) => run(() => populationWithin(lat, lon, promien_m)),
+  );
+
+  server.registerTool(
+    "adres_na_punkt",
+    {
+      title: "Adres na współrzędne",
+      description:
+        "Geokodowanie adresu w Krakowie (punkty adresowe MSIP): zwraca lat/lon, kod pocztowy i dzielnicę. Użyj przed narzędziami przyjmującymi lat/lon.",
+      inputSchema: z.object({
+        ulica: z.string().min(2).describe("Nazwa ulicy, np. 'Telimeny' (bez 'ul.'; polskie litery opcjonalne)"),
+        numer: z.string().describe("Numer budynku dokładnie jak w adresie, np. '11' lub '4A'"),
+        kod_pocztowy: z.string().optional().describe("Opcjonalnie, np. '30-838', gdy ulica powtarza się w mieście"),
+      }),
+      annotations: readOnly,
+    },
+    (args) => run(() => addressToPoint(args)),
+  );
+
+  server.registerTool(
+    "parki_geometria",
+    {
+      title: "Parki z geometrią (OSM)",
+      description:
+        "Parki miejskie z tabeli OD uzupełnione o dopasowaną geometrię z OpenStreetMap: środek, ramka, powierzchnia OSM i miara zgodności. Pokrycie jest częściowe (patrz pole 'pokrycie').",
+      inputSchema: z.object({
+        nazwa: z.string().optional().describe("Fragment nazwy parku, np. 'Jordana'"),
+        dzielnica: z.string().optional().describe("Fragment nazwy dzielnicy, np. 'Podgórze'"),
+        tylko_z_geometria: z.boolean().default(false),
+      }),
+      annotations: readOnly,
+    },
+    (args) => run(async () => parkGeometry(args)),
   );
 
   return server;
