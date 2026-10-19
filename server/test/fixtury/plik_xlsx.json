@@ -1,0 +1,599 @@
+{
+ "_widok": "plik",
+ "_zapytanie": {
+  "url": "https://api.dane.gov.pl/resources/2826170,ceny-ofertowe-mieszkan-dewelopera-dom-development-krakow-sp-z-oo-2026-10-18/file",
+  "pola": [
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]",
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]"
+  ],
+  "sortuj": "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł] desc",
+  "limit": 6
+ },
+ "podsumowanie": "Plik xlsx: 1457 wierszy, 63 kolumn; zwrócono 6.",
+ "zrodlo": "api.dane.gov.pl/media/resources/20261019/DDKW_Ceny_ofertowe_mieszkan_2026_10_18_b03813da.xlsx",
+ "format": "xlsx",
+ "rozmiar_kb": 185,
+ "arkusze": [
+  "Sheet1"
+ ],
+ "wierszy_w_pliku": 1457,
+ "wierszy_w_wyniku": 1457,
+ "kolumny_profil": [
+  {
+   "nazwa": "Forma prawna dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Spółka z ograniczoną odpowiedzialnością"
+   ]
+  },
+  {
+   "nazwa": "Nr KRS",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "0000952695"
+   ]
+  },
+  {
+   "nazwa": "Nr NIP",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "5252895335"
+   ]
+  },
+  {
+   "nazwa": "Nr REGON",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "521214597"
+   ]
+  },
+  {
+   "nazwa": "Nr telefonu",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "12 312 37 00"
+   ]
+  },
+  {
+   "nazwa": "Adres poczty elektronicznej",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "pocztaddkw@domd.pl"
+   ]
+  },
+  {
+   "nazwa": "Nr faxu",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "-"
+   ]
+  },
+  {
+   "nazwa": "Adres strony internetowej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "www.domd.pl/pl-pl/krakow"
+   ]
+  },
+  {
+   "nazwa": "Województwo adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Małopolskie"
+   ]
+  },
+  {
+   "nazwa": "Powiat adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "krakowski"
+   ]
+  },
+  {
+   "nazwa": "Gmina adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Miejscowość adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Ulica adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Wadowicka"
+   ]
+  },
+  {
+   "nazwa": "Nr nieruchomości adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "3A"
+   ]
+  },
+  {
+   "nazwa": "Kod pocztowy adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "30-347"
+   ]
+  },
+  {
+   "nazwa": "Sposób kontaktu nabywcy z deweloperem",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Kmail, telefon, formularz WWW"
+   ]
+  },
+  {
+   "nazwa": "Nr lokalu lub domu jednorodzinnego nadany przez dewelopera",
+   "typ": "tekst",
+   "puste": 893,
+   "unikalne": 564,
+   "przyklady": [
+    "OSIEDLE PRZY WIELICKIEJ_1_2_B_MK_75",
+    "OSIEDLE PRZY WIELICKIEJ_1_2_B_MK_3",
+    "APARTAMENTY PARK MATECZNEGO_2_1_G_MK_16"
+   ]
+  },
+  {
+   "nazwa": "Rodzaj części nieruchomości będących przedmiotem umowy",
+   "typ": "tekst",
+   "puste": 564,
+   "unikalne": 3,
+   "przyklady": [
+    "Garaż",
+    "Parking zewnętrzny",
+    "Komórka lokatorska"
+   ]
+  },
+  {
+   "nazwa": "Oznaczenie części nieruchomości nadane przez dewelopera",
+   "typ": "tekst",
+   "puste": 564,
+   "unikalne": 893,
+   "przyklady": [
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_90",
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_81",
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_87"
+   ]
+  },
+  {
+   "nazwa": "Rodzaj nieruchomości: lokal mieszkalny, dom jednorodzinny",
+   "typ": "tekst",
+   "puste": 893,
+   "unikalne": 1,
+   "przyklady": [
+    "Lokal mieszkalny"
+   ]
+  },
+  {
+   "nazwa": "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]",
+   "typ": "liczba",
+   "puste": 893,
+   "min": 12502,
+   "max": 23000,
+   "suma": 9427432,
+   "srednia": 16715.305
+  },
+  {
+   "nazwa": "Cena części nieruchomości, będących przedmiotem umowy [zł]",
+   "typ": "liczba",
+   "puste": 564,
+   "min": 8400,
+   "max": 100000,
+   "suma": 44048300,
+   "srednia": 49326.2038
+  },
+  {
+   "nazwa": "Cena lokalu mieszkalnego lub domu jednorodzinnego będących przedmiotem umowy stanowiąca iloczyn ceny m2 oraz powierzchni [zł]",
+   "typ": "liczba",
+   "puste": 893,
+   "min": 447966.4,
+   "max": 1922488,
+   "suma": 450162251.69,
+   "srednia": 798160.0207
+  },
+  {
+   "nazwa": "Data od której obowiązuje cena części nieruchomości, będących przedmiotem umowy",
+   "typ": "tekst",
+   "puste": 564,
+   "unikalne": 18,
+   "przyklady": [
+    "18-03-2026 11:44",
+    "18-03-2026 11:43",
+    "09-09-2026 12:36"
+   ]
+  },
+  {
+   "nazwa": "Numer lokalu",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 284,
+   "przyklady": [
+    "90",
+    "81",
+    "87"
+   ]
+  },
+  {
+   "nazwa": "Kod",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 4,
+   "przyklady": [
+    "GR",
+    "PZ",
+    "KL"
+   ]
+  },
+  {
+   "nazwa": "Nr wpisu do CEiDG",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Nr lokalu adresu siedziby/głównego miejsca wykonywania działalności gospodarczej dewelopera",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Data od której cena obowiązuje cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego",
+   "typ": "tekst",
+   "puste": 893,
+   "unikalne": 54,
+   "przyklady": [
+    "01-08-2026 00:08",
+    "25-03-2026 11:39",
+    "01-09-2026 00:44"
+   ]
+  },
+  {
+   "nazwa": "Data od której cena obowiązuje cena lokalu mieszkalnego lub domu jednorodzinnego będących przedmiotem umowy stanowiąca iloczyn ceny m2 oraz powierzchni",
+   "typ": "tekst",
+   "puste": 893,
+   "unikalne": 54,
+   "przyklady": [
+    "01-08-2026 00:08",
+    "25-03-2026 11:39",
+    "01-09-2026 00:44"
+   ]
+  },
+  {
+   "nazwa": "Cena lokalu mieszkalnego lub domu jednorodzinnego uwzględniająca cenę lokalu stanowiącą iloczyn powierzchni oraz metrażu i innych składowych ceny, o których mowa w art. 19a ust. 1 pkt 1), 2) lub 3) [zł]",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Data od której obowiązuje cena lokalu mieszkalnego lub domu jednorodzinnego uwzględniająca cenę lokalu stanowiącą iloczyn powierzchni oraz metrażu i innych składowych ceny, o których mowa w art. 19a ust. 1 pkt 1), 2) lub 3)",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Rodzaj pomieszczeń przynależnych, o których mowa w art. 2 ust. 4 ustawy z dnia 24 czerwca 1994 r. o własności lokali",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Oznaczenie pomieszczeń przynależnych, o których mowa w art. 2 ust. 4 ustawy z dnia 24 czerwca 1994 r. o własności lokali",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Wyszczególnienie cen pomieszczeń przynależnych, o których mowa w art. 2 ust. 4 ustawy z dnia 24 czerwca 1994 r. o własności lokali [zł]",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Data od której obowiązuje cena wyszczególnionych pomieszczeń przynależnych, o których mowa w art. 2 ust. 4 ustawy z dnia 24 czerwca 1994 r. o własności lokali",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Wyszczególnienie praw niezbędnych do korzystania z lokalu mieszkalnego lub domu jednorodzinnego",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Wartość praw niezbędnych do korzystania z lokalu mieszkalnego lub domu jednorodzinnego [zł]",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Data od której obowiązuje cena wartości praw niezbędnych do korzystania z lokalu mieszkalnego lub domu jednorodzinnego",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Wyszczególnienie rodzajów innych świadczeń pieniężnych, które nabywca zobowiązany jest spełnić na rzecz dewelopera w wykonaniu umowy przenoszącej własność",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Wartość innych świadczeń pieniężnych, które nabywca zobowiązany jest spełnić na rzecz dewelopera w wykonaniu umowy przenoszącej własność [zł]",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Data od której obowiązuje cena wartości innych świadczeń pieniężnych, które nabywca zobowiązany jest spełnić na rzecz dewelopera w wykonaniu umowy przenoszącej własność",
+   "typ": "pusta",
+   "puste": 1457
+  },
+  {
+   "nazwa": "Adres strony internetowej, pod którym dostępny jest prospekt informacyjny",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 12,
+   "przyklady": [
+    "https://prdddstructure.blob.core.windows.net/brosh…",
+    "https://prdddstructure.blob.core.windows.net/brosh…",
+    "https://prdddstructure.blob.core.windows.net/brosh…"
+   ]
+  },
+  {
+   "nazwa": "Województwo adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "małopolskie"
+   ]
+  },
+  {
+   "nazwa": "Powiat adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "krakowski"
+   ]
+  },
+  {
+   "nazwa": "Gmina adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Miejscowość adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Ulica adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 2,
+   "przyklady": [
+    "Wadowicka",
+    "Prandoty"
+   ]
+  },
+  {
+   "nazwa": "Nr nieruchomości adresu lokalu, w którym prowadzona jest sprzeda",
+   "typ": "tekst",
+   "puste": 1415,
+   "unikalne": 1,
+   "przyklady": [
+    "10"
+   ]
+  },
+  {
+   "nazwa": "Nr lokalu adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1415,
+   "unikalne": 1,
+   "przyklady": [
+    "NULL"
+   ]
+  },
+  {
+   "nazwa": "Kod pocztowy adresu lokalu, w którym prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 2,
+   "przyklady": [
+    "30-347",
+    "31-435"
+   ]
+  },
+  {
+   "nazwa": "Dodatkowe lokalizacje, w których prowadzona jest sprzedaż",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "NULL"
+   ]
+  },
+  {
+   "nazwa": "Województwo lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "małopolskie"
+   ]
+  },
+  {
+   "nazwa": "Powiat lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "krakowski"
+   ]
+  },
+  {
+   "nazwa": "Gmina lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Miejscowość lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 1,
+   "przyklady": [
+    "Kraków"
+   ]
+  },
+  {
+   "nazwa": "Ulica lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 4,
+   "przyklady": [
+    "Marii Orwid",
+    "Prandoty",
+    "Rydlówka"
+   ]
+  },
+  {
+   "nazwa": "Nr nieruchomości lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 11,
+   "przyklady": [
+    "1",
+    "10F",
+    "5G"
+   ]
+  },
+  {
+   "nazwa": "Kod pocztowy lokalizacji przedsięwzięcia deweloperskiego lub zadania inwestycyjnego",
+   "typ": "tekst",
+   "puste": 1068,
+   "unikalne": 4,
+   "przyklady": [
+    "30-663",
+    "31-435",
+    "30-363"
+   ]
+  },
+  {
+   "nazwa": "Nazwa dewelopera",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1,
+   "przyklady": [
+    "Dom Development Kraków Sp. z o.o."
+   ]
+  },
+  {
+   "nazwa": "kod_produktu",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 1457,
+   "przyklady": [
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_90",
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_81",
+    "PRZYSTANEK PRĄDNIK_1_1_D_GR_87"
+   ]
+  },
+  {
+   "nazwa": "Budynek",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 16,
+   "przyklady": [
+    "PRZYSTANEK PRĄDNIK_1_1_D",
+    "PRZYSTANEK PRĄDNIK_2_1_C",
+    "OSIEDLE PRZY WIELICKIEJ_1_2_B"
+   ]
+  },
+  {
+   "nazwa": "Rodzaj",
+   "typ": "tekst",
+   "puste": 0,
+   "unikalne": 4,
+   "przyklady": [
+    "Garaż",
+    "Parking zewnętrzny",
+    "Komórka lokatorska"
+   ]
+  }
+ ],
+ "uwagi": [
+  "XLSX: arkusz 'Sheet1'; pierwszy wiersz potraktowano jako nagłówek; komórki z formatem daty zamieniono na tekst ISO."
+ ],
+ "kolumny": [
+  "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]",
+  "Cena części nieruchomości, będących przedmiotem umowy [zł]"
+ ],
+ "wiersze": [
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 23000,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  },
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 22800,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  },
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 22750,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  },
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 22650,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  },
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 22650,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  },
+  {
+   "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]": 22550,
+   "Cena części nieruchomości, będących przedmiotem umowy [zł]": null
+  }
+ ]
+}

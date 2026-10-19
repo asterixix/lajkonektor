@@ -1,6 +1,6 @@
 // Geometria parków: migawka zbudowana skryptem scripts/build-parki-osm.mjs (OSM, ODbL) i dołączona do Workera.
 import snapshot from "../data/parki-osm.json" with { type: "json" };
-import { bbox, centroid, clockwise, type Ring } from "./geo.ts";
+import { bbox, centroid, clockwise, uprosc, zaokragl, type Ring } from "./geo.ts";
 
 type Park = (typeof snapshot.parki)[number];
 
@@ -9,6 +9,12 @@ export const PARKI_OSM_ID = "lokalne:parki_osm";
 // Wszystkie dopasowane pierścienie parków, do użycia jako obszar w zapytaniach przestrzennych.
 export function parkiRings(): Ring[] {
   return (snapshot.parki as Park[]).flatMap((p) => (p.osm?.rings as Ring[] | undefined) ?? []).map(clockwise);
+}
+
+// Ile parków z tabeli OD ma dopasowaną geometrię (do komunikatów o pokryciu).
+export function pokrycieParkow() {
+  const all = snapshot.parki as Park[];
+  return { z: all.filter((p) => p.osm).length, razem: all.length };
 }
 
 export function parkGeometry(opts: { nazwa?: string; dzielnica?: string; tylko_z_geometria?: boolean }) {
@@ -40,5 +46,29 @@ export function parkGeometry(opts: { nazwa?: string; dzielnica?: string; tylko_z
     },
     liczba: rows.length,
     parki: rows,
+  };
+}
+
+// Uproszczone kontury do narysowania mapy w karcie (ok. 3 m tolerancji, 5 miejsc po przecinku).
+export function konturyParkow(opts: { lp?: number[]; wokol_lp?: number; promien_m?: number }) {
+  const all = (snapshot.parki as Park[]).filter((p) => p.osm);
+  let wybrane = all;
+  if (opts.wokol_lp !== undefined) {
+    const c = all.find((p) => p.lp === opts.wokol_lp);
+    if (c) {
+      const sc = centroid(c.osm!.rings as Ring[]), r = opts.promien_m ?? 900;
+      const kx = 111320 * Math.cos((sc.lat * Math.PI) / 180);
+      wybrane = all.filter((p) => {
+        const s = centroid(p.osm!.rings as Ring[]);
+        return p.lp === c.lp || Math.hypot((s.lon - sc.lon) * kx, (s.lat - sc.lat) * 110540) <= r;
+      });
+    }
+  } else if (opts.lp?.length) wybrane = all.filter((p) => opts.lp!.includes(p.lp));
+  return {
+    liczba: wybrane.length,
+    parki: wybrane.map((p) => ({
+      lp: p.lp, nazwa: p.nazwa_od, dzielnica: p.dzielnica, powierzchnia_od_ha: p.powierzchnia_od_ha, powierzchnia_osm_ha: p.osm!.area_ha,
+      rings: (p.osm!.rings as Ring[]).map((r) => zaokragl(uprosc(r, 0.00003))),
+    })),
   };
 }

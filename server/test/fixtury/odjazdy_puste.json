@@ -1,0 +1,10 @@
+{
+ "_widok": "odjazdy",
+ "_zapytanie": {
+  "nazwa": "Nieistniejący"
+ },
+ "zrodlo": "ZTP",
+ "przystankow": 0,
+ "odjazdy": [],
+ "komunikaty": []
+}

@@ -1,0 +1,43 @@
+{
+ "_widok": "parki",
+ "_zapytanie": {
+  "nazwa": "Jordana",
+  "tylko_z_geometria": false
+ },
+ "podsumowanie": "Parków: 1. Pokrycie konturów OSM: 46 z 78 parków (44.9% powierzchni).",
+ "zrodlo": "Tabela: Otwarte Dane Miasta Krakowa (parki miejskie). Geometria: © współtwórcy OpenStreetMap, ODbL.",
+ "migawka": "2026-10-19",
+ "uwaga": "Geometria pochodzi z OSM i dotyczy tylko części parków z tabeli OD. Pole 'zgodnosc' mówi, czy dopasowanie potwierdza powierzchnia. Parki bez geometrii nie wchodzą do analiz przestrzennych.",
+ "pokrycie": {
+  "parki_z_geometria": 46,
+  "parki_ogolem": 78,
+  "udzial_powierzchni_proc": 44.9
+ },
+ "liczba": 1,
+ "parki": [
+  {
+   "lp": 17,
+   "nazwa": "Park im. Henryka Jordana",
+   "typ": "Park",
+   "dzielnica": "V Krowodrza",
+   "powierzchnia_od_ha": 20.8,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/25113939",
+    "nazwa": "Park Jordana",
+    "powierzchnia_osm_ha": 20.61,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.062633,
+     "lon": 19.916232
+    },
+    "bbox": [
+     19.912327,
+     50.060107,
+     19.919645,
+     50.065315
+    ]
+   }
+  }
+ ]
+}

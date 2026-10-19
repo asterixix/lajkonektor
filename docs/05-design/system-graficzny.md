@@ -52,7 +52,7 @@ Kroje: `--lk-font` Lato (900 nagłówki i liczby, 700 etykiety, 400 treść), `-
 
 - **Ramka karty MCP:** nagłówek (białe kwadratowe pole z `znak-128.png` 44 px, eyebrow = id narzędzia małymi literami wersalikami, tytuł 22 px/900 o jednym obiekcie, znacznik po prawej), treść, stopka #F5F5F5 z „Źródło: ... stan/data ... pokrycie". Szerokość 520 px (listy) lub 640 px (mapy, wykresy).
 - **Numer linii:** kwadratowa plakietka #0063AF, biała liczba 900. Ten sam motyw na stronie to „numer narzędzia" w tabeli.
-- **Znaczniki:** `NA ŻYWO` (zielony), `MIGAWKA dd.mm.rrrr` (atrament), `Pokrycie 47 z 78` (obrys niebieski), `BŁĄD` (czerwony).
+- **Znaczniki:** `NA ŻYWO` (zielony), `MIGAWKA dd.mm.rrrr` (atrament), `Pokrycie 46 z 78` (obrys niebieski), `BŁĄD` (czerwony).
 - **Przyciski:** główny żółty (jeden na ekran), pomocniczy niebieski, drugorzędny obrys 2 px. Min. wysokość 40 px, ruch 2 px w dół po naciśnięciu.
 - **Komunikat o utrudnieniu:** pas z czerwoną etykietą `LINIA 8` i tekstem (bez kolorowej krawędzi z boku).
 - **Stany (obowiązkowe dla każdej karty):** ładowanie (szkielet, `role="status"`, pulsowanie wyłączone przy `prefers-reduced-motion`), błąd (kod w monospace, co się stało, co dalej, dwa przyciski), pusto (dlaczego i co zrobić; „brak w feedzie" ≠ „linia nie kursuje").
@@ -66,7 +66,7 @@ Wszystkie narzędzia już zwracają `structuredContent` (`server.ts`, funkcja `r
 | `Odjazdy` 520×600 | `odjazdy` | `odjazdy[]`: `linia`→plakietka, `kierunek`, `odjazd` (hh:mm), `za_min`→duża liczba, `opoznienie_s`→„opóźnienie N min"/„o czasie"; `komunikaty`→pas utrudnień; `czas_feedu`→„stan hh:mm"; `zrodlo` w stopce |
 | `Trasa` 520×600 | `trasa` | `Opcja`: `czas_min` (duży), `rodzaj` (zakładki), `dojscie_start`, `nogi[]` (`linia`, `kierunek`, `wsiadanie`, `wysiadanie`, `przystankow`, `jazda_min`), `przesiadka`, `czekanie_min`, `dojscie_cel`, `zrodlo_czasu` |
 | `Przystanki` 520×600 | `przystanki_w_poblizu` | `przystanki[]` z `dojscie_min`, odległością, liniami; `zrodlo_dojscia` w stopce; pasek skali do 1500 m |
-| `Parki` 640×700 | `parki_geometria` | `parki[]`: `powierzchnia_od_ha` vs `osm.powierzchnia_osm_ha`, `zgodnosc`; `pokrycie` (47/78, 46,9%) w stopce; mapa z konturami |
+| `Parki` 640×700 | `parki_geometria` | `parki[]`: `powierzchnia_od_ha` vs `osm.powierzchnia_osm_ha`, `zgodnosc`; `pokrycie` (46/78, 44,9%) w stopce; mapa z konturami |
 | `Tabela` 640×640 | `dane_zapytaj` | `wiersze[]` z `grupuj_po`/`agreguj`; przełącznik Tabela/Słupki; stopka mówi, co pominięto |
 | `Szereg` 640×640 | `bdl_dane` | `wiersze[]` `{rok, wartosc, jednostka_miary}`; duża ostatnia wartość, zmiana, wykres liniowy, min/max |
 | `Status` 520×440 | `status_zrodel` | `testy[]` `{host, status, ms, blad}`; `worker.colo/kraj`; `uwaga` w stopce |
@@ -82,7 +82,7 @@ Kolejność: nagłówek → hero z działającym demo → **Rozkład narzędzi**
 
 - **Hero:** H1 „Model pyta. Kod liczy. Kraków podaje źródło.", jedno żółte wezwanie „Dodaj do Claude". Trzy pytania do kliknięcia przełączają pytanie, wywołanie narzędzia w monospace, odpowiedź i kartę. Karty parków to prawdziwe dane, karta odjazdów to przykład (podpisany).
 - **Rozkład narzędzi:** belka #0063AF, wiersze: numer, nazwa narzędzia, co robi, skąd i jak świeże. 8 z 15 narzędzi.
-- **Czego nie wiemy:** „Na mapie jest 47 z 78 parków." Powód: 23 nie znaleziono po nazwie, 8 bez domkniętego obrysu; 46,9% powierzchni. Atrybucja OSM (ODbL) pod mapą.
+- **Czego nie wiemy:** „Na mapie jest 46 z 78 parków." Powód: 23 nie znaleziono po nazwie, 8 bez domkniętego obrysu, 1 z konturem należącym do innego parku (Planty Bieńczyckie); 44,9% powierzchni. Atrybucja OSM (ODbL) pod mapą.
 - **Podłączenie:** trzy kroki w numerowanych plakietkach, adres `https://lajkonektor.sendyka.workers.dev/mcp` z przyciskiem kopiowania (etykieta zmienia się na „Skopiowano" tylko po udanym zapisie do schowka).
 - Hasło z `PROGRESS.md` „Podłącz Kraków" nie weszło do H1; pasuje na przycisk lub podtytuł, jeśli zespół woli.
 
@@ -100,7 +100,7 @@ Kolejność: nagłówek → hero z działającym demo → **Rozkład narzędzi**
 
 ## Prawdziwe czy przykładowe
 
-- **Prawdziwe:** parki (`parki-osm.json`, migawka 19.10.2026), sumy po dzielnicach, pokrycie 47/78 i 46,9%, szereg GUS BDL (zmienna 461691, powiat m. Kraków, grudzień 2011-2025), lista narzędzi i adres konektora.
+- **Prawdziwe:** parki (`parki-osm.json`, migawka 19.10.2026), sumy po dzielnicach, pokrycie 46/78 i 44,9%, szereg GUS BDL (zmienna 461691, powiat m. Kraków, grudzień 2011-2025), lista narzędzi i adres konektora.
 - **Przykładowe (podpisane w stopkach):** odjazdy, trasa, przystanki, status źródeł (w tym 522 dla ZTP).
 
 ## Znane problemy i niesprawdzone

@@ -1,0 +1,1122 @@
+{
+ "_widok": "parki",
+ "_zapytanie": {
+  "tylko_z_geometria": true
+ },
+ "podsumowanie": "Parków: 46. Pokrycie konturów OSM: 46 z 78 parków (44.9% powierzchni).",
+ "zrodlo": "Tabela: Otwarte Dane Miasta Krakowa (parki miejskie). Geometria: © współtwórcy OpenStreetMap, ODbL.",
+ "migawka": "2026-10-19",
+ "uwaga": "Geometria pochodzi z OSM i dotyczy tylko części parków z tabeli OD. Pole 'zgodnosc' mówi, czy dopasowanie potwierdza powierzchnia. Parki bez geometrii nie wchodzą do analiz przestrzennych.",
+ "pokrycie": {
+  "parki_z_geometria": 46,
+  "parki_ogolem": 78,
+  "udzial_powierzchni_proc": 44.9
+ },
+ "liczba": 46,
+ "parki": [
+  {
+   "lp": 1,
+   "nazwa": "Błonia Krakowskie",
+   "typ": "Park typu błonia (łąka publiczna)",
+   "dzielnica": "VII Zwierzyniec",
+   "powierzchnia_od_ha": 41.72,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/25113592",
+    "nazwa": "Błonia Krakowskie",
+    "powierzchnia_osm_ha": 41.61,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.059747,
+     "lon": 19.910178
+    },
+    "bbox": [
+     19.901035,
+     50.056992,
+     19.923133,
+     50.062442
+    ]
+   }
+  },
+  {
+   "lp": 5,
+   "nazwa": "Park Aleksandry",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów - Prokocim",
+   "powierzchnia_od_ha": 14.53,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26249071",
+    "nazwa": "Park Aleksandry",
+    "powierzchnia_osm_ha": 15.11,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.012124,
+     "lon": 20.013865
+    },
+    "bbox": [
+     20.010769,
+     50.008573,
+     20.016917,
+     50.016087
+    ]
+   }
+  },
+  {
+   "lp": 6,
+   "nazwa": "Park Aleksandry Północ",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów - Prokocim",
+   "powierzchnia_od_ha": 6.88,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/64868810",
+    "nazwa": "Park Aleksandry-Północ",
+    "powierzchnia_osm_ha": 6.79,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.018658,
+     "lon": 20.010426
+    },
+    "bbox": [
+     20.007588,
+     50.016365,
+     20.01376,
+     50.020871
+    ]
+   }
+  },
+  {
+   "lp": 8,
+   "nazwa": "Park Czyżyny",
+   "typ": "Park",
+   "dzielnica": "XIV Czyżyny",
+   "powierzchnia_od_ha": 3.04,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/844713460",
+    "nazwa": "Park Czyżyny",
+    "powierzchnia_osm_ha": 3.03,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.079827,
+     "lon": 20.000609
+    },
+    "bbox": [
+     19.998958,
+     50.078407,
+     20.002386,
+     50.081332
+    ]
+   }
+  },
+  {
+   "lp": 10,
+   "nazwa": "Park Decjusza",
+   "typ": "Park",
+   "dzielnica": "VII Zwierzyniec",
+   "powierzchnia_od_ha": 10.1,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26485272",
+    "nazwa": "Park Decjusza",
+    "powierzchnia_osm_ha": 7.91,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.064784,
+     "lon": 19.872592
+    },
+    "bbox": [
+     19.87043,
+     50.062526,
+     19.87464,
+     50.066486
+    ]
+   }
+  },
+  {
+   "lp": 12,
+   "nazwa": "Park Duchacki",
+   "typ": "Park",
+   "dzielnica": "XI Podgórze Duchackie",
+   "powierzchnia_od_ha": 2.94,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/912392095",
+    "nazwa": "Park Duchacki",
+    "powierzchnia_osm_ha": 2.96,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.020968,
+     "lon": 19.965885
+    },
+    "bbox": [
+     19.964268,
+     50.019741,
+     19.96737,
+     50.022075
+    ]
+   }
+  },
+  {
+   "lp": 15,
+   "nazwa": "Park Grzegórzecki",
+   "typ": "Park na terenie fortecznym",
+   "dzielnica": "II Grzegórzki",
+   "powierzchnia_od_ha": 5.32,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/652102108",
+    "nazwa": "Park Grzegórzecki",
+    "powierzchnia_osm_ha": 5.23,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.054735,
+     "lon": 19.968057
+    },
+    "bbox": [
+     19.965433,
+     50.053732,
+     19.97009,
+     50.056076
+    ]
+   }
+  },
+  {
+   "lp": 17,
+   "nazwa": "Park im. Henryka Jordana",
+   "typ": "Park",
+   "dzielnica": "V Krowodrza",
+   "powierzchnia_od_ha": 20.8,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/25113939",
+    "nazwa": "Park Jordana",
+    "powierzchnia_osm_ha": 20.61,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.062633,
+     "lon": 19.916232
+    },
+    "bbox": [
+     19.912327,
+     50.060107,
+     19.919645,
+     50.065315
+    ]
+   }
+  },
+  {
+   "lp": 18,
+   "nazwa": "Park im. Stanisława Wyspiańskiego",
+   "typ": "Park",
+   "dzielnica": "IV Prądnik Biały",
+   "powierzchnia_od_ha": 2.56,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/39273032",
+    "nazwa": "Park imienia Stanisława Wyspiańskiego",
+    "powierzchnia_osm_ha": 2.42,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.085965,
+     "lon": 19.920766
+    },
+    "bbox": [
+     19.919252,
+     50.08504,
+     19.921943,
+     50.086753
+    ]
+   }
+  },
+  {
+   "lp": 19,
+   "nazwa": "Park im. Stefana Żeromskiego",
+   "typ": "Park",
+   "dzielnica": "XVIII Nowa Huta",
+   "powierzchnia_od_ha": 3.47,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/107575325",
+    "nazwa": "Park imienia Stefana Żeromskiego",
+    "powierzchnia_osm_ha": 2.37,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.066691,
+     "lon": 20.042805
+    },
+    "bbox": [
+     20.041294,
+     50.065699,
+     20.0448,
+     50.067637
+    ]
+   }
+  },
+  {
+   "lp": 20,
+   "nazwa": "Park im. Tadeusza Kościuszki",
+   "typ": "Park",
+   "dzielnica": "IV Prądnik Biały",
+   "powierzchnia_od_ha": 4.41,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26534890",
+    "nazwa": "Park im. Tadeusza Kościuszki",
+    "powierzchnia_osm_ha": 6.24,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.093444,
+     "lon": 19.941241
+    },
+    "bbox": [
+     19.938707,
+     50.092173,
+     19.944548,
+     50.094818
+    ]
+   }
+  },
+  {
+   "lp": 21,
+   "nazwa": "Park im. Wisławy Szymborskiej",
+   "typ": "Park",
+   "dzielnica": "I Stare Miasto",
+   "powierzchnia_od_ha": 0.75,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/39393926",
+    "nazwa": "Park im. Wisławy Szymborskiej",
+    "powierzchnia_osm_ha": 0.79,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.065294,
+     "lon": 19.929006
+    },
+    "bbox": [
+     19.927513,
+     50.06493,
+     19.930534,
+     50.065653
+    ]
+   }
+  },
+  {
+   "lp": 22,
+   "nazwa": "Park im. Wojciecha Bednarskiego",
+   "typ": "Park",
+   "dzielnica": "XIII Podgórze",
+   "powierzchnia_od_ha": 8.24,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26344189",
+    "nazwa": "Park imienia Wojciecha Bednarskiego",
+    "powierzchnia_osm_ha": 7.14,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.041662,
+     "lon": 19.949086
+    },
+    "bbox": [
+     19.946139,
+     50.040448,
+     19.952349,
+     50.043026
+    ]
+   }
+  },
+  {
+   "lp": 23,
+   "nazwa": "Park Jalu Kurka",
+   "typ": "Park",
+   "dzielnica": "I Stare Miasto",
+   "powierzchnia_od_ha": 2.09,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/44135132",
+    "nazwa": "Park Jalu Kurka",
+    "powierzchnia_osm_ha": 1.61,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.069541,
+     "lon": 19.941947
+    },
+    "bbox": [
+     19.940787,
+     50.068838,
+     19.943146,
+     50.070743
+    ]
+   }
+  },
+  {
+   "lp": 24,
+   "nazwa": "Park Jana Matejki",
+   "typ": "Park",
+   "dzielnica": "XVII Wzgórza Krzesławickie",
+   "powierzchnia_od_ha": 4.11,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/128504976",
+    "nazwa": "Park wokół Dworku Jana Matejki",
+    "powierzchnia_osm_ha": 3.7,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.081614,
+     "lon": 20.054732
+    },
+    "bbox": [
+     20.053173,
+     50.080268,
+     20.056556,
+     50.082731
+    ]
+   }
+  },
+  {
+   "lp": 26,
+   "nazwa": "Park Kleparski",
+   "typ": "Park",
+   "dzielnica": "V Krowodrza",
+   "powierzchnia_od_ha": 3.95,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26532982",
+    "nazwa": "Park Kleparski",
+    "powierzchnia_osm_ha": 3.24,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.076142,
+     "lon": 19.938053
+    },
+    "bbox": [
+     19.936164,
+     50.074696,
+     19.939881,
+     50.077213
+    ]
+   }
+  },
+  {
+   "lp": 27,
+   "nazwa": "Park Kolejowy",
+   "typ": "Park",
+   "dzielnica": "II Grzegórzki",
+   "powierzchnia_od_ha": 0.92,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1432779904",
+    "nazwa": "Park Kolejowy",
+    "powierzchnia_osm_ha": 0.99,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.059938,
+     "lon": 19.94774
+    },
+    "bbox": [
+     19.947398,
+     50.058725,
+     19.948107,
+     50.061339
+    ]
+   }
+  },
+  {
+   "lp": 29,
+   "nazwa": "Park Krowoderski",
+   "typ": "Park",
+   "dzielnica": "IV Prądnik Biały",
+   "powierzchnia_od_ha": 8.95,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/39273160",
+    "nazwa": "Park Krowoderski",
+    "powierzchnia_osm_ha": 9.33,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.089025,
+     "lon": 19.921143
+    },
+    "bbox": [
+     19.918253,
+     50.087177,
+     19.923729,
+     50.090854
+    ]
+   }
+  },
+  {
+   "lp": 31,
+   "nazwa": "Park Kurczaba",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów - Prokocim",
+   "powierzchnia_od_ha": 1.78,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26257460",
+    "nazwa": "Park Dolina Kurczaba",
+    "powierzchnia_osm_ha": 1.89,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.012881,
+     "lon": 20.004982
+    },
+    "bbox": [
+     20.00377,
+     50.011972,
+     20.006312,
+     50.013676
+    ]
+   }
+  },
+  {
+   "lp": 32,
+   "nazwa": "Park Kurdwanów",
+   "typ": "Park",
+   "dzielnica": "XI Podgórze Duchackie",
+   "powierzchnia_od_ha": 5.06,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/90702978",
+    "nazwa": "Park Kurdwanów",
+    "powierzchnia_osm_ha": 6.04,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.010383,
+     "lon": 19.955586
+    },
+    "bbox": [
+     19.949174,
+     50.009499,
+     19.961828,
+     50.012054
+    ]
+   }
+  },
+  {
+   "lp": 33,
+   "nazwa": "Park Lilli Wenedy",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów - Prokocim",
+   "powierzchnia_od_ha": 9.08,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/26259194",
+    "nazwa": "Park Lilli Wenedy",
+    "powierzchnia_osm_ha": 10.44,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.020297,
+     "lon": 20.002719
+    },
+    "bbox": [
+     20.000191,
+     50.018638,
+     20.006338,
+     50.022092
+    ]
+   }
+  },
+  {
+   "lp": 38,
+   "nazwa": "Park Maćka i Doroty",
+   "typ": "Park",
+   "dzielnica": "X Swoszowice",
+   "powierzchnia_od_ha": 8.54,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/49002874",
+    "nazwa": "Park Maćka i Doroty",
+    "powierzchnia_osm_ha": 8.74,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.002425,
+     "lon": 19.910831
+    },
+    "bbox": [
+     19.905615,
+     50.001451,
+     19.916629,
+     50.003677
+    ]
+   }
+  },
+  {
+   "lp": 39,
+   "nazwa": "Park Miejski Bagry Wielkie",
+   "typ": "Park",
+   "dzielnica": "XIII Podgórze",
+   "powierzchnia_od_ha": 49.19,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1473988053",
+    "nazwa": "Park Miejski Bagry Wielkie",
+    "powierzchnia_osm_ha": 48.21,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.032822,
+     "lon": 19.991111
+    },
+    "bbox": [
+     19.982832,
+     50.030139,
+     19.999884,
+     50.036222
+    ]
+   }
+  },
+  {
+   "lp": 42,
+   "nazwa": "Park Ogród nad Sudołem",
+   "typ": "Park",
+   "dzielnica": "III Prądnik Czerwony",
+   "powierzchnia_od_ha": 1.26,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/266904511",
+    "nazwa": "Ogród nad Sudołem",
+    "powierzchnia_osm_ha": 1.24,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.090335,
+     "lon": 19.968959
+    },
+    "bbox": [
+     19.967777,
+     50.089665,
+     19.969875,
+     50.090832
+    ]
+   }
+  },
+  {
+   "lp": 45,
+   "nazwa": "Park przy ul. Łokietka",
+   "typ": "Park",
+   "dzielnica": "V Krowodrza",
+   "powierzchnia_od_ha": 1.61,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1503647315",
+    "nazwa": "Park Łokietka",
+    "powierzchnia_osm_ha": 1.75,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.080184,
+     "lon": 19.927901
+    },
+    "bbox": [
+     19.926703,
+     50.079088,
+     19.928826,
+     50.081007
+    ]
+   }
+  },
+  {
+   "lp": 46,
+   "nazwa": "Park przy ul. Radzikowskiego",
+   "typ": "Park",
+   "dzielnica": "VI Bronowice",
+   "powierzchnia_od_ha": 3.16,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1127489351",
+    "nazwa": "Park Radzikowskiego",
+    "powierzchnia_osm_ha": 2.73,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.086949,
+     "lon": 19.887661
+    },
+    "bbox": [
+     19.886367,
+     50.08574,
+     19.889282,
+     50.08798
+    ]
+   }
+  },
+  {
+   "lp": 50,
+   "nazwa": "Park Ratuszowy",
+   "typ": "Park",
+   "dzielnica": "XVIII Nowa Huta",
+   "powierzchnia_od_ha": 2.22,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/25995071",
+    "nazwa": "Park Ratuszowy",
+    "powierzchnia_osm_ha": 2.25,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.075632,
+     "lon": 20.039731
+    },
+    "bbox": [
+     20.038529,
+     50.074803,
+     20.040934,
+     50.076459
+    ]
+   }
+  },
+  {
+   "lp": 51,
+   "nazwa": "Park Reduta",
+   "typ": "Park",
+   "dzielnica": "III Prądnik Czerwony",
+   "powierzchnia_od_ha": 7.71,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/595077343",
+    "nazwa": "Park Reduta",
+    "powierzchnia_osm_ha": 8.01,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.096474,
+     "lon": 19.985465
+    },
+    "bbox": [
+     19.982344,
+     50.095238,
+     19.988055,
+     50.097887
+    ]
+   }
+  },
+  {
+   "lp": 52,
+   "nazwa": "Park Rzeczny Białucha",
+   "typ": "Park rzeczny",
+   "dzielnica": "III Prądnik Czerwony",
+   "powierzchnia_od_ha": 8.03,
+   "zgodnosc": "nazwa (powierzchnia OSM różni się >2x)",
+   "osm": {
+    "id": "way/1495821305",
+    "nazwa": "Park Rzeczny Białucha",
+    "powierzchnia_osm_ha": 1.56,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.083434,
+     "lon": 19.957209
+    },
+    "bbox": [
+     19.955696,
+     50.081683,
+     19.958659,
+     50.085342
+    ]
+   }
+  },
+  {
+   "lp": 58,
+   "nazwa": "Park Rżąka",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów - Prokocim",
+   "powierzchnia_od_ha": 3.64,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1516075182",
+    "nazwa": "Park Rżąka",
+    "powierzchnia_osm_ha": 3.59,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.00808,
+     "lon": 20.007576
+    },
+    "bbox": [
+     20.00422,
+     50.006887,
+     20.010933,
+     50.009294
+    ]
+   }
+  },
+  {
+   "lp": 59,
+   "nazwa": "Park Solvay",
+   "typ": "Park",
+   "dzielnica": "IX Łagiewniki - Borek Fałęcki",
+   "powierzchnia_od_ha": 13.21,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1456936869",
+    "nazwa": "Park Solvay",
+    "powierzchnia_osm_ha": 16.93,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.015767,
+     "lon": 19.925036
+    },
+    "bbox": [
+     19.919968,
+     50.012788,
+     19.929574,
+     50.018923
+    ]
+   }
+  },
+  {
+   "lp": 60,
+   "nazwa": "Park Stacja Wisła",
+   "typ": "Park",
+   "dzielnica": "XIII Podgórze",
+   "powierzchnia_od_ha": 1.39,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/525229887",
+    "nazwa": "Park Stacja Wisła",
+    "powierzchnia_osm_ha": 1.22,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.050752,
+     "lon": 19.959558
+    },
+    "bbox": [
+     19.958142,
+     50.050143,
+     19.960982,
+     50.051443
+    ]
+   }
+  },
+  {
+   "lp": 62,
+   "nazwa": "Park Strzelecki",
+   "typ": "Park",
+   "dzielnica": "II Grzegórzki",
+   "powierzchnia_od_ha": 1.47,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/512161274",
+    "nazwa": "Park Strzelecki",
+    "powierzchnia_osm_ha": 1.49,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.066126,
+     "lon": 19.950077
+    },
+    "bbox": [
+     19.949228,
+     50.065026,
+     19.950841,
+     50.067256
+    ]
+   }
+  },
+  {
+   "lp": 63,
+   "nazwa": "Park Szwedzki",
+   "typ": "Park",
+   "dzielnica": "XVIII Nowa Huta",
+   "powierzchnia_od_ha": 2.2,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/45819128",
+    "nazwa": "Park Szwedzki",
+    "powierzchnia_osm_ha": 2.01,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.074572,
+     "lon": 20.043619
+    },
+    "bbox": [
+     20.041968,
+     50.073837,
+     20.045842,
+     50.075285
+    ]
+   }
+  },
+  {
+   "lp": 64,
+   "nazwa": "Park św. Wincentego a'Paulo",
+   "typ": "Park",
+   "dzielnica": "V Krowodrza",
+   "powierzchnia_od_ha": 2.14,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/44518401",
+    "nazwa": "Park Świętego Wincentego á Paulo",
+    "powierzchnia_osm_ha": 1.85,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.070747,
+     "lon": 19.911884
+    },
+    "bbox": [
+     19.910594,
+     50.0694,
+     19.913843,
+     50.071539
+    ]
+   }
+  },
+  {
+   "lp": 65,
+   "nazwa": "Park Tysiąclecia",
+   "typ": "Park",
+   "dzielnica": "XV Mistrzejowice",
+   "powierzchnia_od_ha": 12.58,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/54118410",
+    "nazwa": "Park Tysiąclecia",
+    "powierzchnia_osm_ha": 11.95,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.090031,
+     "lon": 19.997399
+    },
+    "bbox": [
+     19.994253,
+     50.087767,
+     20.001222,
+     50.093144
+    ]
+   }
+  },
+  {
+   "lp": 68,
+   "nazwa": "Park Wiśniowy Sad",
+   "typ": "Park",
+   "dzielnica": "XVIII Nowa Huta",
+   "powierzchnia_od_ha": 3.93,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/83156465",
+    "nazwa": "Park Wiśniowy Sad",
+    "powierzchnia_osm_ha": 2.7,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.075877,
+     "lon": 20.027554
+    },
+    "bbox": [
+     20.025333,
+     50.075346,
+     20.029838,
+     50.076482
+    ]
+   }
+  },
+  {
+   "lp": 69,
+   "nazwa": "Park Woźniców",
+   "typ": "Park",
+   "dzielnica": "XIV Czyżyny",
+   "powierzchnia_od_ha": 0.9,
+   "zgodnosc": "nazwa (powierzchnia OSM różni się >2x)",
+   "osm": {
+    "id": "way/1495841060",
+    "nazwa": "Park Woźniców",
+    "powierzchnia_osm_ha": 1.88,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.065684,
+     "lon": 20.014139
+    },
+    "bbox": [
+     20.013141,
+     50.064771,
+     20.015292,
+     50.066419
+    ]
+   }
+  },
+  {
+   "lp": 70,
+   "nazwa": "Park Zaczarowanej Dorożki (Stawy Dominikańskie)",
+   "typ": "Park",
+   "dzielnica": "III Prądnik Czerwony",
+   "powierzchnia_od_ha": 2.07,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/276312612",
+    "nazwa": "Park Zaczarowanej Dorożki",
+    "powierzchnia_osm_ha": 2.48,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.086751,
+     "lon": 19.966165
+    },
+    "bbox": [
+     19.964238,
+     50.086129,
+     19.967668,
+     50.087582
+    ]
+   }
+  },
+  {
+   "lp": 71,
+   "nazwa": "Park Zakrzówek",
+   "typ": "Park",
+   "dzielnica": "VIII Dębniki",
+   "powierzchnia_od_ha": 48.76,
+   "zgodnosc": "nazwa (powierzchnia OSM różni się >2x)",
+   "osm": {
+    "id": "way/1460614954",
+    "nazwa": "Zakrzówek",
+    "powierzchnia_osm_ha": 17.32,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.036413,
+     "lon": 19.916257
+    },
+    "bbox": [
+     19.911894,
+     50.032414,
+     19.920265,
+     50.039938
+    ]
+   }
+  },
+  {
+   "lp": 72,
+   "nazwa": "Park Zalew Nowohucki",
+   "typ": "Park",
+   "dzielnica": "XVI Bieńczyce",
+   "powierzchnia_od_ha": 14.47,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/128505095",
+    "nazwa": "Park Zalew Nowohucki",
+    "powierzchnia_osm_ha": 14.99,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.078983,
+     "lon": 20.052903
+    },
+    "bbox": [
+     20.049551,
+     50.076422,
+     20.056353,
+     50.08189
+    ]
+   }
+  },
+  {
+   "lp": 73,
+   "nazwa": "Park Zielony Jar Wandy",
+   "typ": "Park",
+   "dzielnica": "XVII Wzgórza Krzesławickie",
+   "powierzchnia_od_ha": 5.89,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/54531043",
+    "nazwa": "Park Zielony Jar Wandy",
+    "powierzchnia_osm_ha": 6.28,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.094734,
+     "lon": 20.058986
+    },
+    "bbox": [
+     20.056037,
+     50.091979,
+     20.061326,
+     50.097053
+    ]
+   }
+  },
+  {
+   "lp": 74,
+   "nazwa": "Park Złocień",
+   "typ": "Park",
+   "dzielnica": "XII Bieżanów",
+   "powierzchnia_od_ha": 0.69,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1248085752",
+    "nazwa": "Park Złocień",
+    "powierzchnia_osm_ha": 0.71,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.023988,
+     "lon": 20.048845
+    },
+    "bbox": [
+     20.046441,
+     50.023864,
+     20.051186,
+     50.024118
+    ]
+   }
+  },
+  {
+   "lp": 76,
+   "nazwa": "Planty Floriana Nowackiego",
+   "typ": "Park",
+   "dzielnica": "XIII Podgórze",
+   "powierzchnia_od_ha": 2.59,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/25517366",
+    "nazwa": "Park Planty Floriana Nowackiego",
+    "powierzchnia_osm_ha": 2.12,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.043575,
+     "lon": 19.942796
+    },
+    "bbox": [
+     19.941144,
+     50.042923,
+     19.944604,
+     50.044171
+    ]
+   }
+  },
+  {
+   "lp": 77,
+   "nazwa": "Planty Krakowskie",
+   "typ": "Park",
+   "dzielnica": "I Stare Miasto",
+   "powierzchnia_od_ha": 20.4,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/1221128266",
+    "nazwa": "Planty",
+    "powierzchnia_osm_ha": 21.45,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.061502,
+     "lon": 19.938291
+    },
+    "bbox": [
+     19.931882,
+     50.054287,
+     19.944968,
+     50.06621
+    ]
+   }
+  },
+  {
+   "lp": 78,
+   "nazwa": "Planty Mistrzejowickie",
+   "typ": "Park",
+   "dzielnica": "XV Mistrzejowice",
+   "powierzchnia_od_ha": 10.54,
+   "zgodnosc": "nazwa+powierzchnia",
+   "osm": {
+    "id": "way/65738893",
+    "nazwa": "Planty Mistrzejowickie",
+    "powierzchnia_osm_ha": 11.53,
+    "niepelna_geometria": false,
+    "srodek": {
+     "lat": 50.097447,
+     "lon": 20.005422
+    },
+    "bbox": [
+     20.001856,
+     50.09402,
+     20.007996,
+     50.100665
+    ]
+   }
+  }
+ ]
+}

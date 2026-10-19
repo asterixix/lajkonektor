@@ -1,0 +1,129 @@
+{
+ "_widok": "tabela",
+ "_zapytanie": {
+  "id": "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia",
+  "sortuj": "ha desc",
+  "limit": 100,
+  "grupuj_po": [
+   "Dzielnica"
+  ],
+  "agreguj": [
+   {
+    "fn": "sum",
+    "pole": "Powierzchnia_ha",
+    "nazwa": "ha"
+   },
+   {
+    "fn": "count",
+    "pole": "Lp",
+    "nazwa": "parki"
+   }
+  ]
+ },
+ "podsumowanie": "Zwrócono 20 wierszy ze zbioru od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia.",
+ "zrodlo": "OD-SrodowiskoParkiMiejskie / parki-miejskie-powierzchnia",
+ "zbior": "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia",
+ "wiersze_zwrocone": 20,
+ "wiersze": [
+  {
+   "Dzielnica": "XVIII Nowa Huta",
+   "ha": 145.446,
+   "parki": 8
+  },
+  {
+   "Dzielnica": "VII Zwierzyniec",
+   "ha": 111.15719999999999,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "XIII Podgórze",
+   "ha": 84.0246,
+   "parki": 6
+  },
+  {
+   "Dzielnica": "VIII Dębniki",
+   "ha": 55.7669,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "XIV Czyżyny",
+   "ha": 54.444300000000005,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "XI Podgórze Duchackie",
+   "ha": 47.0271,
+   "parki": 3
+  },
+  {
+   "Dzielnica": "XII Bieżanów - Prokocim",
+   "ha": 44.461499999999994,
+   "parki": 7
+  },
+  {
+   "Dzielnica": "VI Bronowice",
+   "ha": 39.7602,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "XV Mistrzejowice",
+   "ha": 37.3204,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "IX Łagiewniki - Borek Fałęcki",
+   "ha": 36.6154,
+   "parki": 3
+  },
+  {
+   "Dzielnica": "I, II, VII, VIII, XIII",
+   "ha": 36.0054,
+   "parki": 1
+  },
+  {
+   "Dzielnica": "V Krowodrza",
+   "ha": 34.6134,
+   "parki": 6
+  },
+  {
+   "Dzielnica": "XVI Bieńczyce",
+   "ha": 31.7292,
+   "parki": 2
+  },
+  {
+   "Dzielnica": "I Stare Miasto",
+   "ha": 23.2318,
+   "parki": 3
+  },
+  {
+   "Dzielnica": "XVII Wzgórza Krzesławickie",
+   "ha": 19.3753,
+   "parki": 5
+  },
+  {
+   "Dzielnica": "III Prądnik Czerwony",
+   "ha": 19.0732,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "II Grzegórzki",
+   "ha": 16.1596,
+   "parki": 4
+  },
+  {
+   "Dzielnica": "IV Prądnik Biały",
+   "ha": 15.9172,
+   "parki": 3
+  },
+  {
+   "Dzielnica": "X Swoszowice",
+   "ha": 13.304200000000002,
+   "parki": 2
+  },
+  {
+   "Dzielnica": "XII Bieżanów",
+   "ha": 0.6853,
+   "parki": 1
+  }
+ ]
+}

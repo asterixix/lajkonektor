@@ -1,0 +1,167 @@
+{
+ "_widok": "prognoza",
+ "_zapytanie": {
+  "serie": [
+   {
+    "x": 2015,
+    "y": 4.4
+   },
+   {
+    "x": 2016,
+    "y": 3.5
+   },
+   {
+    "x": 2017,
+    "y": 2.7
+   },
+   {
+    "x": 2018,
+    "y": 2.3
+   },
+   {
+    "x": 2019,
+    "y": 2
+   },
+   {
+    "x": 2020,
+    "y": 3.1
+   },
+   {
+    "x": 2021,
+    "y": 2.8
+   },
+   {
+    "x": 2022,
+    "y": 2.3
+   },
+   {
+    "x": 2023,
+    "y": 1.9
+   },
+   {
+    "x": 2024,
+    "y": 2
+   },
+   {
+    "x": 2025,
+    "y": 2.5
+   }
+  ],
+  "horyzont": 3,
+  "metoda": "auto",
+  "etykieta": "Stopa bezrobocia rejestrowanego, Kraków (%)"
+ },
+ "podsumowanie": "Projekcja metodą wykladniczy: 2026: 1,9 (przedział 95%: 1,1–3,26). To projekcja trendu, nie przewidywanie. Ostrzeżenia: Przedział 95% na końcu horyzontu jest szerszy niż sama wartość: prognoza jest praktycznie niezdecydowana. Duży błąd w backteście (MAPE 14.815%): model słabo opisuje dane, traktuj prognozę jako orientacyjną.",
+ "etykieta": "Stopa bezrobocia rejestrowanego, Kraków (%)",
+ "metoda": "wykladniczy",
+ "opis_metody": "Wzrost wykładniczy (regresja liniowa na logarytmach): stała procentowa zmiana na krok; wymaga wartości dodatnich; przedział liczony na skali logarytmicznej i przeliczony z powrotem.",
+ "wybor": "automatyczny: najmniejszy błąd MAE w backteście z przesuwanym początkiem (remis: model liniowy)",
+ "parametry": {
+  "wzrost_na_krok_proc": -5.121,
+  "odchylenie_reszt_log": 0.20183,
+  "stopnie_swobody": 9
+ },
+ "jakosc": {
+  "punktow": 11,
+  "r2": 0.453,
+  "backtest_mae": 0.34,
+  "backtest_mape_proc": 14.815,
+  "backtest_testow": 3
+ },
+ "porownanie_metod": [
+  {
+   "metoda": "liniowy",
+   "backtest_mae": 0.402
+  },
+  {
+   "metoda": "wykladniczy",
+   "backtest_mae": 0.34
+  },
+  {
+   "metoda": "holt",
+   "backtest_mae": 0.405
+  }
+ ],
+ "serie": [
+  {
+   "x": 2015,
+   "y": 4.4
+  },
+  {
+   "x": 2016,
+   "y": 3.5
+  },
+  {
+   "x": 2017,
+   "y": 2.7
+  },
+  {
+   "x": 2018,
+   "y": 2.3
+  },
+  {
+   "x": 2019,
+   "y": 2
+  },
+  {
+   "x": 2020,
+   "y": 3.1
+  },
+  {
+   "x": 2021,
+   "y": 2.8
+  },
+  {
+   "x": 2022,
+   "y": 2.3
+  },
+  {
+   "x": 2023,
+   "y": 1.9
+  },
+  {
+   "x": 2024,
+   "y": 2
+  },
+  {
+   "x": 2025,
+   "y": 2.5
+  }
+ ],
+ "ostatni_punkt": {
+  "x": 2025,
+  "y": 2.5
+ },
+ "krok": 1,
+ "prognoza": [
+  {
+   "x": 2026,
+   "wartosc": 1.895,
+   "dolna_80": 1.359,
+   "gorna_80": 2.642,
+   "dolna_95": 1.1,
+   "gorna_95": 3.263
+  },
+  {
+   "x": 2027,
+   "wartosc": 1.798,
+   "dolna_80": 1.272,
+   "gorna_80": 2.541,
+   "dolna_95": 1.021,
+   "gorna_95": 3.166
+  },
+  {
+   "x": 2028,
+   "wartosc": 1.706,
+   "dolna_80": 1.189,
+   "gorna_80": 2.447,
+   "dolna_95": 0.945,
+   "gorna_95": 3.078
+  }
+ ],
+ "ostrzezenia": [
+  "Przedział 95% na końcu horyzontu jest szerszy niż sama wartość: prognoza jest praktycznie niezdecydowana.",
+  "Duży błąd w backteście (MAPE 14.815%): model słabo opisuje dane, traktuj prognozę jako orientacyjną."
+ ],
+ "uwaga": "Projekcja trendu z danych historycznych, nie przewidywanie: nie uwzględnia zdarzeń zewnętrznych (polityka, migracje, kryzysy). Przedziały opisują niepewność statystyczną modelu, nie ryzyko zmiany reżimu."
+}

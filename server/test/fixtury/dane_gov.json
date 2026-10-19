@@ -1,0 +1,61 @@
+{
+ "_widok": "dane_gov",
+ "_zapytanie": {
+  "q": "Kraków ceny mieszkań",
+  "limit": 4
+ },
+ "podsumowanie": "",
+ "zrodlo": "dane.gov.pl (Portal Danych Otwartych)",
+ "razem": 21620,
+ "zbiory": [
+  {
+   "id": "7732",
+   "tytul": "FHU Małgorzata Bugiel, ceny mieszkań, naziemnych miejsc parkingowych oraz komórek lokatorskich Panorama Słoneczna",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera udostępniane zgodnie",
+   "formaty": [
+    "csv",
+    "jsonld",
+    "xlsx"
+   ],
+   "url": "https://dane.gov.pl/pl/dataset/7732",
+   "slowa_kluczowe": [
+    "mieszkania ceny"
+   ]
+  },
+  {
+   "id": "42145",
+   "tytul": "Ceny ofertowe mieszkań dewelopera Osiedle w Dolinie Sp. z o.o. na dzień 19.10.2026 r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań",
+   "formaty": [
+    "xlsx"
+   ],
+   "url": "https://dane.gov.pl/pl/dataset/42145",
+   "slowa_kluczowe": [
+    "Domovo",
+    "Deweloper Osiedle w Dolinie"
+   ]
+  },
+  {
+   "id": "42144",
+   "tytul": "Dane dewelopera Bursztynowy Park w Rumi budynek B5 aktualizacja 19.10.2026r.",
+   "opis": "Dane dotyczące cen ofertowych mieszkań dewelopera Bursztynowy Park udostępnione zgodnie z art",
+   "formaty": [],
+   "url": "https://dane.gov.pl/pl/dataset/42144",
+   "slowa_kluczowe": [
+    "Rumia"
+   ]
+  },
+  {
+   "id": "6746",
+   "tytul": "Ceny ofertowe mieszkań dewelopera AB ARCHI – INWEST SPÓŁKA JAWNA A. ŚWIERCZEK, S. CAŁKA SPÓŁKA KOMANDYTOWA w 2025 r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera AB ARCHI – INWEST",
+   "formaty": [
+    "xlsx"
+   ],
+   "url": "https://dane.gov.pl/pl/dataset/6746",
+   "slowa_kluczowe": [
+    "deweloper AB ARCHI-INWEST"
+   ]
+  }
+ ]
+}

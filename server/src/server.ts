@@ -1,8 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/server";
+import { RESOURCE_MIME_TYPE, registerAppResource, registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { addressToPoint } from "./adres.ts";
 import { pozycje, szukaj } from "./katalog.ts";
-import { parkGeometry } from "./parki.ts";
+import { konturyParkow, parkGeometry } from "./parki.ts";
+import { KARTA_HTML } from "./ui/karta.generated.ts";
+import { podsumuj } from "./podsumowanie.ts";
 import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
 import { statusZrodel } from "./status.ts";
 import { plikOdczyt } from "./plik.ts";
@@ -18,11 +21,19 @@ const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: t
 async function run(fn: () => Promise<Record<string, unknown>>) {
   try {
     const data = await fn();
-    return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }], structuredContent: data };
+    return { content: [{ type: "text" as const, text: JSON.stringify(data) }], structuredContent: data };
   } catch (e) {
     return { isError: true, content: [{ type: "text" as const, text: `Błąd: ${(e as Error).message}` }] };
   }
 }
+
+// Karta MCP Apps wspólna dla wszystkich narzędzi: widok wybiera pole `_widok` w wyniku.
+const KARTA_URI = "ui://lajkonektor/karta.html";
+export const WIDOK: Record<string, string> = {
+  katalog_szukaj: "katalog", zbior_opis: "opis_zbioru", dane_zapytaj: "tabela", adres_na_punkt: "adres", parki_geometria: "parki",
+  bdl_szukaj: "bdl_lista", bdl_dane: "szereg", dane_gov: "dane_gov", przystanki_w_poblizu: "przystanki", odjazdy: "odjazdy",
+  trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik",
+};
 
 const geometria = z
   .union([
@@ -35,9 +46,23 @@ const geometria = z
   );
 
 export function createServer(cf?: { colo?: string; country?: string }): McpServer {
-  const server = new McpServer({ name: "lajkonektor", version: "0.2.0" });
+  const server = new McpServer({ name: "lajkonektor", version: "0.3.0" });
 
-  server.registerTool(
+  registerAppResource(server, "Karta Lajkonektora", KARTA_URI, { description: "Widoki wyników narzędzi: odjazdy, trasa, mapa parków, tabele, wykresy, prognoza." }, async () => ({
+    contents: [{ uri: KARTA_URI, mimeType: RESOURCE_MIME_TYPE, text: KARTA_HTML, _meta: { ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: [] } } } }],
+  }));
+
+  // Każde narzędzie ma kartę UI (klienci z MCP Apps) i pełny wynik tekstowy (pozostali). Do wyniku dokładamy widok,
+  // zapytanie (do odświeżania) i krótkie podsumowanie po polsku dla klientów bez UI.
+  const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) =>
+    registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
+      const r = await handler(args);
+      if (!r.structuredContent) return r;
+      const dane = { podsumowanie: podsumuj(nazwa, r.structuredContent), ...r.structuredContent };
+      return { content: [{ type: "text" as const, text: JSON.stringify(dane) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...dane } };
+    });
+
+  narzedzie(
     "katalog_szukaj",
     {
       title: "Szukaj danych o Krakowie",
@@ -60,7 +85,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       }),
   );
 
-  server.registerTool(
+  narzedzie(
     "zbior_opis",
     {
       title: "Opis zbioru danych",
@@ -71,7 +96,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     ({ id }) => run(() => zbiorOpis(id)),
   );
 
-  server.registerTool(
+  narzedzie(
     "dane_zapytaj",
     {
       title: "Zapytaj zbiór danych",
@@ -96,7 +121,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     (args) => run(() => daneZapytaj(args)),
   );
 
-  server.registerTool(
+  narzedzie(
     "adres_na_punkt",
     {
       title: "Adres na współrzędne",
@@ -112,7 +137,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     (args) => run(() => addressToPoint(args)),
   );
 
-  server.registerTool(
+  narzedzie(
     "parki_geometria",
     {
       title: "Parki z geometrią (OSM)",
@@ -128,7 +153,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     (args) => run(async () => parkGeometry(args)),
   );
 
-  server.registerTool(
+  narzedzie(
     "status_zrodel",
     {
       title: "Status źródeł danych",
@@ -139,7 +164,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     () => run(() => statusZrodel(cf)),
   );
 
-  server.registerTool(
+  narzedzie(
     "bdl_szukaj",
     {
       title: "Szukaj wskaźników GUS (BDL)",
@@ -154,7 +179,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     ({ nazwa, limit }) => run(() => bdlSzukaj(nazwa, limit)),
   );
 
-  server.registerTool(
+  narzedzie(
     "bdl_dane",
     {
       title: "Dane GUS (BDL) dla Krakowa",
@@ -170,7 +195,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     (args) => run(() => bdlDane(args)),
   );
 
-  server.registerTool(
+  narzedzie(
     "dane_gov",
     {
       title: "Portal dane.gov.pl",
@@ -210,7 +235,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     return { lat: k.lat as number, lon: k.lon as number, etykieta: `${k.ulica} ${k.numer}, ${k.kod_pocztowy} (${k.dzielnica})`, zrodlo: "MSIP Kraków (punkty adresowe)" };
   };
 
-  server.registerTool(
+  narzedzie(
     "przystanki_w_poblizu",
     {
       title: "Przystanki komunikacji w pobliżu",
@@ -224,13 +249,13 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
         const [p, S] = await Promise.all([rozwiaz(m), wczytajSiec()]);
         const { kandydaci, zrodlo } = await kandydaciOsm(S, p, promien_m, limit);
         return {
-          miejsce: p.etykieta, zrodlo_miejsca: p.zrodlo, zrodlo_dojscia: zrodlo, feedy: S.feedy,
+          miejsce: p.etykieta, punkt: { lat: p.lat, lon: p.lon }, zrodlo_miejsca: p.zrodlo, zrodlo_dojscia: zrodlo, feedy: S.feedy,
           przystanki: kandydaci.map((k) => ({ ...opisPrzystanku(S, k.idx, k.m), dojscie_min: k.min })),
         };
       }),
   );
 
-  server.registerTool(
+  narzedzie(
     "odjazdy",
     {
       title: "Odjazdy na żywo",
@@ -264,7 +289,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       }),
   );
 
-  server.registerTool(
+  narzedzie(
     "trasa",
     {
       title: "Planer trasy komunikacją miejską",
@@ -288,17 +313,17 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
         return {
           zrodlo: "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; dojście: OSM",
           uwaga: "Szacunek, nie gwarancja: brak pełnego rozkładu, transfery do 200 m, maks. jedna przesiadka.",
-          z: { opis: pa.etykieta, zrodlo: pa.zrodlo }, do: { opis: pb.etykieta, zrodlo: pb.zrodlo },
+          z: { opis: pa.etykieta, zrodlo: pa.zrodlo, lat: pa.lat, lon: pa.lon }, do: { opis: pb.etykieta, zrodlo: pb.zrodlo, lat: pb.lat, lon: pb.lon },
           odleglosc_prosta_m: Math.round(odleglosc(pa.lat, pa.lon, pb.lat, pb.lon)),
           opcji: opcje.length,
           ...(bledy.length ? { bledy_realtime: bledy } : {}),
           komunikaty_o_utrudnieniach: dotyczace(k.komunikaty, linie, przyst).slice(0, 8),
-          opcje: pokazane.map(({ nogi, ...o }) => ({ ...o, nogi: nogi.map(({ wsiadanie_idx, wysiadanie_idx, wzorzec, ...n }) => n) })),
+          opcje: pokazane.map(({ nogi, ...o }) => ({ ...o, nogi: nogi.map(({ wsiadanie_idx, wysiadanie_idx, wzorzec, ...n }) => ({ ...n, wsiadanie_pkt: { lat: S.przystanki[wsiadanie_idx][3], lon: S.przystanki[wsiadanie_idx][4] }, wysiadanie_pkt: { lat: S.przystanki[wysiadanie_idx][3], lon: S.przystanki[wysiadanie_idx][4] } })) })),
         };
       }),
   );
 
-  server.registerTool(
+  narzedzie(
     "utrudnienia",
     {
       title: "Komunikaty o utrudnieniach ZTP",
@@ -315,7 +340,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       }),
   );
 
-  server.registerTool(
+  narzedzie(
     "prognoza",
     {
       title: "Prognoza szeregu czasowego",
@@ -335,7 +360,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       run(async () => ({ ...(etykieta ? { etykieta } : {}), ...prognoza({ serie, horyzont, metoda, krok, ostatnie_punkty }) })),
   );
 
-  server.registerTool(
+  narzedzie(
     "plik_odczyt",
     {
       title: "Odczyt pliku z otwartych danych",
@@ -357,6 +382,24 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       annotations: readOnly,
     },
     (args) => run(() => plikOdczyt(args)),
+  );
+
+  // Tylko dla aplikacji (niewidoczne dla modelu): uproszczone kontury parków do narysowania mapy, żeby nie zalewać kontekstu.
+  registerAppTool(
+    server,
+    "ui_kontury_parkow",
+    {
+      title: "Kontury parków dla mapy",
+      description: "Uproszczone kontury parków (OSM) do rysowania mapy w karcie. Narzędzie dla interfejsu, nie dla modelu.",
+      inputSchema: z.object({
+        lp: z.array(z.number().int()).max(60).optional(),
+        wokol_lp: z.number().int().optional().describe("Park centralny: dołącz sąsiadów w promieniu"),
+        promien_m: z.number().int().min(100).max(3000).default(900),
+      }),
+      annotations: readOnly,
+      _meta: { ui: { resourceUri: KARTA_URI, visibility: ["app"] } },
+    } as any,
+    async (args: any) => run(async () => konturyParkow(args)) as any,
   );
 
   return server;

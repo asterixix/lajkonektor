@@ -1,0 +1,44 @@
+{
+ "_widok": "bdl_lista",
+ "_zapytanie": {
+  "nazwa": "stopa bezrobocia",
+  "limit": 5
+ },
+ "podsumowanie": "",
+ "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+ "uwaga": "Wiele zmiennych ma tę samą nazwę dla różnych okresów (np. kwartałów); sprawdź pole 'nazwa' i użyj bdl_dane z kilkoma id.",
+ "razem_w_bdl": 334,
+ "zwrocono": 5,
+ "zmienne": [
+  {
+   "id": 450231,
+   "temat": "P3414",
+   "nazwa": "ogółem | ogółem | stopa bezrobocia | wartość liczbowa",
+   "jednostka_miary": "%"
+  },
+  {
+   "id": 450230,
+   "temat": "P3414",
+   "nazwa": "ogółem | ogółem | stopa bezrobocia | wskaźnik precyzji",
+   "jednostka_miary": "%"
+  },
+  {
+   "id": 450285,
+   "temat": "P3414",
+   "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wartość liczbowa",
+   "jednostka_miary": "%"
+  },
+  {
+   "id": 450284,
+   "temat": "P3414",
+   "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wskaźnik precyzji",
+   "jednostka_miary": "%"
+  },
+  {
+   "id": 450339,
+   "temat": "P3414",
+   "nazwa": "ogółem | kobiety | stopa bezrobocia | wartość liczbowa",
+   "jednostka_miary": "%"
+  }
+ ]
+}

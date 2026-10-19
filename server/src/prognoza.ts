@@ -182,6 +182,7 @@ export function prognoza(opts: { serie: Punkt[]; horyzont: number; metoda?: Meto
       backtest_testow: bt.testy,
     },
     porownanie_metod: porownanie.map((p) => ({ metoda: p.metoda, backtest_mae: Number.isFinite(p.mae) ? r(p.mae) : null })),
+    serie: pts,
     ostatni_punkt: pts[pts.length - 1],
     krok,
     prognoza: wyniki,

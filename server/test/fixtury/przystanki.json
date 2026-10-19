@@ -1,0 +1,217 @@
+{
+ "_widok": "przystanki",
+ "_zapytanie": {
+  "miejsce": {
+   "ulica": "Łojasiewicza",
+   "numer": "4"
+  },
+  "promien_m": 600,
+  "limit": 6
+ },
+ "podsumowanie": "12 przystanków w pobliżu: Norymberska (7 min pieszo, linie 662); Norymberska (7 min pieszo, linie 578); Norymberska (7 min pieszo, linie 11, 12, 17, 18, 62, 71); Ruczaj (7 min pieszo, linie 11, 12, 17, 18, 62, 71); Ruczaj (8 min pieszo, linie 662).",
+ "miejsce": "prof. Stanisława Łojasiewicza 4, 30-348 (Dzielnica VIII Dębniki)",
+ "punkt": {
+  "lat": 50.029916607804964,
+  "lon": 19.908323580405057
+ },
+ "zrodlo_miejsca": "MSIP Kraków (punkty adresowe)",
+ "zrodlo_dojscia": "OSM (OSRM, pieszo)",
+ "feedy": {
+  "A": {
+   "opis": "autobus",
+   "wersja": "20261017_20261020",
+   "last_modified": "Mon, 19 Oct 2026 07:12:17 GMT",
+   "zbudowano": "2026-10-19T19:10:21.727Z"
+  },
+  "T": {
+   "opis": "tramwaj",
+   "wersja": "20261017",
+   "last_modified": "Fri, 16 Oct 2026 22:46:33 GMT",
+   "zbudowano": "2026-10-19T19:10:24.034Z"
+  },
+  "M": {
+   "opis": "linie aglomeracyjne",
+   "wersja": "1691_1692",
+   "last_modified": "Mon, 19 Oct 2026 14:06:07 GMT",
+   "zbudowano": "2026-10-19T19:10:25.013Z"
+  }
+ },
+ "przystanki": [
+  {
+   "id": "A:12847",
+   "nazwa": "Norymberska",
+   "slupek": "04",
+   "rodzaj": "autobus",
+   "lat": 50.02961,
+   "lon": 19.91208,
+   "odleglosc_m": 518,
+   "dojscie_min": 7,
+   "linie": [
+    "662"
+   ]
+  },
+  {
+   "id": "M:2656",
+   "nazwa": "Norymberska",
+   "slupek": "04",
+   "rodzaj": "linie aglomeracyjne",
+   "lat": 50.0296,
+   "lon": 19.91208,
+   "odleglosc_m": 519,
+   "dojscie_min": 7,
+   "linie": [
+    "578"
+   ]
+  },
+  {
+   "id": "T:stop_345_268819",
+   "nazwa": "Norymberska",
+   "slupek": "01",
+   "rodzaj": "tramwaj",
+   "lat": 50.02981,
+   "lon": 19.91222,
+   "odleglosc_m": 485,
+   "dojscie_min": 7,
+   "linie": [
+    "11",
+    "12",
+    "17",
+    "18",
+    "62",
+    "71"
+   ]
+  },
+  {
+   "id": "T:stop_289_58929",
+   "nazwa": "Ruczaj",
+   "slupek": "02",
+   "rodzaj": "tramwaj",
+   "lat": 50.02729,
+   "lon": 19.90612,
+   "odleglosc_m": 533,
+   "dojscie_min": 7,
+   "linie": [
+    "11",
+    "12",
+    "17",
+    "18",
+    "62",
+    "71"
+   ]
+  },
+  {
+   "id": "A:12862",
+   "nazwa": "Ruczaj",
+   "slupek": "03",
+   "rodzaj": "autobus",
+   "lat": 50.02705,
+   "lon": 19.90654,
+   "odleglosc_m": 610,
+   "dojscie_min": 8,
+   "linie": [
+    "662"
+   ]
+  },
+  {
+   "id": "M:3139",
+   "nazwa": "Ruczaj",
+   "slupek": "03",
+   "rodzaj": "linie aglomeracyjne",
+   "lat": 50.02705,
+   "lon": 19.90654,
+   "odleglosc_m": 610,
+   "dojscie_min": 8,
+   "linie": [
+    "578"
+   ]
+  },
+  {
+   "id": "T:stop_345_268829",
+   "nazwa": "Norymberska",
+   "slupek": "02",
+   "rodzaj": "tramwaj",
+   "lat": 50.03013,
+   "lon": 19.91313,
+   "odleglosc_m": 510,
+   "dojscie_min": 7,
+   "linie": [
+    "11",
+    "12",
+    "17",
+    "18",
+    "62",
+    "71"
+   ]
+  },
+  {
+   "id": "A:9904",
+   "nazwa": "Norymberska",
+   "slupek": "03",
+   "rodzaj": "autobus",
+   "lat": 50.02999,
+   "lon": 19.91368,
+   "odleglosc_m": 570,
+   "dojscie_min": 8,
+   "linie": [
+    "662"
+   ]
+  },
+  {
+   "id": "M:2655",
+   "nazwa": "Norymberska",
+   "slupek": "03",
+   "rodzaj": "linie aglomeracyjne",
+   "lat": 50.02999,
+   "lon": 19.91368,
+   "odleglosc_m": 570,
+   "dojscie_min": 8,
+   "linie": [
+    "578"
+   ]
+  },
+  {
+   "id": "T:stop_289_58919",
+   "nazwa": "Ruczaj",
+   "slupek": "01",
+   "rodzaj": "tramwaj",
+   "lat": 50.02693,
+   "lon": 19.90518,
+   "odleglosc_m": 518,
+   "dojscie_min": 7,
+   "linie": [
+    "11",
+    "12",
+    "17",
+    "18",
+    "62",
+    "71"
+   ]
+  },
+  {
+   "id": "A:10313",
+   "nazwa": "Ruczaj",
+   "slupek": "04",
+   "rodzaj": "autobus",
+   "lat": 50.02676,
+   "lon": 19.90507,
+   "odleglosc_m": 550,
+   "dojscie_min": 8,
+   "linie": [
+    "662"
+   ]
+  },
+  {
+   "id": "M:3140",
+   "nazwa": "Ruczaj",
+   "slupek": "04",
+   "rodzaj": "linie aglomeracyjne",
+   "lat": 50.02676,
+   "lon": 19.90507,
+   "odleglosc_m": 550,
+   "dojscie_min": 8,
+   "linie": [
+    "578"
+   ]
+  }
+ ]
+}

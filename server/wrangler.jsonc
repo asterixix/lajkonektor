@@ -7,6 +7,7 @@
   "workers_dev": true,
   // Serwery UM Krakowa zrywają połączenia spoza regionu (HTTP 522), więc Worker ma działać w Polsce (GCP Warszawa).
   "placement": { "region": "gcp:europe-central2" },
+  "build": { "command": "node scripts/build-ui.mjs" },
   "triggers": { "crons": ["*/30 * * * *"] },
   "observability": { "enabled": true }
 }

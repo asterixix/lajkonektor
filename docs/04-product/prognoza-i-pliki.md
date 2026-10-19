@@ -1,6 +1,6 @@
 # Prognoza i odczyt plików
 
-**Data:** 2026-10-19 · **Pewność:** wysoka dla działania (47 testów, e2e na wdrożonym Workerze), średnia dla merytorycznej jakości prognoz (kilka metod, bez walidacji na wielu szeregach).
+**Data:** 2026-10-19 · **Pewność:** wysoka dla działania (73 testy w repo, e2e na wdrożonym Workerze), średnia dla merytorycznej jakości prognoz (kilka metod, bez walidacji na wielu szeregach).
 
 ## `prognoza`: deterministyczna projekcja szeregu
 Wejście: punkty `{x, y}` (np. z `bdl_dane`), horyzont 1–20 kroków, metoda `auto|liniowy|wykladniczy|holt`, opcjonalnie `ostatnie_punkty` (ucięcie historii) i `krok`.

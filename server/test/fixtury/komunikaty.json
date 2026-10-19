@@ -1,0 +1,29 @@
+{
+ "_widok": "komunikaty",
+ "_zapytanie": {},
+ "podsumowanie": "Aktywne komunikaty ZTP: 2.",
+ "zrodlo": "ZTP Kraków, GTFS-RT ServiceAlerts (na żywo)",
+ "liczba": 2,
+ "komunikaty": [
+  {
+   "feed": "T",
+   "tytul": "Ogólny tekst specjalny",
+   "opis": "TEST_1 EBBLO_1 TEST_1 EBBLO_1_",
+   "linie": [],
+   "przystanki": [],
+   "od": null,
+   "do": null,
+   "testowy": true
+  },
+  {
+   "feed": "T",
+   "tytul": "Ogólny tekst specjalny",
+   "opis": "TEST_2 EBBLO_2 TEST_2 EBBLO_2_",
+   "linie": [],
+   "przystanki": [],
+   "od": null,
+   "do": null,
+   "testowy": true
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "_widok": "status",
+ "_zapytanie": {},
+ "podsumowanie": "Wszystkie źródła odpowiadają.",
+ "worker": {
+  "colo": null,
+  "kraj": null
+ },
+ "uwaga": "status 200 = źródło dostępne z tego miejsca; 522/timeout = serwer źródła nie odpowiada na połączenia z tego regionu.",
+ "testy": [
+  {
+   "host": "api.um.krakow.pl",
+   "status": 200,
+   "ms": 220
+  },
+  {
+   "host": "msip3.um.krakow.pl",
+   "status": 200,
+   "ms": 33
+  },
+  {
+   "host": "bdl.stat.gov.pl",
+   "status": 200,
+   "ms": 28
+  },
+  {
+   "host": "gtfs.ztp.krakow.pl",
+   "status": 200,
+   "ms": 24
+  }
+ ]
+}

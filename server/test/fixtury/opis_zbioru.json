@@ -1,0 +1,44 @@
+{
+ "_widok": "opis_zbioru",
+ "_zapytanie": {
+  "id": "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia"
+ },
+ "podsumowanie": "",
+ "id": "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia",
+ "zrodlo": "od",
+ "tytul": "OD-SrodowiskoParkiMiejskie / parki-miejskie-powierzchnia",
+ "url": "https://api.um.krakow.pl/opendata-srodowisko-parki-miejskie/v1/parki-miejskie-powierzchnia",
+ "pola": [
+  "Lp:number",
+  "Typ:string",
+  "Nazwa:string",
+  "Dzielnica:string",
+  "Powierzchnia_ha:number"
+ ],
+ "wiersze": 78,
+ "odswiezono": "2026-10-19T19:09:38.233",
+ "probka": [
+  {
+   "Lp": 1,
+   "Typ": "Park typu błonia (łąka publiczna)",
+   "Nazwa": "Błonia Krakowskie",
+   "Dzielnica": "VII Zwierzyniec",
+   "Powierzchnia_ha": 41.7187
+  },
+  {
+   "Lp": 2,
+   "Typ": "Park",
+   "Nazwa": "Bulwary Wisły",
+   "Dzielnica": "I, II, VII, VIII, XIII",
+   "Powierzchnia_ha": 36.0054
+  },
+  {
+   "Lp": 3,
+   "Typ": "Park na terenie fortecznym",
+   "Nazwa": "Fort Batowice",
+   "Dzielnica": "XV Mistrzejowice",
+   "Powierzchnia_ha": 8.7799
+  }
+ ],
+ "jak_pytac": "dane_zapytaj: filtr=OData ($filter, np. \"Rok eq 2024\"), pola, sortuj, limit, kursor; agregacje liczone po naszej stronie."
+}

@@ -1,0 +1,19 @@
+// Wspólny kontrakt widoków kart: render zwraca HTML, podlacz (opcjonalnie) wiąże zdarzenia po wstawieniu do DOM.
+export interface Ctx {
+  /** Wywołuje narzędzie serwera przez hosta (app.callServerTool) i zwraca structuredContent. Rzuca błąd, gdy host nie pozwala. */
+  wywolaj(nazwa: string, argumenty: Record<string, unknown>): Promise<any>;
+  /** Podmienia kartę na wynik nowego wywołania (np. po odświeżeniu). */
+  pokaz(dane: any): void;
+  /** Ponownie rysuje bieżący widok (po zmianie stanu lokalnego). */
+  przerysuj(): void;
+  otworz(url: string): void;
+  czyMoznaWolac: boolean;
+  pelnyEkran?: () => void;
+}
+
+export interface Widok {
+  render(d: any, c: Ctx): string;
+  podlacz?(root: HTMLElement, d: any, c: Ctx): void;
+}
+
+export const stan: Record<string, any> = {}; // lokalny stan interfejsu (wybrana opcja, tryb tabeli); resetowany przy nowym wyniku

@@ -1,0 +1,118 @@
+{
+ "_widok": "szereg",
+ "_zapytanie": {
+  "zmienne": [
+   60270
+  ],
+  "jednostka": "powiat",
+  "lata": [
+   2015,
+   2016,
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025
+  ]
+ },
+ "podsumowanie": "Szereg GUS (Powiat m. Kraków): 2023: 1,9%, 2024: 2%, 2025: 2,5% (ostatnie wartości).",
+ "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+ "jednostka": "Powiat m. Kraków",
+ "jednostka_id": "011212161000",
+ "uwaga": "Brak wartości w danym roku oznacza brak publikacji dla tej jednostki.",
+ "liczba": 11,
+ "wiersze": [
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2015,
+   "wartosc": 4.4
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2016,
+   "wartosc": 3.5
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2017,
+   "wartosc": 2.7
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2018,
+   "wartosc": 2.3
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2019,
+   "wartosc": 2
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2020,
+   "wartosc": 3.1
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2021,
+   "wartosc": 2.8
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2022,
+   "wartosc": 2.3
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2023,
+   "wartosc": 1.9
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2024,
+   "wartosc": 2
+  },
+  {
+   "zmienna_id": 60270,
+   "temat": "Stopa bezrobocia rejestrowanego",
+   "nazwa": "ogółem",
+   "jednostka_miary": "%",
+   "rok": 2025,
+   "wartosc": 2.5
+  }
+ ]
+}

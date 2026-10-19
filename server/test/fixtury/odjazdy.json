@@ -1,0 +1,92 @@
+{
+ "_widok": "odjazdy",
+ "_zapytanie": {
+  "nazwa": "Teatr Słowackiego",
+  "promien_m": 400,
+  "limit": 8
+ },
+ "podsumowanie": "Najbliższe odjazdy (na żywo): linia 152 → Cmentarz Olszanica o 21:10 (za 0 min, opóźnienie 2 min); linia 12 → Czerwone Maki P+R o 21:12 (za 2 min); linia 74 → Wzg. Krzesławickie o 21:12 (za 2 min); linia 3 → Krowodrza G. P+R o 21:14 (za 4 min); linia 5 → Wzg. Krzesławickie o 21:14 (za 4 min).",
+ "zrodlo": "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)",
+ "przystankow": 9,
+ "bledy": [],
+ "czas_feedu": {
+  "M": 1792437015,
+  "A": 1792437014,
+  "T": 1792437022
+ },
+ "odjazdy": [
+  {
+   "linia": "152",
+   "kierunek": "Cmentarz Olszanica",
+   "przystanek": "Teatr Słowackiego 01",
+   "odjazd": "21:10",
+   "za_min": 0,
+   "opoznienie_s": 134,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "12",
+   "kierunek": "Czerwone Maki P+R",
+   "przystanek": "Teatr Słowackiego 01",
+   "odjazd": "21:12",
+   "za_min": 2,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "74",
+   "kierunek": "Wzg. Krzesławickie",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "21:12",
+   "za_min": 2,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "3",
+   "kierunek": "Krowodrza G. P+R",
+   "przystanek": "Teatr Słowackiego 03",
+   "odjazd": "21:14",
+   "za_min": 4,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "5",
+   "kierunek": "Wzg. Krzesławickie",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "21:14",
+   "za_min": 4,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "3",
+   "kierunek": "Nowy Bieżanów P+R",
+   "przystanek": "Teatr Słowackiego 04",
+   "odjazd": "21:14",
+   "za_min": 4,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "78",
+   "kierunek": "Mały Płaszów P+R",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "21:15",
+   "za_min": 5,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "72",
+   "kierunek": "Cmentarz Rakowicki",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "21:16",
+   "za_min": 6,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  }
+ ],
+ "komunikaty": []
+}

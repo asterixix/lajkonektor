@@ -1,0 +1,142 @@
+{
+ "_widok": "katalog",
+ "_zapytanie": {
+  "temat": "przedszkola",
+  "limit": 6
+ },
+ "podsumowanie": "Znaleziono 6 zbiorów. Najlepszy: od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2023-2024.",
+ "liczba": 6,
+ "wyniki": [
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2023-2024",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2023-2024",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba uczniów ogółem",
+    "Liczba oddziałów ogółem",
+    "Typ organu prowadzącego",
+    "Organ prowadzący",
+    "Wojewodztwo",
+    "Powiat",
+    "Gmina",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu"
+   ],
+   "pol_razem": 20
+  },
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2023-2024",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2023-2024",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba uczniów ogółem",
+    "Liczba oddziałów ogółem",
+    "Typ organu prowadzącego",
+    "Organ prowadzący",
+    "Wojewodztwo",
+    "Powiat",
+    "Gmina",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu"
+   ],
+   "pol_razem": 21
+  },
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2024-2025",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2024-2025",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba dzieci ogółem",
+    "Liczba oddziałów ogółem",
+    "Wojewodztwo",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu",
+    "Nr lokalu",
+    "Kod pocztowy",
+    "Specyfika szkoły",
+    "Publiczność szkoły_placówki"
+   ]
+  },
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2024-2025",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2024-2025",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba dzieci ogółem",
+    "Liczba oddziałów ogółem",
+    "Organ prowadzący",
+    "Województwo",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu",
+    "Nr lokalu",
+    "Kod pocztowy",
+    "Telefon"
+   ],
+   "pol_razem": 16
+  },
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2025-2026",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2025-2026",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba dzieci ogółem",
+    "Liczba oddziałów ogółem",
+    "Organ prowadzący",
+    "Województwo",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu",
+    "Nr lokalu",
+    "Kod pocztowy",
+    "Telefon"
+   ],
+   "pol_razem": 16
+  },
+  {
+   "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
+   "zrodlo": "od",
+   "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
+   "pola": [
+    "Lp",
+    "Numer RSPO",
+    "Typ szkoły_placówki",
+    "Nazwa szkoły_placówki",
+    "Liczba dzieci ogółem",
+    "Liczba oddziałów ogółem",
+    "Wojewodztwo",
+    "Miejscowość",
+    "Ulica",
+    "Nr domu",
+    "Nr lokalu",
+    "Kod pocztowy",
+    "Specyfika szkoły",
+    "Publiczność szkoły_placówki"
+   ]
+  }
+ ],
+ "podpowiedz": "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj."
+}

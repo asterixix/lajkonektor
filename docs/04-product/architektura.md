@@ -51,7 +51,7 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 - `mpzp_w_punkcie` — przeznaczenia MPZP w punkcie (MSIP `Planowanie/BP_MPZP`, warstwy 1–3, wejście WGS84).
 - `ludnosc_w_promieniu` — zameldowani w promieniu z siatki Hex100, najnowszy snapshot (dziś 2026-09-30).
 - `adres_na_punkt` — geokodowanie przez punkty adresowe MSIP; działa też bez polskich liter (wieloznacznik `_`). Sprawdzone: Telimeny 11, Basztowa 20, Łojasiewicza 4.
-- `parki_geometria` — migawka OSM (`server/data/parki-osm.json`, skrypt `scripts/build-parki-osm.mjs`) dopasowana do tabeli OD. **Pokrycie: 47 z 78 parków (46,9% powierzchni OD)**: 31 bez geometrii (23 nie znaleziono po nazwie, 8 bez domkniętego poligonu), 2 z rozbieżną powierzchnią (>2x). Pole `pokrycie` jest w każdej odpowiedzi.
+- `parki_geometria` — migawka OSM (`server/data/parki-osm.json`, skrypt `scripts/build-parki-osm.mjs`) dopasowana do tabeli OD. **Pokrycie: 46 z 78 parków (44,9% powierzchni OD)**: 32 bez geometrii (23 nie znaleziono po nazwie, 8 bez domkniętego poligonu, 1 — Planty Bieńczyckie — z konturem OSM należącym do innego parku), 2 z rozbieżną powierzchnią (>2x). Pole `pokrycie` jest w każdej odpowiedzi.
 
 **Następne (kolejność z planu):**
 3. `park_dostepnosc` — udział zameldowanych w zasięgu 300/500 m od parku, per dzielnica (liczone w kodzie).
@@ -72,7 +72,7 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 - ArcGIS zwraca błędy w HTTP 200; `arcgisQuery` to sprawdza.
 - OD API nie przyjmuje `$top`; filtrowanie po stronie serwera Lajkonektora.
 - Overpass wymaga nagłówka User-Agent (inaczej 406) i bywa przeciążony (502), więc geometria to migawka budowana raz, nie zapytanie w czasie działania.
-- 🔴 Luka pokrycia: 53% powierzchni parków OD bez geometrii. W pitchu mówić „47 z 78 parków z geometrią" albo uzupełnić brakujące z MPZP (ZP) lub od jednostki miejskiej.
+- 🔴 Luka pokrycia: 55% powierzchni parków OD bez geometrii. W pitchu mówić „46 z 78 parków z geometrią" albo uzupełnić brakujące z MPZP (ZP) lub od jednostki miejskiej.
 
 ## Bezpieczeństwo i prywatność
 - Tylko odczyt, brak PII, adresy użytkownika nie są zapisywane ani logowane (Worker nie loguje argumentów).

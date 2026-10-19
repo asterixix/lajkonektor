@@ -1,0 +1,132 @@
+{
+ "_widok": "trasa",
+ "_zapytanie": {
+  "z": {
+   "ulica": "Łojasiewicza",
+   "numer": "4"
+  },
+  "do": {
+   "ulica": "Basztowa",
+   "numer": "20"
+  },
+  "max_dojscie_m": 800
+ },
+ "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 43 min. Dojście 7 min do przystanku Norymberska 02, linia 12 (Norymberska 02 → Teatr Słowackiego 03, 19 min), dojście 4 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 2.",
+ "zrodlo": "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; dojście: OSM",
+ "uwaga": "Szacunek, nie gwarancja: brak pełnego rozkładu, transfery do 200 m, maks. jedna przesiadka.",
+ "z": {
+  "opis": "prof. Stanisława Łojasiewicza 4, 30-348 (Dzielnica VIII Dębniki)",
+  "zrodlo": "MSIP Kraków (punkty adresowe)",
+  "lat": 50.029916607804964,
+  "lon": 19.908323580405057
+ },
+ "do": {
+  "opis": "Basztowa 20, 31-156 (Dzielnica I Stare Miasto)",
+  "zrodlo": "MSIP Kraków (punkty adresowe)",
+  "lat": 50.065651151766104,
+  "lon": 19.942362581873347
+ },
+ "odleglosc_prosta_m": 4658,
+ "opcji": 2,
+ "komunikaty_o_utrudnieniach": [],
+ "opcje": [
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 43,
+   "dojscie_start": {
+    "przystanek": "Norymberska 02",
+    "m": 510,
+    "min": 7,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Teatr Słowackiego 03",
+    "m": 279,
+    "min": 4,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 13,
+   "czekanie_pierwsza_noga_min": 13,
+   "zrodlo_czasu": "pierwsza noga z GTFS-RT (na żywo), reszta szacunek z rozkładu",
+   "najblizsze_odjazdy_na_zywo": [
+    {
+     "odjazd": "21:30",
+     "za_min": 20,
+     "opoznienie_s": null
+    },
+    {
+     "odjazd": "21:45",
+     "za_min": 35,
+     "opoznienie_s": null
+    }
+   ],
+   "nogi": [
+    {
+     "linia": "12",
+     "kierunek": "Os.Piastów",
+     "wsiadanie": "Norymberska 02",
+     "wysiadanie": "Teatr Słowackiego 03",
+     "przystankow": 12,
+     "jazda_min": 19,
+     "wsiadanie_pkt": {
+      "lat": 50.03013,
+      "lon": 19.91313
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.06416,
+      "lon": 19.945
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 37,
+   "dojscie_start": {
+    "przystanek": "Norymberska 02",
+    "m": 510,
+    "min": 7,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Stary Kleparz 02",
+    "m": 298,
+    "min": 4,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 1,
+   "czekanie_pierwsza_noga_min": 1,
+   "zrodlo_czasu": "pierwsza noga z GTFS-RT (na żywo), reszta szacunek z rozkładu",
+   "najblizsze_odjazdy_na_zywo": [
+    {
+     "odjazd": "21:18",
+     "za_min": 8,
+     "opoznienie_s": null
+    },
+    {
+     "odjazd": "21:34",
+     "za_min": 24,
+     "opoznienie_s": null
+    }
+   ],
+   "nogi": [
+    {
+     "linia": "18",
+     "kierunek": "Górka Narodowa P+R",
+     "wsiadanie": "Norymberska 02",
+     "wysiadanie": "Stary Kleparz 02",
+     "przystankow": 15,
+     "jazda_min": 25,
+     "wsiadanie_pkt": {
+      "lat": 50.03013,
+      "lon": 19.91313
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.06623,
+      "lon": 19.93862
+     }
+    }
+   ]
+  }
+ ]
+}
