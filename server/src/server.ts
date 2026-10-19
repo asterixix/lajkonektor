@@ -5,6 +5,9 @@ import { pozycje, szukaj } from "./katalog.ts";
 import { parkGeometry } from "./parki.ts";
 import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
 import { statusZrodel } from "./status.ts";
+import { geokodujOsm, kandydaciOsm, kandydaciPara } from "./osm.ts";
+import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
+import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
@@ -183,6 +186,130 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
         if (zbior_id) return daneGovZasoby(zbior_id);
         if (!q) throw new Error("Podaj 'q' (fraza) albo 'zbior_id'.");
         return daneGovSzukaj(q, limit);
+      }),
+  );
+
+  const punkt = z.object({ lat: z.number().min(49.9).max(50.2), lon: z.number().min(19.7).max(20.2) });
+  const adres = z.object({ ulica: z.string().min(2), numer: z.string(), kod_pocztowy: z.string().optional() });
+  const nazwaMiejsca = z.object({ tekst: z.string().min(2).describe("Nazwa miejsca, np. 'Rynek Główny', 'Dworzec Główny', 'AGH' (geokodowanie OSM)") });
+  const miejsce = z
+    .union([punkt, adres, nazwaMiejsca])
+    .describe("Miejsce: {lat,lon} | adres {ulica,numer[,kod_pocztowy]} (MSIP) | {tekst} nazwa miejsca (OpenStreetMap)");
+  const rozwiaz = async (m: z.infer<typeof miejsce>) => {
+    if ("lat" in m) return { lat: m.lat, lon: m.lon, etykieta: `${m.lat.toFixed(5)}, ${m.lon.toFixed(5)}`, zrodlo: "współrzędne podane" };
+    if ("tekst" in m) {
+      const g = await geokodujOsm(m.tekst);
+      if (!g) throw new Error(`Nie znaleziono miejsca w Krakowie: ${m.tekst}`);
+      return { lat: g.lat, lon: g.lon, etykieta: g.nazwa, zrodlo: "OpenStreetMap (Nominatim)" };
+    }
+    const r = await addressToPoint(m);
+    if (!r.liczba) throw new Error(`Nie znaleziono adresu: ${m.ulica} ${m.numer}. ${r.uwaga}`);
+    const k = r.kandydaci[0];
+    return { lat: k.lat as number, lon: k.lon as number, etykieta: `${k.ulica} ${k.numer}, ${k.kod_pocztowy} (${k.dzielnica})`, zrodlo: "MSIP Kraków (punkty adresowe)" };
+  };
+
+  server.registerTool(
+    "przystanki_w_poblizu",
+    {
+      title: "Przystanki komunikacji w pobliżu",
+      description:
+        "Przystanki autobusowe, tramwajowe i aglomeracyjne (ZTP Kraków) w pobliżu miejsca: odległość i czas dojścia pieszo po sieci OSM (OSRM), linie. Miejsce: współrzędne, adres albo nazwa miejsca.",
+      inputSchema: z.object({ miejsce, promien_m: z.number().int().min(100).max(1500).default(500), limit: z.number().int().min(1).max(10).default(6) }),
+      annotations: readOnly,
+    },
+    ({ miejsce: m, promien_m, limit }) =>
+      run(async () => {
+        const [p, S] = await Promise.all([rozwiaz(m), wczytajSiec()]);
+        const { kandydaci, zrodlo } = await kandydaciOsm(S, p, promien_m, limit);
+        return {
+          miejsce: p.etykieta, zrodlo_miejsca: p.zrodlo, zrodlo_dojscia: zrodlo, feedy: S.feedy,
+          przystanki: kandydaci.map((k) => ({ ...opisPrzystanku(S, k.idx, k.m), dojscie_min: k.min })),
+        };
+      }),
+  );
+
+  server.registerTool(
+    "odjazdy",
+    {
+      title: "Odjazdy na żywo",
+      description:
+        "Najbliższe odjazdy z przystanku na żywo (GTFS-RT ZTP: przewidywane czasy i opóźnienia) wraz z aktualnymi komunikatami o utrudnieniach dla tych linii. Podaj nazwę przystanku (np. 'Basztowa LOT') albo miejsce z promieniem. Obejmuje kursy już będące w trasie; odległe odjazdy mogą jeszcze nie być w feedzie.",
+      inputSchema: z.object({
+        nazwa: z.string().min(2).optional().describe("Fragment nazwy przystanku"),
+        miejsce: miejsce.optional(),
+        promien_m: z.number().int().min(100).max(1000).default(400),
+        limit: z.number().int().min(1).max(30).default(10),
+      }),
+      annotations: readOnly,
+    },
+    ({ nazwa, miejsce: m, promien_m, limit }) =>
+      run(async () => {
+        if (!nazwa && !m) throw new Error("Podaj 'nazwa' przystanku albo 'miejsce'.");
+        const S = await wczytajSiec();
+        const norm = (x: string) => x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
+        let idxs: number[];
+        if (m) {
+          const p = await rozwiaz(m);
+          idxs = przystankiBlisko(S, p.lat, p.lon, promien_m, 40).map((x) => x.idx).filter((i) => !nazwa || norm(S.przystanki[i][2]).includes(norm(nazwa)));
+        } else idxs = S.przystanki.flatMap((p, i) => (norm(p[2]).includes(norm(nazwa!)) ? [i] : []));
+        if (!idxs.length) throw new Error("Nie znaleziono przystanków dla podanych kryteriów.");
+        const uzyte = idxs.slice(0, 60);
+        const wynik = await odjazdyZPrzystankow(S, uzyte, limit);
+        const feedy = [...new Set(uzyte.map((i) => S.przystanki[i][0]))];
+        const k = await pobierzKomunikaty(S, feedy);
+        const linie = new Set(wynik.odjazdy.map((o) => o.linia)), przyst = new Set(uzyte.map((i) => S.przystanki[i][2]));
+        return { zrodlo: "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)", przystankow: idxs.length, ...wynik, komunikaty: dotyczace(k.komunikaty, linie, przyst), ...(k.bledy.length ? { bledy_komunikatow: k.bledy } : {}) };
+      }),
+  );
+
+  server.registerTool(
+    "trasa",
+    {
+      title: "Planer trasy komunikacją miejską",
+      description:
+        "Jak dojechać komunikacją miejską z A do B (współrzędne, adres albo nazwa miejsca): geokodowanie i dojście do przystanku po sieci pieszej OSM (OSRM), linie bezpośrednie i z jedną przesiadką, najbliższe odjazdy na żywo (GTFS-RT) dla pierwszego odcinka oraz komunikaty o utrudnieniach (ServiceAlerts). Czasy są szacunkami: oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu.",
+      inputSchema: z.object({ z: miejsce, do: miejsce, max_dojscie_m: z.number().int().min(200).max(1500).default(800) }),
+      annotations: readOnly,
+    },
+    ({ z: a, do: b, max_dojscie_m }) =>
+      run(async () => {
+        const [pa, pb, S] = await Promise.all([rozwiaz(a), rozwiaz(b), wczytajSiec()]);
+        const { start: ks, cel: kc } = await kandydaciPara(S, pa, pb, max_dojscie_m);
+        const opcje = planuj(S, ks.kandydaci, kc.kandydaci);
+        const rt = await uzupelnijNaZywo(S, opcje.slice(0, 5));
+        const pokazane = opcje.slice(0, 5);
+        const feedyOpcji = [...new Set(pokazane.flatMap((o) => o.nogi.map((n) => S.przystanki[n.wsiadanie_idx][0])))];
+        const k = feedyOpcji.length ? await pobierzKomunikaty(S, feedyOpcji) : { komunikaty: [], bledy: [] as string[] };
+        const linie = new Set(pokazane.flatMap((o) => o.nogi.map((n) => n.linia)));
+        const przyst = new Set(pokazane.flatMap((o) => o.nogi.flatMap((n) => [S.przystanki[n.wsiadanie_idx][2], S.przystanki[n.wysiadanie_idx][2]])));
+        const bledy = [...rt.bledy, ...k.bledy];
+        return {
+          zrodlo: "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; dojście: OSM",
+          uwaga: "Szacunek, nie gwarancja: brak pełnego rozkładu, transfery do 200 m, maks. jedna przesiadka.",
+          z: { opis: pa.etykieta, zrodlo: pa.zrodlo }, do: { opis: pb.etykieta, zrodlo: pb.zrodlo },
+          odleglosc_prosta_m: Math.round(odleglosc(pa.lat, pa.lon, pb.lat, pb.lon)),
+          opcji: opcje.length,
+          ...(bledy.length ? { bledy_realtime: bledy } : {}),
+          komunikaty_o_utrudnieniach: dotyczace(k.komunikaty, linie, przyst).slice(0, 8),
+          opcje: pokazane.map(({ nogi, ...o }) => ({ ...o, nogi: nogi.map(({ wsiadanie_idx, wysiadanie_idx, wzorzec, ...n }) => n) })),
+        };
+      }),
+  );
+
+  server.registerTool(
+    "utrudnienia",
+    {
+      title: "Komunikaty o utrudnieniach ZTP",
+      description: "Aktualne komunikaty o utrudnieniach w komunikacji miejskiej w Krakowie (ZTP, GTFS-RT ServiceAlerts, na żywo), opcjonalnie dla jednej linii.",
+      inputSchema: z.object({ linia: z.string().optional().describe("Numer linii, np. '50' lub '194'") }),
+      annotations: readOnly,
+    },
+    ({ linia }) =>
+      run(async () => {
+        const S = await wczytajSiec();
+        const k = await pobierzKomunikaty(S);
+        const lista = linia ? k.komunikaty.filter((x) => x.linie.includes(linia)) : k.komunikaty;
+        return { zrodlo: "ZTP Kraków, GTFS-RT ServiceAlerts (na żywo)", liczba: lista.length, komunikaty: lista, ...(k.bledy.length ? { bledy: k.bledy } : {}) };
       }),
   );
 

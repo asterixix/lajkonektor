@@ -1,6 +1,7 @@
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { createServer } from "./server.ts";
 import { statusZrodel } from "./status.ts";
+import { wczytajSiec } from "./transport.ts";
 
 // Publiczny serwer tylko do odczytu, więc CORS otwarty (klienci przeglądarkowi, MCP Inspector).
 const CORS = {
@@ -25,5 +26,9 @@ export default {
     if (pathname === "/diag") return Response.json(await statusZrodel((request as any).cf), { headers: CORS });
     if (pathname === "/health") return Response.json({ ok: true, name: "lajkonektor", version: "0.1.0" }, { headers: CORS });
     return new Response("Lajkonektor: serwer MCP z otwartymi danymi Krakowa. Endpoint: /mcp", { status: 200 });
+  },
+  // Co 30 min sprawdza, czy ZTP opublikował nowy GTFS, i buduje sieć z wyprzedzeniem, żeby pierwsze pytanie użytkownika nie czekało ~13 s.
+  async scheduled(_event: unknown, _env: unknown, ctx: { waitUntil(p: Promise<unknown>): void }) {
+    ctx.waitUntil(wczytajSiec().catch(() => {}));
   },
 };

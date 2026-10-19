@@ -18,7 +18,7 @@ Powód: pytań o miasto jest nieskończenie wiele, a źródeł jest kilka typów
 | `bdl_szukaj`, `bdl_dane` | GUS BDL: bezrobocie, ludność, wynagrodzenia itd. dla Krakowa, jako szereg czasowy | ✅ |
 | `dane_gov` | Wyszukiwanie zbiorów i plików w dane.gov.pl | ✅ |
 | `parki_geometria` | Geometria parków z OSM (jako „obszar" `lokalne:parki_osm` w `dane_zapytaj`); pokrycie 47/78 | ✅ (częściowe) |
-| `transport` | Rozkłady i trasy: GTFS statyczny + GTFS-RT na żywo (ZTP) | ⏳ |
+| `przystanki_w_poblizu`, `odjazdy`, `trasa`, `utrudnienia` | Transport: GTFS ZTP pobierany na żywo, GTFS-RT, dojście przez OSM, komunikaty (patrz `transport.md`) | ✅ |
 | `plik_odczyt` | CSV/XLSX/PDF/GeoJSON/SHP z dowolnego URL (np. z dane.gov.pl): tabela do analizy | ⏳ |
 | `prognoza` | Deterministyczna projekcja szeregu (trend + przedział + opis metody) | ⏳ |
 | MCP Apps (mapa, wykres), Skills „Badacz miejski", Tasks | Warstwa prezentacji i metodyki | ⏳ |
@@ -39,6 +39,6 @@ Usunięte jako zbędne: `parki_lista`, `mpzp_w_punkcie`, `ludnosc_w_promieniu` (
 
 ## Znane luki
 - 🔴 Rodziny tabel OD z rocznymi migawkami nie są jeszcze zgrupowane w katalogu (model musi sam zauważyć sufiks daty). Poprawka: pole `rodzina` w `katalog_szukaj` i narzędzie/zapytanie łączące.
-- 🔴 Brak ZTP (czas dojazdu, odjazdy), `plik_odczyt` i `prognoza`: bez nich dwa z czterech pytań demo są niepełne.
+- 🔴 Brak `plik_odczyt` i `prognoza`: pytanie o prognozę cudzoziemców 2026–2036 jest niepełne.
 - 🟡 Opisy w katalogu to nazwy urzędowe + ręczny słownik aliasów (7 tematów). Warto rozszerzyć o opisy kuratorskie dla 30–50 najważniejszych zbiorów (skill „Badacz miejski").
 - 🟡 Złączenie przestrzenne z całym zbiorem obiektów (np. 2000 wielokątów) bywa wolne (parki: ~8 s). Potrzebny cache (KV) wyników agregacji.

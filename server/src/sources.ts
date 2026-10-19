@@ -18,6 +18,12 @@ async function z_ponowieniem(url: string, init: RequestInit): Promise<Response> 
   }
 }
 
+export async function getBytes(url: string): Promise<Uint8Array> {
+  const res = await z_ponowieniem(url, { headers: { "user-agent": UA } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url}`);
+  return new Uint8Array(await res.arrayBuffer());
+}
+
 export async function getJson(url: string): Promise<any> {
   const res = await z_ponowieniem(url, { headers: { "user-agent": UA } });
   if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url.split("?")[0]}`);
