@@ -5,18 +5,30 @@ const TIMEOUT_MS = 25_000;
 export const OD_BASE = "https://api.um.krakow.pl";
 export const MSIP = "https://msip3.um.krakow.pl/server/rest/services";
 
+// Serwery miasta bywają chwilowo niedostępne (5xx, zerwane połączenia), więc jedno ponowienie po krótkiej przerwie.
+async function z_ponowieniem(url: string, init: RequestInit): Promise<Response> {
+  for (let proba = 0; ; proba++) {
+    try {
+      const res = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
+      if (res.status < 500 || proba === 1) return res;
+    } catch (e) {
+      if (proba === 1) throw e;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+}
+
 export async function getJson(url: string): Promise<any> {
-  const res = await fetch(url, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+  const res = await z_ponowieniem(url, { headers: { "user-agent": UA } });
   if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url.split("?")[0]}`);
   return res.json();
 }
 
 async function postForm(url: string, body: URLSearchParams): Promise<any> {
-  const res = await fetch(url, {
+  const res = await z_ponowieniem(url, {
     method: "POST",
     headers: { "user-agent": UA, "content-type": "application/x-www-form-urlencoded" },
     body,
-    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url}`);
   return res.json();

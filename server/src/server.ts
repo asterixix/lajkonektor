@@ -4,6 +4,7 @@ import { addressToPoint } from "./adres.ts";
 import { pozycje, szukaj } from "./katalog.ts";
 import { parkGeometry } from "./parki.ts";
 import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
+import { statusZrodel } from "./status.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
@@ -28,7 +29,7 @@ const geometria = z
     "Filtr przestrzenny (tylko warstwy MSIP): {punkt:{lat,lon},promien_m} | {bbox:[zach,pld,wsch,pln]} | {z:{id,where,bufor_m}} = obiekty innej warstwy (lub 'lokalne:parki_osm') z buforem",
   );
 
-export function createServer(): McpServer {
+export function createServer(cf?: { colo?: string; country?: string }): McpServer {
   const server = new McpServer({ name: "lajkonektor", version: "0.2.0" });
 
   server.registerTool(
@@ -120,6 +121,17 @@ export function createServer(): McpServer {
       annotations: readOnly,
     },
     (args) => run(async () => parkGeometry(args)),
+  );
+
+  server.registerTool(
+    "status_zrodel",
+    {
+      title: "Status źródeł danych",
+      description: "Sprawdza z serwera Lajkonektora, czy źródła (Otwarte Dane UMK, MSIP, GUS BDL, ZTP) odpowiadają, i podaje lokalizację serwera. Użyj, gdy inne narzędzia zwracają błąd HTTP 5xx lub timeout.",
+      inputSchema: z.object({}),
+      annotations: readOnly,
+    },
+    () => run(() => statusZrodel(cf)),
   );
 
   server.registerTool(

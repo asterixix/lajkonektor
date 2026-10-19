@@ -1,7 +1,6 @@
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { createServer } from "./server.ts";
-
-const mcp = createMcpHandler(() => createServer());
+import { statusZrodel } from "./status.ts";
 
 // Publiczny serwer tylko do odczytu, więc CORS otwarty (klienci przeglądarkowi, MCP Inspector).
 const CORS = {
@@ -21,7 +20,9 @@ export default {
   async fetch(request: Request): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
-    if (pathname === "/mcp") return withCors(await mcp.fetch(request));
+    // Handler per żądanie (bezstanowy), żeby narzędzie status_zrodel znało colo/kraj bieżącego żądania.
+    if (pathname === "/mcp") return withCors(await createMcpHandler(() => createServer((request as any).cf)).fetch(request));
+    if (pathname === "/diag") return Response.json(await statusZrodel((request as any).cf), { headers: CORS });
     if (pathname === "/health") return Response.json({ ok: true, name: "lajkonektor", version: "0.1.0" }, { headers: CORS });
     return new Response("Lajkonektor: serwer MCP z otwartymi danymi Krakowa. Endpoint: /mcp", { status: 200 });
   },

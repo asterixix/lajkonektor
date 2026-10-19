@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { addressToPoint } from "../src/adres.ts";
 import { pozycje, szukaj } from "../src/katalog.ts";
 import { parkGeometry } from "../src/parki.ts";
-import { agreguj, daneZapytaj, zbiorOpis } from "../src/zapytanie.ts";
+import { agreguj, daneZapytaj, sortuj, zbiorOpis } from "../src/zapytanie.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj } from "../src/zewnetrzne.ts";
 
 const BLONIA = { lat: 50.0585, lon: 19.9186 };
@@ -139,4 +139,17 @@ test("MSIP: warstwy z błędnym stronicowaniem (Studium K1, mapy powodziowe) nad
 test("katalog: tematy potoczne trafiają w warstwy planistyczne i transportowe", () => {
   assert.ok(szukaj("plan zagospodarowania przestrzennego").some((p) => p.id.includes("Planowanie/")));
   assert.ok(szukaj("komunikacja miejska przystanki").some((p) => p.id.includes("Transport/") || p.id.includes("KCK_przystanki")));
+});
+
+test("katalog: 'przedszkola' nie zwraca szkół muzycznych na szczycie", () => {
+  const top = szukaj("przedszkola", { limit: 5 }).map((p) => p.id.toLowerCase());
+  assert.ok(top.some((id) => id.includes("przedszk")), `brak przedszkoli w top5: ${top.join(" | ")}`);
+  assert.ok(!top[0].includes("muzyczne"), "szkoły muzyczne na pierwszym miejscu");
+});
+
+test("OD: agregacja z sortowaniem po kolumnie agregatu i limitem (regresja: 400 z $orderby=ha)", async () => {
+  const r = await daneZapytaj({ id: PARKI_OD, grupuj_po: ["Dzielnica"], agreguj: [{ fn: "sum", pole: "Powierzchnia_ha", nazwa: "ha" }], sortuj: "ha desc", limit: 3 });
+  assert.equal(r.wiersze.length, 3);
+  assert.ok((r.wiersze[0] as any).ha >= (r.wiersze[1] as any).ha && (r.wiersze[1] as any).ha >= (r.wiersze[2] as any).ha);
+  assert.deepEqual(sortuj([{ a: 1 }, { a: 3 }, { a: 2 }], "a desc").map((x) => x.a), [3, 2, 1]);
 });

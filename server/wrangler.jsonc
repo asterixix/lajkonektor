@@ -5,5 +5,7 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  // Serwery UM Krakowa zrywają połączenia spoza regionu (HTTP 522), więc Worker ma działać w Polsce (GCP Warszawa).
+  "placement": { "region": "gcp:europe-central2" },
   "observability": { "enabled": true }
 }

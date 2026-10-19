@@ -58,6 +58,14 @@ export function agreguj(rows: Record<string, any>[], grupuj: string[], agg: NonN
   });
 }
 
+// Sortowanie wyniku agregacji po kolumnie ("pole" lub "pole desc").
+export function sortuj(rows: Record<string, any>[], spec?: string) {
+  if (!spec) return rows;
+  const [pole, kier] = spec.trim().split(/\s+/);
+  const m = kier?.toLowerCase() === "desc" ? -1 : 1;
+  return rows.slice().sort((a, b) => (a[pole] > b[pole] ? m : a[pole] < b[pole] ? -m : 0));
+}
+
 // --- tabele OD (WSO2 + DAB: $select, $filter, $orderby, $first, $after)
 async function odPage(url: string, q: Zapytanie, first: number, after?: string) {
   const p = new URLSearchParams();
@@ -78,13 +86,14 @@ async function odQuery(p: Pozycja, q: Zapytanie) {
     // Agregacja wymaga wszystkich wierszy: pobieramy strony aż do limitu bezpieczeństwa.
     let rows: Record<string, any>[] = [], after: string | undefined, ucieto = false;
     do {
-      const pg = await odPage(p.url, { ...q, pola: undefined }, 1000, after);
+      // sortuj dotyczy wyniku agregacji (np. "ha desc"), więc nie przekazujemy go do tabeli źródłowej.
+      const pg = await odPage(p.url, { ...q, pola: undefined, sortuj: undefined }, 1000, after);
       rows = rows.concat(pg.rows);
       after = pg.next ?? undefined;
       if (rows.length >= MAX_WIERSZY_OD_AGREGACJA && after) { ucieto = true; break; }
     } while (after);
     if (ucieto) uwagi.push(`Agregacja na pierwszych ${rows.length} wierszach (limit bezpieczeństwa); wynik niepełny.`);
-    const wynik = agreguj(rows, q.grupuj_po ?? [], q.agreguj);
+    const wynik = sortuj(agreguj(rows, q.grupuj_po ?? [], q.agreguj), q.sortuj);
     return { wiersze: wynik.slice(0, limit), ile_zrodlo: rows.length, nastepny_kursor: null as string | null, uwagi };
   }
   const pg = await odPage(p.url, q, limit, q.kursor);

@@ -31,26 +31,26 @@ const ALIASY: [RegExp, string][] = [
 ];
 
 export function szukaj(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: number } = {}) {
-  const rozszerzony = ALIASY.reduce((t, [rx, dodaj]) => (rx.test(norm(temat)) ? `${t} ${dodaj}` : t), temat);
-  // Przybliżony stemming polskiej fleksji: pierwsze 6 liter ("bezrobocie" ~ "bezrobotni", "cudzoziemcy" ~ "cudzoziemiec").
-  const tokens = [...new Set(norm(rozszerzony).split(" "))].filter((t) => t.length >= 2).map((t) => t.slice(0, 6));
-  if (!tokens.length) return [];
-  const wyniki = indeks
+  // Przybliżony stemming polskiej fleksji: pierwsze 7 liter ("bezrobocie" ~ "bezrobotni"; 6 liter mylilo "przedszkola" z "przedstawienia").
+  const stem = (t: string) => t.slice(0, 7);
+  const slowa = (s: string) => [...new Set(norm(s).split(" ").filter((t) => t.length >= 2).map(stem))];
+  const wlasne = slowa(temat);
+  // Słowa z aliasów wspierają ranking, ale słabiej niż słowa użytkownika (inaczej "przedszkola" daje szkoły muzyczne).
+  const dodatkowe = slowa(ALIASY.reduce((t, [rx, dodaj]) => (rx.test(norm(temat)) ? `${t} ${dodaj}` : t), "")).filter((t) => !wlasne.includes(t));
+  if (!wlasne.length) return [];
+  const punkty = (x: (typeof indeks)[number], t: string) => (x.tytul.includes(t) ? 3 : 0) + (x.pola.includes(t) ? 2 : 0) + (x.opis.includes(t) ? 1 : 0);
+  return indeks
     .filter((x) => !opts.zrodlo || x.p.zrodlo === opts.zrodlo)
     .map((x) => {
-      let s = 0, trafione = 0;
-      for (const t of tokens) {
-        const hit = (x.tytul.includes(t) ? 3 : 0) + (x.pola.includes(t) ? 2 : 0) + (x.opis.includes(t) ? 1 : 0);
-        if (hit) trafione++;
-        s += hit;
-      }
-      // Wszystkie słowa zapytania powinny coś trafić; brakujące obniżają wynik.
-      return { p: x.p, score: trafione === tokens.length ? s + 5 : s * 0.5 };
+      const hity = wlasne.map((t) => punkty(x, t));
+      const wszystkie = hity.every((h) => h > 0);
+      const s = hity.reduce((a, b) => a + b, 0) + 0.3 * dodatkowe.reduce((a, t) => a + punkty(x, t), 0);
+      return { p: x.p, score: wszystkie ? s + 5 : s * 0.4 };
     })
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, opts.limit ?? 10);
-  return wyniki.map((x) => x.p);
+    .slice(0, opts.limit ?? 10)
+    .map((x) => x.p);
 }
 
 export const znajdz = (id: string) => pozycje.find((p) => p.id === id);
