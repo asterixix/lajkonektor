@@ -44,14 +44,14 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 
 ## Narzędzia
 
-**Gotowe (3):**
+**Gotowe (5):**
 - `parki_lista` — parki miejskie/kieszonkowe z OD (78 rekordów; bez geometrii).
 - `mpzp_w_punkcie` — przeznaczenia MPZP w punkcie (MSIP `Planowanie/BP_MPZP`, warstwy 1–3, wejście WGS84).
 - `ludnosc_w_promieniu` — zameldowani w promieniu z siatki Hex100, najnowszy snapshot (dziś 2026-09-30).
+- `adres_na_punkt` — geokodowanie przez punkty adresowe MSIP; działa też bez polskich liter (wieloznacznik `_`). Sprawdzone: Telimeny 11, Basztowa 20, Łojasiewicza 4.
+- `parki_geometria` — migawka OSM (`server/data/parki-osm.json`, skrypt `scripts/build-parki-osm.mjs`) dopasowana do tabeli OD. **Pokrycie: 47 z 78 parków (46,9% powierzchni OD)**: 31 bez geometrii (23 nie znaleziono po nazwie, 8 bez domkniętego poligonu), 2 z rozbieżną powierzchnią (>2x). Pole `pokrycie` jest w każdej odpowiedzi.
 
 **Następne (kolejność z planu):**
-1. `adres_na_punkt` — geokodowanie przez `Pobieranie/Adresy` (do „Telimeny 11" i „Łojasiewicza 4").
-2. `parki_geometria` — poligony parków z OSM (ODbL, przypis), dopasowanie do tabeli OD po nazwie.
 3. `park_dostepnosc` — udział zameldowanych w zasięgu 300/500 m od parku, per dzielnica (liczone w kodzie).
 4. `mpzp_zielen_bez_parku` — poligony `ZP…` minus istniejące parki = „potencjał" (jawnie: teren przeznaczony pod zieleń).
 5. `badania_szukaj` — literatura z RUJ/AGH/UAFM/BN (wzorzec z `polish-academic-mcp`, tylko potrzebne wywołania).
@@ -69,7 +69,8 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 - Warstwy MPZP 1–3 to skale tej samej treści; zbieramy z wszystkich i deduplikujemy.
 - ArcGIS zwraca błędy w HTTP 200; `arcgisQuery` to sprawdza.
 - OD API nie przyjmuje `$top`; filtrowanie po stronie serwera Lajkonektora.
-- Overpass wymaga nagłówka User-Agent (inaczej 406).
+- Overpass wymaga nagłówka User-Agent (inaczej 406) i bywa przeciążony (502), więc geometria to migawka budowana raz, nie zapytanie w czasie działania.
+- 🔴 Luka pokrycia: 53% powierzchni parków OD bez geometrii. W pitchu mówić „47 z 78 parków z geometrią" albo uzupełnić brakujące z MPZP (ZP) lub od jednostki miejskiej.
 
 ## Bezpieczeństwo i prywatność
 - Tylko odczyt, brak PII, adresy użytkownika nie są zapisywane ani logowane (Worker nie loguje argumentów).
