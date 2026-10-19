@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Karta wyniku zapytania</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+button{font-family:var(--lk-font);cursor:pointer}
+.press:active{transform:translateY(2px)}
+.press:focus-visible{outline:3px solid var(--lk-atrament);outline-offset:2px}
+</style>
+</helmet>
+<div style="width:640px;height:640px;box-sizing:border-box;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="Lajkonektor" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">dane_zapytaj</div><div style="font-size:22px;font-weight:900;line-height:1.15">Powierzchnia parków wg dzielnicy</div></div>
+<span style="border:1px solid #fff;font-weight:700;font-size:12px;padding:5px 9px;flex-shrink:0">8 grup</span>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--lk-szary-linia)">
+<div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--lk-szary-tekst);min-width:0;overflow-wrap:anywhere">grupuj_po: dzielnica · agreguj: sum(powierzchnia)</div>
+<div style="display:flex;flex-shrink:0">
+<button class="press" onClick="{{pickTabela}}" aria-pressed="{{isTabela}}" style="{{styleTabela}}">Tabela</button>
+<button class="press" onClick="{{pickSlupki}}" aria-pressed="{{isSlupki}}" style="{{styleSlupki}}">Słupki</button>
+</div>
+</div>
+
+<div style="flex-grow:1;overflow:hidden">
+<sc-if value="{{isTabela}}" hint-placeholder-val="{{ true }}">
+<div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 130px;background:var(--lk-szary-tlo);font-size:12px;font-weight:900;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:7px 16px">Dzielnica</div><div style="padding:7px 8px;text-align:right">Parków</div><div style="padding:7px 16px;text-align:right">Powierzchnia, ha</div></div>
+<sc-for list="{{wiersze}}" as="w" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 130px;border-bottom:1px solid var(--lk-szary-linia);font-size:15px"><div style="padding:11px 16px;font-weight:700">{{w.nazwa}}</div><div style="padding:11px 8px;text-align:right">{{w.ile}}</div><div style="padding:11px 16px;text-align:right;font-weight:900">{{w.ha}}</div></div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isSlupki}}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 16px;display:flex;flex-direction:column;gap:11px">
+<sc-for list="{{wiersze}}" as="w" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:190px minmax(0,1fr) 58px;align-items:center;gap:10px;font-size:14px"><div style="font-weight:700">{{w.nazwa}}</div><div style="height:22px;background:var(--lk-szary-tlo)"><div style="{{w.pasek}}"></div></div><div style="text-align:right;font-weight:900">{{w.ha}}</div></div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 16px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> Otwarte Dane UMK, tabela parków miejskich (78 rekordów). Sumy liczy kod, nie model. Pominięto Bulwary Wisły (36,01 ha, park w pięciu dzielnicach) i 11 dzielnic z mniejszą powierzchnią.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":640}}'>
+class Component extends DCLogic {
+renderVals() {
+  const v = (this.state && this.state.v) || 'tabela';
+  const rows = [['XVIII Nowa Huta',8,145.45],['VII Zwierzyniec',4,111.16],['XIII Podgórze',6,84.02],['VIII Dębniki',4,55.77],['XIV Czyżyny',4,54.45],['XI Podgórze Duchackie',3,47.03],['XII Bieżanów - Prokocim',7,44.47],['VI Bronowice',4,39.77]];
+  const max = rows[0][2];
+  const fmt = (n) => n.toFixed(2).replace('.', ',');
+  const on = 'border:2px solid #071F32;background:#071F32;color:#fff;font-weight:900;font-size:14px;padding:6px 14px;min-height:36px;';
+  const off = 'border:2px solid #071F32;background:#fff;color:#071F32;font-weight:900;font-size:14px;padding:6px 14px;min-height:36px;';
+  return {
+    isTabela: v === 'tabela', isSlupki: v === 'slupki',
+    styleTabela: v === 'tabela' ? on : off, styleSlupki: v === 'slupki' ? on : off,
+    pickTabela: () => this.setState({ v: 'tabela' }), pickSlupki: () => this.setState({ v: 'slupki' }),
+    wiersze: rows.map(([nazwa, ile, ha]) => ({ nazwa, ile, ha: fmt(ha), pasek: 'height:22px;background:#0063AF;width:' + (100 * ha / max).toFixed(1) + '%' }))
+  };
+}
+}
+</script>
+</body>
+</html>

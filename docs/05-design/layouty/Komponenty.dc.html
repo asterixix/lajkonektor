@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Komponenty Lajkonektora</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-zloty:#CDB794;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+.press:active{transform:translateY(2px)}
+</style>
+</helmet>
+<div style="width:1280px;height:1080px;box-sizing:border-box;padding:48px 56px;background:var(--lk-szary-tlo);display:flex;flex-direction:column;gap:32px;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px">
+<h1 style="margin:0;font-size:34px;font-weight:900">Komponenty i zasady</h1>
+<div style="font-size:15px;color:var(--lk-szary-tekst);text-align:right">Kafle bez zaokrągleń, belka z krakow.pl, Lato. Tokeny: <span style="font-family:ui-monospace,Consolas,monospace">brand/tokens.css</span></div>
+</div>
+
+<div style="display:flex;gap:40px;align-items:flex-start">
+
+<!-- anatomia karty -->
+<div style="flex-shrink:0;width:520px;display:flex;flex-direction:column;gap:12px">
+<div style="font-size:13px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--lk-szary-tekst)">Ramka każdej karty MCP</div>
+<div style="background:#fff;border:1px solid var(--lk-szary-linia)">
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">id narzędzia</div><div style="font-size:22px;font-weight:900;line-height:1.15">Tytuł o jednym obiekcie</div></div>
+<span style="border:1px solid #fff;font-weight:700;font-size:12px;padding:5px 9px">znacznik</span>
+</div>
+<div style="padding:28px 16px;font-size:15px;line-height:1.5;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)">Treść: tabela, mapa albo wykres. Jedna główna liczba, reszta tonem pomocniczym.</div>
+<div style="padding:10px 16px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> nazwa, data lub stan. Pokrycie i ostrzeżenia. Akcja po prawej, jeśli jest.</div>
+</div>
+<div style="font-size:14px;line-height:1.55;color:var(--lk-szary-tekst)">Szerokość 520 px dla list, 640 px dla map i wykresów. Karta zawsze ma tekstowy odpowiednik w <span style="font-family:ui-monospace,Consolas,monospace">content</span>, bo nie każdy klient pokaże UI.</div>
+</div>
+
+<!-- elementy -->
+<div style="flex-grow:1;min-width:0;display:flex;flex-direction:column;gap:24px">
+<div style="font-size:13px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--lk-szary-tekst)">Znaczniki stanu</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<span style="background:var(--lk-zielony);color:#fff;font-weight:900;font-size:12px;padding:6px 10px">NA ŻYWO</span>
+<span style="background:var(--lk-atrament);color:#fff;font-weight:900;font-size:12px;padding:6px 10px">MIGAWKA 19.10.2026</span>
+<span style="background:#fff;border:1px solid var(--lk-niebieski);color:var(--lk-niebieski);font-weight:700;font-size:12px;padding:5px 9px">Pokrycie 47 z 78</span>
+<span style="background:var(--lk-czerwony);color:#fff;font-weight:900;font-size:12px;padding:6px 10px">BŁĄD</span>
+</div>
+
+<div style="font-size:13px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--lk-szary-tekst)">Numer linii i przyciski</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+<span style="min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">52</span>
+<a href="#" class="press" style="background:var(--lk-zolty);color:var(--lk-atrament);font-weight:900;padding:12px 22px;text-decoration:none">Dodaj do Claude</a>
+<a href="#" class="press" style="background:var(--lk-niebieski);color:#fff;font-weight:900;padding:12px 22px;text-decoration:none">Odśwież</a>
+<a href="#" class="press" style="border:2px solid var(--lk-niebieski);color:var(--lk-niebieski);background:#fff;font-weight:900;padding:10px 20px;text-decoration:none">Sprawdź status</a>
+</div>
+
+<div style="font-size:13px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--lk-szary-tekst)">Belka tytułowa, komunikat</div>
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 18px;font-size:22px;font-weight:900">Rozkład narzędzi</div>
+<div style="background:#fff;border:1px solid var(--lk-szary-linia);padding:10px 14px;display:flex;gap:12px;align-items:baseline;font-size:14px;line-height:1.45"><span style="flex-shrink:0;background:var(--lk-czerwony);color:#fff;font-weight:900;font-size:11px;letter-spacing:0.06em;padding:3px 7px">LINIA 8</span><span>Objazd przez ul. Dietla do odwołania.</span></div>
+</div>
+</div>
+
+<!-- zasady -->
+<div style="background:#fff;border:1px solid var(--lk-szary-linia);padding:24px 28px">
+<div style="font-size:20px;font-weight:900;padding-bottom:14px">Zasady, które da się sprawdzić</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 40px;font-size:15px;line-height:1.5">
+<div><strong>Tokeny, nie kolory z głowy.</strong> Każdy kolor to zmienna <span style="font-family:ui-monospace,Consolas,monospace;font-size:13px">--lk-*</span>. Nie ma indygo ani gradientów.</div>
+<div><strong>Żółty dwa razy na ekran.</strong> Tylko główne wezwanie do działania i zaznaczony obiekt. Reszta to niebieski i atrament.</div>
+<div><strong>Liczba ma źródło i datę.</strong> Wartość przykładowa jest podpisana jako przykład. Brak danych to pole <span style="font-family:ui-monospace,Consolas,monospace;font-size:13px">pokrycie</span>, nie wymyślona liczba.</div>
+<div><strong>Bez emoji i bez ozdób.</strong> Ikony to kreska 2 px. Mapa pokazuje prawdziwe kontury z danych, nie fale.</div>
+<div><strong>Kwadratowe kafle.</strong> Bez zaokrągleń i bez kolorowej krawędzi z boku karty. Kolor niesie pasek nagłówka.</div>
+<div><strong>Każda karta ma trzy stany.</strong> Ładowanie, błąd i pusto. Błąd mówi, co się stało i co zrobić dalej.</div>
+<div><strong>Język miasta, nie startupu.</strong> „Odśwież”, „Sprawdź status źródeł”. Nie „Get started” i nie „Odkryj moc danych”.</div>
+<div><strong>Dostępność.</strong> Kontrast 4,5:1, przyciski min. 40 px, stan nie tylko kolorem, <span style="font-family:ui-monospace,Consolas,monospace;font-size:13px">prefers-reduced-motion</span> wyłącza pulsowanie.</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1080}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

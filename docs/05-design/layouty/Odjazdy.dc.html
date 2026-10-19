@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Karta odjazdów</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+.press:active{transform:translateY(2px)}
+</style>
+</helmet>
+<div style="width:520px;height:600px;box-sizing:border-box;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="Lajkonektor" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">odjazdy</div><div style="font-size:22px;font-weight:900;line-height:1.15">Basztowa LOT</div></div>
+<span style="background:var(--lk-zielony);font-weight:900;font-size:12px;padding:6px 10px;flex-shrink:0">NA ŻYWO</span>
+</div>
+
+<div style="display:flex;gap:12px;align-items:baseline;padding:10px 16px;border-bottom:1px solid var(--lk-szary-linia);font-size:14px;line-height:1.45">
+<span style="flex-shrink:0;background:var(--lk-czerwony);color:#fff;font-weight:900;font-size:11px;letter-spacing:0.06em;padding:3px 7px">LINIA 8</span>
+<span>Objazd przez ul. Dietla do odwołania.</span>
+</div>
+
+<div style="flex-grow:1;overflow:hidden">
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;background:var(--lk-szary-tlo);font-size:12px;font-weight:900;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:7px 16px">Linia</div><div style="padding:7px 8px">Kierunek</div><div style="padding:7px 16px;text-align:right">Za</div></div>
+
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">52</span></div><div style="padding:12px 8px;font-size:16px;line-height:1.3">Bronowice Małe<div style="font-size:13px;color:var(--lk-zielony);font-weight:700">o czasie, 14:32</div></div><div style="padding:12px 16px;text-align:right;font-size:24px;font-weight:900;line-height:1">2<span style="font-size:13px;font-weight:700"> min</span></div></div>
+
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">8</span></div><div style="padding:12px 8px;font-size:16px;line-height:1.3">Czerwone Maki P+R<div style="font-size:13px;color:var(--lk-czerwony);font-weight:700">opóźnienie 3 min, 14:39</div></div><div style="padding:12px 16px;text-align:right;font-size:24px;font-weight:900;line-height:1">6<span style="font-size:13px;font-weight:700"> min</span></div></div>
+
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">24</span></div><div style="padding:12px 8px;font-size:16px;line-height:1.3">Wzgórza Krzesławickie<div style="font-size:13px;color:var(--lk-zielony);font-weight:700">o czasie, 14:41</div></div><div style="padding:12px 16px;text-align:right;font-size:24px;font-weight:900;line-height:1">8<span style="font-size:13px;font-weight:700"> min</span></div></div>
+
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">502</span></div><div style="padding:12px 8px;font-size:16px;line-height:1.3">Nowy Bieżanów P+R<div style="font-size:13px;color:var(--lk-zielony);font-weight:700">o czasie, 14:44</div></div><div style="padding:12px 16px;text-align:right;font-size:24px;font-weight:900;line-height:1">11<span style="font-size:13px;font-weight:700"> min</span></div></div>
+
+<div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;align-items:center"><div style="padding:12px 16px"><span style="display:inline-block;min-width:38px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:17px;padding:4px 0">3</span></div><div style="padding:12px 8px;font-size:16px;line-height:1.3">Nowy Bieżanów P+R<div style="font-size:13px;color:var(--lk-szary-tekst);font-weight:700">14:49</div></div><div style="padding:12px 16px;text-align:right;font-size:24px;font-weight:900;line-height:1">16<span style="font-size:13px;font-weight:700"> min</span></div></div>
+</div>
+
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)">
+<div><strong>Źródło:</strong> ZTP Kraków, GTFS-RT, stan 14:30. Kursy jeszcze niewyjechane mogą nie być w feedzie. Wartości przykładowe.</div>
+<button class="press" style="flex-shrink:0;border:0;background:var(--lk-niebieski);color:#fff;font:900 14px var(--lk-font);padding:9px 16px;min-height:40px">Odśwież</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":520,"height":600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Stany kart</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+@keyframes lk-puls{0%,100%{opacity:1}50%{opacity:0.45}}
+.lk-szkielet{background:var(--lk-szary-linia);animation:lk-puls 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.lk-szkielet{animation:none}}
+.press:active{transform:translateY(2px)}
+</style>
+</helmet>
+<div style="width:1200px;height:440px;box-sizing:border-box;padding:0;background:var(--lk-szary-tlo);display:grid;grid-template-columns:repeat(3,360px);gap:40px;justify-content:center;align-content:center;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<!-- ładowanie -->
+<div style="height:380px;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:40px;height:40px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="" style="width:34px;height:34px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">odjazdy</div><div style="font-size:19px;font-weight:900;line-height:1.15">Pobieram z ZTP</div></div>
+</div>
+<div style="flex-grow:1;padding:16px 14px;display:flex;flex-direction:column;gap:18px" role="status" aria-label="Ładowanie odjazdów">
+<div style="display:flex;gap:12px;align-items:center"><div class="lk-szkielet" style="width:38px;height:26px"></div><div class="lk-szkielet" style="flex-grow:1;height:16px"></div><div class="lk-szkielet" style="width:46px;height:20px"></div></div>
+<div style="display:flex;gap:12px;align-items:center"><div class="lk-szkielet" style="width:38px;height:26px"></div><div class="lk-szkielet" style="flex-grow:1;height:16px"></div><div class="lk-szkielet" style="width:46px;height:20px"></div></div>
+<div style="display:flex;gap:12px;align-items:center"><div class="lk-szkielet" style="width:38px;height:26px"></div><div class="lk-szkielet" style="flex-grow:1;height:16px"></div><div class="lk-szkielet" style="width:46px;height:20px"></div></div>
+<div style="display:flex;gap:12px;align-items:center"><div class="lk-szkielet" style="width:38px;height:26px"></div><div class="lk-szkielet" style="flex-grow:1;height:16px"></div><div class="lk-szkielet" style="width:46px;height:20px"></div></div>
+</div>
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)">Feed GTFS-RT odpowiada zwykle w kilka sekund.</div>
+</div>
+
+<!-- błąd -->
+<div style="height:380px;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:40px;height:40px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="" style="width:34px;height:34px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">odjazdy</div><div style="font-size:19px;font-weight:900;line-height:1.15">Basztowa LOT</div></div>
+<span style="background:var(--lk-czerwony);font-weight:900;font-size:12px;padding:5px 9px">BŁĄD</span>
+</div>
+<div style="flex-grow:1;padding:20px 14px;display:flex;flex-direction:column;gap:12px" role="alert">
+<div style="font-family:ui-monospace,Consolas,monospace;font-size:34px;font-weight:700;color:var(--lk-czerwony);line-height:1">522</div>
+<div style="font-size:17px;font-weight:900;line-height:1.3">Serwer ZTP nie odpowiada.</div>
+<div style="font-size:15px;line-height:1.5">Nie przyjmuje połączeń z regionu, w którym działa Lajkonektor. Nie masz złych danych w pytaniu. Spróbuj za chwilę albo sprawdź, które źródła działają.</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:4px">
+<button class="press" style="border:0;background:var(--lk-niebieski);color:#fff;font:900 14px var(--lk-font);padding:9px 14px;min-height:40px">Sprawdź status źródeł</button>
+<button class="press" style="border:2px solid var(--lk-niebieski);background:#fff;color:var(--lk-niebieski);font:900 14px var(--lk-font);padding:7px 14px;min-height:40px">Spróbuj ponownie</button>
+</div>
+</div>
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> gtfs.ztp.krakow.pl, timeout po 15 s.</div>
+</div>
+
+<!-- pusto -->
+<div style="height:380px;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:40px;height:40px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="" style="width:34px;height:34px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">odjazdy</div><div style="font-size:19px;font-weight:900;line-height:1.15">Plac Wolnica</div></div>
+<span style="background:var(--lk-zielony);font-weight:900;font-size:12px;padding:5px 9px">NA ŻYWO</span>
+</div>
+<div style="flex-grow:1;padding:20px 14px;display:flex;flex-direction:column;gap:12px">
+<div style="font-size:17px;font-weight:900;line-height:1.3">Brak odjazdów w feedzie.</div>
+<div style="font-size:15px;line-height:1.5">Feed obejmuje kursy, które już wyjechały na trasę. Odległe odjazdy mogą się jeszcze nie pojawić. To nie znaczy, że linia nie kursuje.</div>
+<div style="font-size:15px;line-height:1.5">Spróbuj inną nazwę przystanku albo zapytaj o trasę z rozkładu.</div>
+<div style="padding-top:4px"><button class="press" style="border:2px solid var(--lk-niebieski);background:#fff;color:var(--lk-niebieski);font:900 14px var(--lk-font);padding:7px 14px;min-height:40px">Zapytaj o trasę</button></div>
+</div>
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> ZTP Kraków, GTFS-RT.</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":440}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

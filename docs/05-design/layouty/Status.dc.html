@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Karta statusu źródeł</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+.press:active{transform:translateY(2px)}
+</style>
+</helmet>
+<div style="width:520px;height:440px;box-sizing:border-box;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="Lajkonektor" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">status_zrodel</div><div style="font-size:22px;font-weight:900;line-height:1.15">Źródła danych</div></div>
+<span style="background:var(--lk-czerwony);font-weight:900;font-size:12px;padding:6px 10px;flex-shrink:0">1 NIE ODPOWIADA</span>
+</div>
+
+<div style="flex-grow:1">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 90px;background:var(--lk-szary-tlo);font-size:12px;font-weight:900;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:7px 16px">Serwer</div><div style="padding:7px 8px">Status</div><div style="padding:7px 16px;text-align:right">Czas</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 90px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:13px 16px;font-family:ui-monospace,Consolas,monospace;font-size:14px">api.um.krakow.pl</div><div style="padding:13px 8px"><span style="background:var(--lk-zielony);color:#fff;font-weight:900;font-size:12px;padding:3px 8px">200</span></div><div style="padding:13px 16px;text-align:right;font-size:14px">340 ms</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 90px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:13px 16px;font-family:ui-monospace,Consolas,monospace;font-size:14px">msip3.um.krakow.pl</div><div style="padding:13px 8px"><span style="background:var(--lk-zielony);color:#fff;font-weight:900;font-size:12px;padding:3px 8px">200</span></div><div style="padding:13px 16px;text-align:right;font-size:14px">512 ms</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 90px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:13px 16px;font-family:ui-monospace,Consolas,monospace;font-size:14px">bdl.stat.gov.pl</div><div style="padding:13px 8px"><span style="background:var(--lk-zielony);color:#fff;font-weight:900;font-size:12px;padding:3px 8px">200</span></div><div style="padding:13px 16px;text-align:right;font-size:14px">289 ms</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 90px;align-items:center"><div style="padding:13px 16px;font-family:ui-monospace,Consolas,monospace;font-size:14px">gtfs.ztp.krakow.pl</div><div style="padding:13px 8px"><span style="background:var(--lk-czerwony);color:#fff;font-weight:900;font-size:12px;padding:3px 8px">522</span></div><div style="padding:13px 16px;text-align:right;font-size:14px">15 000 ms</div></div>
+</div>
+
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)">
+<div><strong>Test z serwera Lajkonektora (Warszawa, PL).</strong> 522 lub timeout: serwer źródła nie przyjmuje połączeń z tego regionu. Wartości przykładowe.</div>
+<button class="press" style="flex-shrink:0;border:0;background:var(--lk-niebieski);color:#fff;font:900 14px var(--lk-font);padding:9px 16px;min-height:40px">Sprawdź ponownie</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":520,"height":440}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

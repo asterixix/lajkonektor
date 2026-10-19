@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Karta parków</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+</style>
+</helmet>
+<div style="width:640px;height:700px;box-sizing:border-box;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="Lajkonektor" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">parki_geometria</div><div style="font-size:22px;font-weight:900;line-height:1.15">Park im. Henryka Jordana</div></div>
+<span style="border:1px solid #fff;font-weight:700;font-size:12px;padding:5px 9px;flex-shrink:0">V Krowodrza</span>
+</div>
+
+<div style="position:relative;height:282px;background:var(--lk-szary-tlo);border-bottom:1px solid var(--lk-szary-linia);overflow:hidden">
+<img src="../../../brand/mapa-parki-park-jordana.svg" alt="Mapa konturów parków wokół Parku Jordana: Błonia, Planty, parki Szymborskiej, Kolejowy i Strzelecki; okrąg 500 metrów od środka parku" style="position:absolute;left:0;top:0;width:640px;height:282px">
+<span style="position:absolute;left:200px;top:196px;background:#fff;border:1px solid var(--lk-szary-linia);font-size:12px;font-weight:700;padding:2px 6px">Błonia</span>
+<span style="position:absolute;left:262px;top:118px;background:var(--lk-atrament);color:#fff;font-size:12px;font-weight:900;padding:2px 6px">Park Jordana</span>
+<span style="position:absolute;left:372px;top:88px;background:#fff;border:1px solid var(--lk-szary-linia);font-size:12px;font-weight:700;padding:2px 6px">Park Szymborskiej</span>
+<span style="position:absolute;left:432px;top:150px;background:#fff;border:1px solid var(--lk-szary-linia);font-size:12px;font-weight:700;padding:2px 6px">Planty</span>
+<span style="position:absolute;left:520px;top:182px;background:#fff;border:1px solid var(--lk-szary-linia);font-size:12px;font-weight:700;padding:2px 6px">Park Kolejowy</span>
+<div style="position:absolute;right:12px;bottom:10px;background:#fff;border:1px solid var(--lk-szary-linia);padding:5px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:59px;height:6px;border:2px solid var(--lk-atrament);border-top:0;box-sizing:border-box"></span>500 m</div>
+<div style="position:absolute;left:12px;bottom:10px;background:#fff;border:1px solid var(--lk-szary-linia);padding:4px 8px;font-size:11px;color:var(--lk-szary-tekst)">Kontury: współtwórcy OpenStreetMap, ODbL</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--lk-szary-linia)">
+<div style="padding:12px 16px;border-right:1px solid var(--lk-szary-linia)"><div style="font-size:12px;color:var(--lk-szary-tekst)">Tabela miasta</div><div style="font-size:24px;font-weight:900;line-height:1.2">20,8 ha</div></div>
+<div style="padding:12px 16px;border-right:1px solid var(--lk-szary-linia)"><div style="font-size:12px;color:var(--lk-szary-tekst)">OpenStreetMap</div><div style="font-size:24px;font-weight:900;line-height:1.2">20,61 ha</div></div>
+<div style="padding:12px 16px"><div style="font-size:12px;color:var(--lk-szary-tekst)">Dopasowanie</div><div style="font-size:16px;font-weight:900;line-height:1.5">nazwa i powierzchnia</div></div>
+</div>
+
+<div style="flex-grow:1;overflow:hidden">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px 110px;background:var(--lk-szary-tlo);font-size:12px;font-weight:900;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:7px 16px">Pozostałe w kadrze</div><div style="padding:7px 8px;text-align:right">Tabela, ha</div><div style="padding:7px 16px;text-align:right">OSM, ha</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px 110px;border-bottom:1px solid var(--lk-szary-linia);font-size:15px"><div style="padding:9px 16px;font-weight:700">Błonia Krakowskie</div><div style="padding:9px 8px;text-align:right">41,72</div><div style="padding:9px 16px;text-align:right">41,61</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px 110px;border-bottom:1px solid var(--lk-szary-linia);font-size:15px"><div style="padding:9px 16px;font-weight:700">Planty Krakowskie</div><div style="padding:9px 8px;text-align:right">20,40</div><div style="padding:9px 16px;text-align:right">21,45</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px 110px;border-bottom:1px solid var(--lk-szary-linia);font-size:15px"><div style="padding:9px 16px;font-weight:700">Park im. Wisławy Szymborskiej</div><div style="padding:9px 8px;text-align:right">0,75</div><div style="padding:9px 16px;text-align:right">0,79</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 130px 110px;font-size:15px"><div style="padding:9px 16px;font-weight:700">Park Kolejowy</div><div style="padding:9px 8px;text-align:right">0,92</div><div style="padding:9px 16px;text-align:right">0,99</div></div>
+</div>
+
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 16px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Pokrycie:</strong> kontur ma 47 z 78 parków (46,9% powierzchni). Źródło: Otwarte Dane UMK i OpenStreetMap, migawka z 19.10.2026.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":700}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

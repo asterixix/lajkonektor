@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Lajkonektor demo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-zloty:#CDB794;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif;--lk-font-znak:Ubuntu,Lato,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament);background:#fff}
+a{color:var(--lk-niebieski)}a:hover{color:var(--lk-niebieski-ciemny)}
+button{font-family:var(--lk-font);cursor:pointer}
+.press:active{transform:translateY(2px)}
+.press:focus-visible,a:focus-visible{outline:3px solid var(--lk-atrament);outline-offset:2px}
+</style>
+</helmet>
+<div style="font-family:var(--lk-font);color:var(--lk-atrament);background:#fff">
+
+<header style="border-bottom:1px solid var(--lk-szary-linia)">
+<div style="max-width:1200px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 32px">
+<a href="#" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+<img src="../../../brand/znak-128.png" alt="" style="width:52px;height:52px;object-fit:contain">
+<span style="font-family:var(--lk-font-znak);font-weight:500;font-size:26px;color:var(--lk-niebieski)">Lajkonektor</span></a>
+<nav style="display:flex;flex-wrap:wrap;gap:8px 28px;font-weight:700;font-size:16px;flex-grow:1">
+<a href="#rozklad" style="color:var(--lk-atrament);text-decoration:none;padding:6px 0">Rozkład narzędzi</a>
+<a href="#luki" style="color:var(--lk-atrament);text-decoration:none;padding:6px 0">Czego nie wiemy</a>
+<a href="#podlacz" style="color:var(--lk-atrament);text-decoration:none;padding:6px 0">Podłączenie</a>
+</nav>
+<a href="#podlacz" style="border:2px solid var(--lk-niebieski);color:var(--lk-niebieski);font-weight:900;padding:8px 18px;text-decoration:none">Instrukcja</a>
+</div>
+</header>
+
+<!-- hero: pytanie i odpowiedź zamiast sloganu -->
+<section style="max-width:1200px;margin:0 auto;padding:56px 24px 72px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+<div style="flex:1 1 440px;max-width:540px;display:flex;flex-direction:column;gap:24px">
+<div style="font-size:14px;font-weight:700;color:var(--lk-szary-tekst)">Konektor MCP do otwartych danych Krakowa</div>
+<h1 style="margin:0;font-family:var(--lk-font);font-size:clamp(38px,5.4vw,60px);line-height:1.04;font-weight:900;letter-spacing:-0.02em">Model pyta. Kod liczy. Kraków podaje źródło.</h1>
+<p style="margin:0;font-size:19px;line-height:1.55;color:var(--lk-atrament)">Podłącz Lajkonektor do Claude albo innego klienta MCP i pytaj o przystanki, parki, wskaźniki GUS i&nbsp;1200 zbiorów miasta. Tylko odczyt, bez logowania.</p>
+<div><a href="#podlacz" class="press" style="display:inline-block;background:var(--lk-zolty);color:var(--lk-atrament);font-weight:900;font-size:17px;padding:14px 26px;text-decoration:none">Dodaj do Claude</a></div>
+<div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
+<div style="font-size:14px;font-weight:700;color:var(--lk-szary-tekst)">Spróbuj pytania:</div>
+<sc-for list="{{chips}}" as="chip" hint-placeholder-count="3">
+<button class="press" onClick="{{chip.pick}}" aria-pressed="{{chip.pressed}}" style="{{chip.style}}">{{chip.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="flex:1 1 520px;min-width:0;background:var(--lk-szary-tlo);border:1px solid var(--lk-szary-linia);padding:20px;display:flex;flex-direction:column;gap:14px" aria-live="polite">
+<div style="align-self:flex-end;background:var(--lk-niebieski);color:#fff;padding:10px 14px;max-width:85%;font-size:16px;line-height:1.4">{{pytanie}}</div>
+<div style="font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--lk-szary-tekst);overflow-wrap:anywhere">{{wywolanie}}</div>
+<div style="background:#fff;border:1px solid var(--lk-szary-linia);padding:12px 14px;font-size:16px;line-height:1.5">{{odpowiedz}}</div>
+
+<sc-if value="{{showOdjazdy}}" hint-placeholder-val="{{ true }}">
+<div style="background:#fff;border:1px solid var(--lk-szary-linia)">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><img src="../../../brand/znak-128.png" alt="" style="width:30px;height:30px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">odjazdy</div><div style="font-size:19px;font-weight:900;line-height:1.15">Basztowa LOT</div></div>
+<span style="background:var(--lk-zielony);font-weight:900;font-size:12px;padding:5px 9px">NA ŻYWO</span>
+</div>
+<div style="display:grid;grid-template-columns:56px minmax(0,1fr) 64px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:11px 12px"><span style="display:inline-block;min-width:34px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">52</span></div><div style="padding:11px 8px;font-size:15px">Bronowice Małe</div><div style="padding:11px 12px;text-align:right;font-weight:900;font-size:18px">2 min</div></div>
+<div style="display:grid;grid-template-columns:56px minmax(0,1fr) 64px;align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:11px 12px"><span style="display:inline-block;min-width:34px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">8</span></div><div style="padding:11px 8px;font-size:15px">Czerwone Maki P+R <span style="color:var(--lk-czerwony);font-weight:700">+3 min</span></div><div style="padding:11px 12px;text-align:right;font-weight:900;font-size:18px">6 min</div></div>
+<div style="padding:9px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> ZTP Kraków, GTFS-RT. Przykładowe wartości: odjazdy zmieniają się co minutę.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showPark}}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;border:1px solid var(--lk-szary-linia)">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><img src="../../../brand/znak-128.png" alt="" style="width:30px;height:30px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">parki_geometria</div><div style="font-size:19px;font-weight:900;line-height:1.15">Park im. Henryka Jordana</div></div>
+<span style="border:1px solid #fff;font-weight:700;font-size:12px;padding:4px 8px">V Krowodrza</span>
+</div>
+<div style="height:170px;background:var(--lk-szary-tlo);border-bottom:1px solid var(--lk-szary-linia);overflow:hidden"><img src="../../../brand/mapa-parki-park-jordana.svg" alt="Kontur Parku Jordana i okręgu 500 metrów na tle Plant i Błoń" style="width:100%;height:100%;object-fit:cover;object-position:44% 50%"></div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr))">
+<div style="padding:10px 14px;border-right:1px solid var(--lk-szary-linia)"><div style="font-size:12px;color:var(--lk-szary-tekst)">Powierzchnia w tabeli miasta</div><div style="font-size:22px;font-weight:900">20,8 ha</div></div>
+<div style="padding:10px 14px"><div style="font-size:12px;color:var(--lk-szary-tekst)">Powierzchnia z OpenStreetMap</div><div style="font-size:22px;font-weight:900">20,61 ha</div></div>
+</div>
+<div style="padding:9px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo);border-top:1px solid var(--lk-szary-linia)"><strong>Dopasowanie:</strong> nazwa i powierzchnia. Kontur: współtwórcy OpenStreetMap, ODbL.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showLuki}}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;border:1px solid var(--lk-szary-linia)">
+<div style="background:var(--lk-niebieski);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><img src="../../../brand/znak-128.png" alt="" style="width:30px;height:30px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">parki_geometria · pokrycie</div><div style="font-size:19px;font-weight:900;line-height:1.15">47 z 78 parków z konturem</div></div>
+<span style="border:1px solid #fff;font-weight:700;font-size:12px;padding:4px 8px">migawka 19.10.2026</span>
+</div>
+<div style="padding:16px 14px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;height:22px;background:var(--lk-szary-linia)"><div style="width:60.3%;background:var(--lk-zielony)"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--lk-szary-tekst)"><span>z konturem: 47</span><span>bez konturu: 31</span></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--lk-szary-linia)">
+<div style="padding:10px 14px;border-right:1px solid var(--lk-szary-linia)"><div style="font-size:22px;font-weight:900">23</div><div style="font-size:13px;color:var(--lk-szary-tekst)">nie znaleziono w OSM po nazwie</div></div>
+<div style="padding:10px 14px"><div style="font-size:22px;font-weight:900">8</div><div style="font-size:13px;color:var(--lk-szary-tekst)">kontur bez domkniętego obrysu</div></div>
+</div>
+<div style="padding:9px 14px;font-size:12px;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo);border-top:1px solid var(--lk-szary-linia)"><strong>Źródło:</strong> Otwarte Dane UMK, OpenStreetMap (ODbL). Kontury obejmują 46,9% powierzchni parków z tabeli.</div>
+</div>
+</sc-if>
+</div>
+</section>
+
+<!-- rozkład narzędzi -->
+<section id="rozklad" style="max-width:1200px;margin:0 auto;padding:0 24px 72px">
+<div style="background:var(--lk-niebieski);color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+<h2 style="margin:0;font-size:30px;font-weight:900;line-height:1.1">Rozkład narzędzi</h2>
+<div style="font-size:15px">8 z 15. Linia to narzędzie, przystanek to źródło danych.</div>
+</div>
+<div style="overflow-x:auto;border:1px solid var(--lk-szary-linia);border-top:0">
+<div style="min-width:780px">
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);background:var(--lk-szary-tlo);font-size:13px;font-weight:900;color:var(--lk-szary-tekst);border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:9px 16px">Nr</div><div style="padding:9px 8px">Narzędzie</div><div style="padding:9px 8px">Co robi</div><div style="padding:9px 8px">Skąd i jak świeże</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">1</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">katalog_szukaj</div><div style="padding:12px 8px;font-size:15px">Znajduje zbiór po temacie lub nazwie pola</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">1200 zbiorów Otwartych Danych UMK i MSIP</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">2</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">dane_zapytaj</div><div style="padding:12px 8px;font-size:15px">Filtruje, grupuje i sumuje dowolny zbiór, także przestrzennie</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">API miasta, na żywo</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">3</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">parki_geometria</div><div style="padding:12px 8px;font-size:15px">Parki z konturem z OpenStreetMap</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">Migawka z 19.10.2026, 47 z 78 parków</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">4</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">odjazdy</div><div style="padding:12px 8px;font-size:15px">Najbliższe odjazdy, opóźnienia i utrudnienia</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">ZTP, GTFS-RT, na żywo</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">5</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">trasa</div><div style="padding:12px 8px;font-size:15px">Planuje przejazd, także z przesiadką</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">ZTP i czas dojścia pieszo z OSRM</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">6</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">przystanki_w_poblizu</div><div style="padding:12px 8px;font-size:15px">Przystanki z czasem dojścia pieszo</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">ZTP i OpenStreetMap</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center;border-bottom:1px solid var(--lk-szary-linia)"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">7</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">bdl_dane</div><div style="padding:12px 8px;font-size:15px">Szeregi czasowe GUS dla Krakowa</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">GUS BDL, wartości roczne i miesięczne</div></div>
+<div style="display:grid;grid-template-columns:64px 210px minmax(0,1fr) minmax(0,1fr);align-items:center"><div style="padding:12px 16px"><span style="display:inline-block;min-width:30px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:3px 0">8</span></div><div style="padding:12px 8px;font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700">status_zrodel</div><div style="padding:12px 8px;font-size:15px">Sprawdza, czy źródła odpowiadają z serwera</div><div style="padding:12px 8px;font-size:15px;color:var(--lk-szary-tekst)">Test przy każdym wywołaniu</div></div>
+</div>
+</div>
+</section>
+
+<!-- luki w danych -->
+<section id="luki" style="background:var(--lk-niebieski-ciemny);color:#fff">
+<div style="max-width:1200px;margin:0 auto;padding:64px 24px;display:flex;flex-wrap:wrap;gap:48px;align-items:center">
+<div style="flex:1 1 380px;max-width:480px;display:flex;flex-direction:column;gap:20px">
+<div style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;opacity:0.85">Czego nie wiemy</div>
+<h2 style="margin:0;font-size:clamp(32px,4.4vw,46px);line-height:1.08;font-weight:900;letter-spacing:-0.01em">Na mapie jest 47 z&nbsp;78 parków.</h2>
+<p style="margin:0;font-size:18px;line-height:1.55">Reszty nie narysujemy, bo OpenStreetMap nie ma jej konturu: 23 parków nie znaleźliśmy po nazwie, 8 ma kontur bez domkniętego obrysu. To 46,9% powierzchni parków z tabeli miasta.</p>
+<p style="margin:0;font-size:18px;line-height:1.55">Wolimy to napisać, niż liczyć zasięg parków i udawać, że mapa jest pełna. Każda odpowiedź o parkach niesie pole <span style="font-family:ui-monospace,Consolas,monospace;font-size:16px">pokrycie</span>.</p>
+</div>
+<figure style="flex:1 1 480px;min-width:0;margin:0">
+<img src="../../../brand/mapa-parki-biala.svg" alt="Kontury 47 parków Krakowa z OpenStreetMap; widać pierścień Plant" style="width:100%;height:auto;display:block">
+<figcaption style="padding-top:10px;font-size:13px;opacity:0.9">Kontury: współtwórcy OpenStreetMap, ODbL. Migawka z 19.10.2026.</figcaption>
+</figure>
+</div>
+</section>
+
+<!-- podłączenie -->
+<section id="podlacz" style="max-width:1200px;margin:0 auto;padding:72px 24px 64px;display:flex;flex-wrap:wrap;gap:48px">
+<div style="flex:1 1 380px;display:flex;flex-direction:column;gap:20px">
+<h2 style="margin:0;font-size:clamp(30px,4vw,40px);line-height:1.1;font-weight:900">Podłączenie zajmuje trzy kroki</h2>
+<div style="display:flex;gap:16px;align-items:flex-start"><span style="flex-shrink:0;min-width:34px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:4px 0">1</span><div style="font-size:17px;line-height:1.5">W Claude otwórz Ustawienia, potem Konektory.</div></div>
+<div style="display:flex;gap:16px;align-items:flex-start"><span style="flex-shrink:0;min-width:34px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:4px 0">2</span><div style="font-size:17px;line-height:1.5">Wybierz Dodaj własny konektor i wklej adres obok.</div></div>
+<div style="display:flex;gap:16px;align-items:flex-start"><span style="flex-shrink:0;min-width:34px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;padding:4px 0">3</span><div style="font-size:17px;line-height:1.5">Zapytaj o przystanek, park albo wskaźnik GUS.</div></div>
+</div>
+<div style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:12px;align-self:flex-start">
+<label for="adres-mcp" style="font-size:14px;font-weight:700;color:var(--lk-szary-tekst)">Adres konektora (Streamable HTTP, bez logowania)</label>
+<div style="display:flex;border:1px solid var(--lk-atrament)">
+<input id="adres-mcp" readonly value="https://lajkonektor.sendyka.workers.dev/mcp" style="flex-grow:1;min-width:0;border:0;padding:0 14px;height:52px;font:400 15px ui-monospace,Consolas,monospace;color:var(--lk-atrament);background:#fff">
+<button class="press" onClick="{{kopiuj}}" style="border:0;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:16px;padding:0 22px;min-width:130px">{{kopiujEtykieta}}</button>
+</div>
+<div style="font-size:14px;line-height:1.5;color:var(--lk-szary-tekst)">Działa z klientami MCP, które łączą się po HTTP. Nie zapisujemy adresów ani pytań użytkowników.</div>
+</div>
+</section>
+
+<footer style="background:var(--lk-atrament);color:#fff">
+<div style="max-width:1200px;margin:0 auto;padding:24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;font-size:14px;line-height:1.55">
+<div>Lajkonektor to projekt niezależny. Nie jest serwisem Miasta Krakowa.</div>
+<div style="color:var(--lk-zloty)">Dane: Otwarte Dane UMK, MSIP, GUS BDL, ZTP, OpenStreetMap (ODbL)</div>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2300}}'>
+class Component extends DCLogic {
+renderVals() {
+  const q = (this.state && this.state.q) || 0;
+  const copied = !!(this.state && this.state.copied);
+  const ask = [
+    { label: 'Kiedy autobus spod Basztowej LOT?', pytanie: 'Kiedy najbliższy autobus spod Basztowej LOT?', wywolanie: 'odjazdy({ nazwa: "Basztowa LOT" })', odpowiedz: 'Najbliższa jest linia 52 za 2 min, potem 8 za 6 min (opóźnienie 3 min). Wartości w karcie są przykładowe.' },
+    { label: 'Jak duży jest Park Jordana?', pytanie: 'Jak duży jest Park Jordana?', wywolanie: 'parki_geometria({ nazwa: "Jordana" })', odpowiedz: 'Park im. Henryka Jordana ma 20,8 ha w tabeli miasta i 20,61 ha w OpenStreetMap. Dopasowanie potwierdza nazwa i powierzchnia.' },
+    { label: 'Ile parków nie ma konturu?', pytanie: 'Ile parków nie ma konturu na mapie?', wywolanie: 'parki_geometria({ tylko_z_geometria: false })', odpowiedz: 'Kontur ma 47 z 78 parków, czyli 46,9% powierzchni z tabeli miasta. Analizy przestrzenne parków są więc niepełne.' }
+  ];
+  const on = 'border:2px solid #0063AF;background:#0063AF;color:#fff;font-weight:900;font-size:15px;padding:9px 14px;text-align:left;';
+  const off = 'border:2px solid #0063AF;background:#fff;color:#0063AF;font-weight:900;font-size:15px;padding:9px 14px;text-align:left;';
+  return {
+    chips: ask.map((a, i) => ({ label: a.label, pressed: i === q, style: i === q ? on : off, pick: () => this.setState({ q: i }) })),
+    pytanie: ask[q].pytanie, wywolanie: ask[q].wywolanie, odpowiedz: ask[q].odpowiedz,
+    showOdjazdy: q === 0, showPark: q === 1, showLuki: q === 2,
+    kopiujEtykieta: copied ? 'Skopiowano' : 'Kopiuj adres',
+    kopiuj: () => {
+      const done = () => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); };
+      try { navigator.clipboard.writeText('https://lajkonektor.sendyka.workers.dev/mcp').then(done, () => {}); } catch (e) {}
+    }
+  };
+}
+}
+</script>
+</body>
+</html>

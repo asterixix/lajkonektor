@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Karta trasy</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--lk-niebieski:#0063AF;--lk-niebieski-ciemny:#00488E;--lk-zolty:#FFCC00;--lk-atrament:#071F32;--lk-szary-tlo:#F5F5F5;--lk-szary-linia:#BFBFBF;--lk-szary-tekst:#505050;--lk-czerwony:#AF1828;--lk-zielony:#2E7D32;--lk-font:Lato,system-ui,sans-serif}
+body{margin:0;font-family:var(--lk-font);color:var(--lk-atrament)}
+</style>
+</helmet>
+<div style="width:520px;height:600px;box-sizing:border-box;background:#fff;border:1px solid var(--lk-szary-linia);display:flex;flex-direction:column;font-family:var(--lk-font);color:var(--lk-atrament)">
+
+<div style="background:var(--lk-niebieski);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center"><img src="../../../brand/znak-128.png" alt="Lajkonektor" style="width:38px;height:38px;object-fit:contain"></div>
+<div style="flex-grow:1;min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">trasa</div><div style="font-size:20px;font-weight:900;line-height:1.2">Basztowa 20 do Czerwonych Maków P+R</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:1px solid var(--lk-szary-linia)">
+<div style="padding:12px 16px;background:var(--lk-atrament);color:#fff"><div style="font-size:12px;font-weight:700">Z przesiadką</div><div style="font-size:28px;font-weight:900;line-height:1.1">39 min</div></div>
+<div style="padding:12px 16px;background:var(--lk-szary-tlo)"><div style="font-size:12px;font-weight:700;color:var(--lk-szary-tekst)">Bezpośrednio</div><div style="font-size:28px;font-weight:900;line-height:1.1;color:var(--lk-szary-tekst)">47 min</div></div>
+</div>
+
+<div style="flex-grow:1;padding:16px 16px 8px;display:flex;flex-direction:column">
+
+<div style="display:grid;grid-template-columns:44px minmax(0,1fr);gap:0 12px">
+<div style="display:flex;flex-direction:column;align-items:center"><span style="width:14px;height:14px;background:var(--lk-atrament)"></span><span style="flex-grow:1;width:0;border-left:3px dotted var(--lk-szary-tekst);margin:2px 0"></span></div>
+<div style="padding-bottom:14px;font-size:15px;line-height:1.35"><strong>Dojście 4 min</strong><div style="color:var(--lk-szary-tekst);font-size:13px">310 m do przystanku Basztowa LOT, potem czekanie 2 min</div></div>
+
+<div style="display:flex;flex-direction:column;align-items:center"><span style="min-width:44px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:16px;padding:3px 0">24</span><span style="flex-grow:1;width:6px;background:var(--lk-niebieski);margin:2px 0"></span></div>
+<div style="padding-bottom:14px;font-size:15px;line-height:1.35"><strong>Basztowa LOT do Dworca Głównego Tunelu</strong><div style="color:var(--lk-szary-tekst);font-size:13px">kierunek Wzgórza Krzesławickie · 2 przystanki · 3 min</div></div>
+
+<div style="display:flex;flex-direction:column;align-items:center"><span style="width:14px;height:14px;background:var(--lk-atrament)"></span><span style="flex-grow:1;width:0;border-left:3px dotted var(--lk-szary-tekst);margin:2px 0"></span></div>
+<div style="padding-bottom:14px;font-size:15px;line-height:1.35"><strong>Przesiadka</strong><div style="color:var(--lk-szary-tekst);font-size:13px">dojście 2 min, czekanie 3 min</div></div>
+
+<div style="display:flex;flex-direction:column;align-items:center"><span style="min-width:44px;text-align:center;background:var(--lk-niebieski);color:#fff;font-weight:900;font-size:16px;padding:3px 0">8</span><span style="flex-grow:1;width:6px;background:var(--lk-niebieski);margin:2px 0"></span></div>
+<div style="padding-bottom:14px;font-size:15px;line-height:1.35"><strong>Dworzec Główny do Czerwonych Maków P+R</strong><div style="color:var(--lk-szary-tekst);font-size:13px">17 przystanków · 22 min</div><div style="color:var(--lk-czerwony);font-size:13px;font-weight:700">utrudnienia: objazd przez ul. Dietla</div></div>
+
+<div style="display:flex;flex-direction:column;align-items:center"><span style="width:14px;height:14px;background:var(--lk-atrament)"></span></div>
+<div style="font-size:15px;line-height:1.35"><strong>Dojście 3 min</strong><div style="color:var(--lk-szary-tekst);font-size:13px">230 m z przystanku do celu</div></div>
+</div>
+</div>
+
+<div style="border-top:1px solid var(--lk-szary-linia);padding:10px 16px;font-size:12px;line-height:1.45;color:var(--lk-szary-tekst);background:var(--lk-szary-tlo)"><strong>Źródło:</strong> rozkład ZTP Kraków, dojście po sieci OSM (OSRM). Czas to rozkład, nie prognoza. Wartości przykładowe.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":520,"height":600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

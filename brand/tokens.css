@@ -1,0 +1,15 @@
+/* Lajkonektor: tokeny z SIW Krakowa 2023 (kolory, Lato/Ubuntu) i wzorców krakow.pl (kwadratowe kafle, belka). */
+:root {
+  --lk-niebieski: #0063AF;      /* PANTONE 2945 C */
+  --lk-niebieski-ciemny: #00488E; /* PANTONE 294 C, tło */
+  --lk-zolty: #FFCC00;          /* PANTONE 116 C */
+  --lk-zloty: #CDB794;          /* PANTONE 465 C */
+  --lk-atrament: #071F32;       /* tekst na krakow.pl */
+  --lk-szary-tlo: #F5F5F5;
+  --lk-szary-linia: #BFBFBF;
+  --lk-szary-tekst: #505050;
+  --lk-czerwony: #AF1828;       /* błąd, utrudnienia */
+  --lk-zielony: #2E7D32;        /* punktualnie, dane aktualne */
+  --lk-font: "Lato", system-ui, sans-serif;
+  --lk-font-znak: "Ubuntu", "Lato", sans-serif; /* tylko logotyp i nagłówki znaku */
+}
