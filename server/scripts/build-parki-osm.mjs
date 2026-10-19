@@ -99,6 +99,16 @@ const out = od.map((p) => {
   };
 });
 
+// Jeden obiekt OSM może opisywać tylko jeden park z tabeli OD. Przy konflikcie (np. "Planty" dla Plant Krakowskich i
+// Bieńczyckich) zostaje park o powierzchni najbliższej powierzchni obiektu OSM, reszta traci dopasowanie.
+const wgOsm = Object.groupBy(out.filter((p) => p.osm), (p) => p.osm.id);
+for (const grupa of Object.values(wgOsm)) {
+  if (grupa.length < 2) continue;
+  const blad = (p) => Math.abs(Math.log(p.osm.area_ha / p.powierzchnia_od_ha));
+  grupa.sort((a, b) => blad(a) - blad(b));
+  for (const p of grupa.slice(1)) { p.osm = null; p.zgodnosc = "brak (kontur OSM przypisany do innego parku)"; }
+}
+
 mkdirSync(new URL("../data/", import.meta.url), { recursive: true });
 writeFileSync(new URL("../data/parki-osm.json", import.meta.url), JSON.stringify({
   zrodlo: "Tabela: Otwarte Dane Miasta Krakowa (parki miejskie). Geometria: © współtwórcy OpenStreetMap, ODbL.",

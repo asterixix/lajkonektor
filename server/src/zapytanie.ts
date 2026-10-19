@@ -1,7 +1,7 @@
 // Uniwersalne zapytanie do dowolnej pozycji katalogu (tabela OD albo warstwa MSIP), z agregacją i filtrem przestrzennym.
 import { bbox, centroid, type Ring } from "./geo.ts";
 import { znajdz, type Pozycja } from "./katalog.ts";
-import { PARKI_OSM_ID, parkiRings } from "./parki.ts";
+import { PARKI_OSM_ID, parkiRings, pokrycieParkow } from "./parki.ts";
 import { arcgisQuery, getJson } from "./sources.ts";
 
 export type Fn = "sum" | "count" | "avg" | "min" | "max";
@@ -61,9 +61,12 @@ export function agreguj(rows: Record<string, any>[], grupuj: string[], agg: NonN
 // Sortowanie wyniku agregacji po kolumnie ("pole" lub "pole desc").
 export function sortuj(rows: Record<string, any>[], spec?: string) {
   if (!spec) return rows;
-  const [pole, kier] = spec.trim().split(/\s+/);
+  // Nazwa kolumny z pliku może zawierać spacje, więc kierunek to tylko ostatnie słowo asc/desc.
+  const [, pole, kier] = spec.trim().match(/^(.*?)(?:\s+(asc|desc))?$/i)!;
   const m = kier?.toLowerCase() === "desc" ? -1 : 1;
-  return rows.slice().sort((a, b) => (a[pole] > b[pole] ? m : a[pole] < b[pole] ? -m : 0));
+  const pusta = (v: unknown) => v == null || v === "";
+  // Puste wartości zawsze na końcu, w obu kierunkach.
+  return rows.slice().sort((a, b) => pusta(a[pole]) ? (pusta(b[pole]) ? 0 : 1) : pusta(b[pole]) ? -1 : a[pole] > b[pole] ? m : a[pole] < b[pole] ? -m : 0);
 }
 
 // --- tabele OD (WSO2 + DAB: $select, $filter, $orderby, $first, $after)
@@ -103,7 +106,7 @@ async function odQuery(p: Pozycja, q: Zapytanie) {
 // --- warstwy MSIP (ArcGIS REST)
 async function geometriaZ(z: { id: string; where?: string }) {
   if (z.id === PARKI_OSM_ID) {
-    return { geometry: JSON.stringify({ rings: parkiRings(), spatialReference: { wkid: 4326 } }), type: "esriGeometryPolygon", n: parkiRings().length, uwaga: "Parki z OSM (pokrycie częściowe: 47 z 78 parków)." };
+    return { geometry: JSON.stringify({ rings: parkiRings(), spatialReference: { wkid: 4326 } }), type: "esriGeometryPolygon", n: parkiRings().length, uwaga: `Parki z OSM (pokrycie częściowe: ${pokrycieParkow().z} z ${pokrycieParkow().razem} parków).` };
   }
   const src = pozycja(z.id);
   if (src.zrodlo !== "msip") throw new Error("Obszar 'z' może pochodzić tylko z warstwy MSIP lub z 'lokalne:parki_osm'.");

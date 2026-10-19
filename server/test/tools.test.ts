@@ -29,6 +29,12 @@ test("agregacja po stronie serwera: grupowanie i funkcje", () => {
   assert.deepEqual(r, [{ g: "a", sum_v: 4, sr: 2, count_v: 2 }, { g: "b", sum_v: 10, sr: 10, count_v: 1 }]);
 });
 
+test("sortowanie: kolumna ze spacjami w nazwie, puste wartości zawsze na końcu", () => {
+  const rows = [{ "Cena m 2 [zł]": null }, { "Cena m 2 [zł]": 10 }, { "Cena m 2 [zł]": 30 }, { "Cena m 2 [zł]": "" }, { "Cena m 2 [zł]": 20 }];
+  assert.deepEqual(sortuj(rows, "Cena m 2 [zł] desc").map((r) => r["Cena m 2 [zł]"]), [30, 20, 10, null, ""]);
+  assert.deepEqual(sortuj(rows, "Cena m 2 [zł]").map((r) => r["Cena m 2 [zł]"]), [10, 20, 30, null, ""]);
+});
+
 // --- OD
 test("OD: filtr, pola i agregacja po dzielnicy (parki)", async () => {
   const wszystkie = await daneZapytaj({ id: PARKI_OD, limit: 200 });
@@ -152,4 +158,13 @@ test("OD: agregacja z sortowaniem po kolumnie agregatu i limitem (regresja: 400 
   assert.equal(r.wiersze.length, 3);
   assert.ok((r.wiersze[0] as any).ha >= (r.wiersze[1] as any).ha && (r.wiersze[1] as any).ha >= (r.wiersze[2] as any).ha);
   assert.deepEqual(sortuj([{ a: 1 }, { a: 3 }, { a: 2 }], "a desc").map((x) => x.a), [3, 2, 1]);
+});
+
+test("parki_geometria: żaden kontur OSM nie jest przypisany do dwóch parków (regresja: Planty Bieńczyckie i Krakowskie)", () => {
+  const r = parkGeometry({ tylko_z_geometria: true });
+  const id = r.parki.map((p) => p.osm!.id);
+  assert.equal(new Set(id).size, id.length, "powtórzony kontur OSM");
+  const b = parkGeometry({ nazwa: "Planty Bieńczyckie" }).parki[0];
+  assert.equal(b.osm, null, "Planty Bieńczyckie nie mogą dostać konturu Plant Krakowskich");
+  assert.ok(parkGeometry({ nazwa: "Planty Krakowskie" }).parki[0].osm, "Planty Krakowskie zachowują kontur");
 });

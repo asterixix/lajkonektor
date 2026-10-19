@@ -36,10 +36,13 @@ export async function bdlDane(opts: { zmienne: number[]; jednostka: string; lata
     ...opts.zmienne.map((id) => getJson(bdlUrl(`/variables/${id}`)).catch(() => ({ id }))),
   ]);
   const opis = new Map<number, any>(info.map((v: any) => [v.id, v]));
+  // n1 bywa samym „ogółem”; temat (np. „Stopa bezrobocia rejestrowanego”) mówi, co faktycznie jest mierzone.
+  const tematy = new Map<string, string>(await Promise.all([...new Set(info.map((v: any) => v.subjectId).filter(Boolean))].map(
+    async (id: string) => [id, (await getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({}))).name ?? ""] as [string, string])));
   const wiersze = (dane.results ?? []).flatMap((r: any) => {
     const v = opis.get(r.id) ?? {};
     const nazwa = [v.n1, v.n2, v.n3, v.n4].filter(Boolean).join(" | ");
-    return (r.values ?? []).map((x: any) => ({ zmienna_id: r.id, nazwa, jednostka_miary: v.measureUnitName, rok: Number(x.year), wartosc: x.val }));
+    return (r.values ?? []).map((x: any) => ({ zmienna_id: r.id, temat: tematy.get(v.subjectId) || undefined, nazwa, jednostka_miary: v.measureUnitName, rok: Number(x.year), wartosc: x.val }));
   });
   return {
     zrodlo: "GUS, Bank Danych Lokalnych (BDL)",
@@ -57,7 +60,8 @@ export async function daneGovSzukaj(q: string, limit: number) {
   });
   if (!res.ok) throw new Error(`dane.gov.pl HTTP ${res.status}`);
   const j: any = await res.json();
-  const strip = (s: unknown) => String(s ?? "").replace(/<\/?mark>/g, "");
+  // Opisy na dane.gov.pl to HTML (<p>, <span style>, &nbsp;), a tytuły mają podświetlenie <mark>.
+  const strip = (s: unknown) => String(s ?? "").replace(/<\/?mark>/g, "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
   return {
     zrodlo: "dane.gov.pl (Portal Danych Otwartych)",
     razem: j.meta?.count ?? null,
