@@ -19,8 +19,8 @@ Powód: pytań o miasto jest nieskończenie wiele, a źródeł jest kilka typów
 | `dane_gov` | Wyszukiwanie zbiorów i plików w dane.gov.pl | ✅ |
 | `parki_geometria` | Geometria parków z OSM (jako „obszar" `lokalne:parki_osm` w `dane_zapytaj`); pokrycie 47/78 | ✅ (częściowe) |
 | `przystanki_w_poblizu`, `odjazdy`, `trasa`, `utrudnienia` | Transport: GTFS ZTP pobierany na żywo, GTFS-RT, dojście przez OSM, komunikaty (patrz `transport.md`) | ✅ |
-| `plik_odczyt` | CSV/XLSX/PDF/GeoJSON/SHP z dowolnego URL (np. z dane.gov.pl): tabela do analizy | ⏳ |
-| `prognoza` | Deterministyczna projekcja szeregu (trend + przedział + opis metody) | ⏳ |
+| `plik_odczyt` | CSV/XLSX/GeoJSON/JSON z adresu gov.pl/krakow.pl: tabela, profil kolumn, agregacja (patrz `prognoza-i-pliki.md`) | ✅ (PDF, SHP: nie) |
+| `prognoza` | Deterministyczna projekcja szeregu: OLS, wykładniczy, Holt, backtest, przedziały 80/95%, ostrzeżenia | ✅ |
 | MCP Apps (mapa, wykres), Skills „Badacz miejski", Tasks | Warstwa prezentacji i metodyki | ⏳ |
 
 Usunięte jako zbędne: `parki_lista`, `mpzp_w_punkcie`, `ludnosc_w_promieniu` (robi je `dane_zapytaj`).
@@ -39,6 +39,6 @@ Usunięte jako zbędne: `parki_lista`, `mpzp_w_punkcie`, `ludnosc_w_promieniu` (
 
 ## Znane luki
 - 🔴 Rodziny tabel OD z rocznymi migawkami nie są jeszcze zgrupowane w katalogu (model musi sam zauważyć sufiks daty). Poprawka: pole `rodzina` w `katalog_szukaj` i narzędzie/zapytanie łączące.
-- 🔴 Brak `plik_odczyt` i `prognoza`: pytanie o prognozę cudzoziemców 2026–2036 jest niepełne.
+- 🔴 Prognoza cudzoziemców 2026–2036 opiera się na 3 rocznych migawkach OD (2023–2025): przedział jest bardzo szeroki; potrzebny dłuższy szereg (BDL?) albo scenariusz.
 - 🟡 Opisy w katalogu to nazwy urzędowe + ręczny słownik aliasów (7 tematów). Warto rozszerzyć o opisy kuratorskie dla 30–50 najważniejszych zbiorów (skill „Badacz miejski").
 - 🟡 Złączenie przestrzenne z całym zbiorem obiektów (np. 2000 wielokątów) bywa wolne (parki: ~8 s). Potrzebny cache (KV) wyników agregacji.

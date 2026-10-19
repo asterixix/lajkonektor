@@ -160,9 +160,12 @@ test("na żywo: trasa Łojasiewicza 4 -> Basztowa 20 (OSM dojście, GTFS-RT, kom
   const opcje = planuj(S, start.kandydaci, cel.kandydaci);
   assert.ok(opcje.length >= 1, "powinna istnieć co najmniej jedna opcja");
   assert.ok(opcje[0].czas_min > 10 && opcje[0].czas_min < 120, `czas ${opcje[0].czas_min} min`);
-  const rt = await uzupelnijNaZywo(S, opcje.slice(0, 3));
+  // Publiczne feedy bywają chwilowo wolne przy równoległych testach: jedno ponowienie.
+  let rt = await uzupelnijNaZywo(S, opcje.slice(0, 3));
+  if (rt.bledy.length) rt = await uzupelnijNaZywo(S, opcje.slice(0, 3));
   assert.deepEqual(rt.bledy, [], "feedy RT bez błędów");
-  const k = await pobierzKomunikaty(S);
+  let k = await pobierzKomunikaty(S);
+  if (k.bledy.length) k = await pobierzKomunikaty(S);
   assert.deepEqual(k.bledy, []);
 });
 

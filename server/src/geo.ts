@@ -23,6 +23,17 @@ export function bbox(rings: Ring[]): [number, number, number, number] {
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
 }
 
+// Pole pierścienia w hektarach (rzutowanie lokalne, wystarcza w skali miasta).
+export function ringAreaHa(ring: Ring): number {
+  const ky = 110540, kx = 111320 * K;
+  let a = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+    a += x1 * kx * y2 * ky - x2 * kx * y1 * ky;
+  }
+  return Math.abs(a) / 2 / 10_000;
+}
+
 // Esri JSON wymaga pierścieni zewnętrznych zgodnie z ruchem wskazówek zegara.
 export function clockwise(ring: Ring): Ring {
   let s = 0;

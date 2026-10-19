@@ -5,6 +5,8 @@ import { pozycje, szukaj } from "./katalog.ts";
 import { parkGeometry } from "./parki.ts";
 import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
 import { statusZrodel } from "./status.ts";
+import { plikOdczyt } from "./plik.ts";
+import { prognoza } from "./prognoza.ts";
 import { geokodujOsm, kandydaciOsm, kandydaciPara } from "./osm.ts";
 import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
 import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
@@ -311,6 +313,50 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
         const lista = linia ? k.komunikaty.filter((x) => x.linie.includes(linia)) : k.komunikaty;
         return { zrodlo: "ZTP Kraków, GTFS-RT ServiceAlerts (na żywo)", liczba: lista.length, komunikaty: lista, ...(k.bledy.length ? { bledy: k.bledy } : {}) };
       }),
+  );
+
+  server.registerTool(
+    "prognoza",
+    {
+      title: "Prognoza szeregu czasowego",
+      description:
+        "Deterministyczna projekcja szeregu (np. z bdl_dane lub dane_zapytaj) z przedziałami 80% i 95% oraz opisem metody. Metody: trend liniowy, wzrost wykładniczy, Holt; w trybie auto wybór po błędzie backtestu. To projekcja trendu, nie przewidywanie. Wymaga ≥3 punktów (zalecane ≥6). Liczy serwer, więc wynik jest powtarzalny.",
+      inputSchema: z.object({
+        serie: z.array(z.object({ x: z.number().describe("Okres, np. rok"), y: z.number().describe("Wartość") })).min(3).max(200),
+        horyzont: z.number().int().min(1).max(20).default(5).describe("Liczba kroków do przodu"),
+        metoda: z.enum(["auto", "liniowy", "wykladniczy", "holt"]).default("auto"),
+        krok: z.number().positive().optional().describe("Długość kroku w jednostkach x (domyślnie mediana odstępów)"),
+        ostatnie_punkty: z.number().int().min(3).optional().describe("Użyj tylko ostatnich N punktów (np. po załamaniu trendu)"),
+        etykieta: z.string().optional().describe("Co prognozujemy, np. 'cudzoziemcy na pobyt czasowy' (tylko opis)"),
+      }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    ({ serie, horyzont, metoda, krok, etykieta, ostatnie_punkty }) =>
+      run(async () => ({ ...(etykieta ? { etykieta } : {}), ...prognoza({ serie, horyzont, metoda, krok, ostatnie_punkty }) })),
+  );
+
+  server.registerTool(
+    "plik_odczyt",
+    {
+      title: "Odczyt pliku z otwartych danych",
+      description:
+        "Pobiera i czyta plik CSV, XLSX lub GeoJSON/JSON z adresu https instytucji publicznych (*.gov.pl, *.krakow.pl, np. link z dane_gov albo eksport MSIP f=geojson) i zwraca tabelę z profilem kolumn (typ, braki, min/max/suma/średnia), opcjonalnie z filtrem pól, sortowaniem i agregacją po stronie serwera. Limit pliku 8 MB.",
+      inputSchema: z.object({
+        url: z.string().url().describe("https://api.dane.gov.pl/resources/.../file albo inny link do pliku"),
+        format: z.enum(["csv", "xlsx", "geojson", "json"]).optional().describe("Domyślnie wykrywany automatycznie"),
+        arkusz: z.union([z.string(), z.number().int().min(1)]).optional().describe("XLSX: nazwa lub numer arkusza (od 1)"),
+        separator: z.string().max(1).optional().describe("CSV: separator (domyślnie wykrywany)"),
+        pola: z.array(z.string()).optional().describe("Kolumny do zwrócenia"),
+        sortuj: z.string().optional().describe("'kolumna' lub 'kolumna desc'"),
+        limit: z.number().int().min(1).max(500).default(50),
+        offset: z.number().int().min(0).optional(),
+        grupuj_po: z.array(z.string()).optional(),
+        agreguj: z.array(z.object({ fn: z.enum(["sum", "count", "avg", "min", "max"]), pole: z.string(), nazwa: z.string().optional() })).optional(),
+        geometria: z.enum(["podsumowanie", "brak"]).optional().describe("GeoJSON: środek/ramka/pole obiektów (domyślnie podsumowanie)"),
+      }),
+      annotations: readOnly,
+    },
+    (args) => run(() => plikOdczyt(args)),
   );
 
   return server;
