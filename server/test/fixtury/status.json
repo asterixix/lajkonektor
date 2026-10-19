@@ -11,22 +11,27 @@
   {
    "host": "api.um.krakow.pl",
    "status": 200,
-   "ms": 220
+   "ms": 164
   },
   {
    "host": "msip3.um.krakow.pl",
    "status": 200,
-   "ms": 33
+   "ms": 39
   },
   {
    "host": "bdl.stat.gov.pl",
    "status": 200,
-   "ms": 28
+   "ms": 597
   },
   {
    "host": "gtfs.ztp.krakow.pl",
    "status": 200,
-   "ms": 24
+   "ms": 23
+  },
+  {
+   "host": "mkuran.pl",
+   "status": 200,
+   "ms": 164
   }
  ]
 }

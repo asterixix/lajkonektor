@@ -1,7 +1,7 @@
 // Widoki danych: wynik zapytania (tabela/słupki), plik, szereg GUS, prognoza, parki z mapą, katalog, opis zbioru,
 // lista BDL, dane.gov.pl, adres, komunikaty ZTP i status źródeł.
 import { kafel, esc, liczba, nr, zrodlo } from "../pomoc.ts";
-import { mapa, type Poligon, type Ring } from "../mapa.ts";
+import { mapa, type LiniaMapy, type Poligon, type PunktMapy, type Ring } from "../mapa.ts";
 import { wykres } from "../wykres.ts";
 import { stan, type Ctx, type Widok } from "./typy.ts";
 
@@ -21,6 +21,28 @@ function opisZapytania(a: any): string {
   return cz.join(" · ");
 }
 
+// Obiekty mapy z wierszy MSIP zwróconych z `_geometria`: kontury (jeśli są), linie albo punkty; podpisy tylko przy niewielu obiektach.
+export function obiektyZWierszy(wiersze: Record<string, any>[], kategorie: string[], kolumnaEtykiety?: string) {
+  const kolEt = kolumnaEtykiety ?? kategorie.find((k) => /nazwa|name|ulica|oznaczenie|typ|rodzaj/i.test(k)) ?? kategorie.find((k) => !/^(objectid|gdb_id|globalid|fid)$/i.test(k)) ?? kategorie[0];
+  const podpisy = wiersze.filter((w) => w._geometria).length <= 12;
+  const poligony: Poligon[] = [], linie: LiniaMapy[] = [], punkty: PunktMapy[] = [];
+  for (const w of wiersze) {
+    const g = w._geometria; if (!g) continue;
+    const et = kolEt && w[kolEt] != null ? String(w[kolEt]) : "";
+    if (g.kontury) poligony.push({ rings: g.kontury, klasa: "bez-klika", etykieta: podpisy && et ? { tekst: et } : undefined });
+    else if (g.linie_geom) for (const l of g.linie_geom) linie.push({ pts: l, klasa: "jazda" });
+    else if (g.srodek) punkty.push({ lat: g.srodek.lat, lon: g.srodek.lon, klasa: "obiekt", etykieta: podpisy ? et : undefined });
+    else if (g.lat != null) punkty.push({ lat: g.lat, lon: g.lon, klasa: "obiekt", etykieta: podpisy ? et : undefined });
+  }
+  return { poligony, linie, punkty };
+}
+
+function mapaZWierszy(wiersze: Record<string, any>[], kategorie: string[]): string {
+  const { poligony, linie, punkty } = obiektyZWierszy(wiersze, kategorie);
+  if (!poligony.length && !linie.length && !punkty.length) return "";
+  return mapa({ poligony, linie, punkty, skala: true, opis: `Mapa ${wiersze.length} obiektów`, przypis: poligony.length || linie.length ? "" : "Pokazano środki obiektów; kontury: kontury=true w dane_zapytaj." });
+}
+
 function tabelaTresc(d: any, plik: boolean): { tresc: string; liczbaWierszy: number } {
   const wiersze: Record<string, any>[] = d.wiersze ?? [];
   if (!wiersze.length) return { tresc: `<div class="puste"><div style="font-size:17px;font-weight:900">Zapytanie nie zwróciło wierszy.</div><div class="szary-t">Sprawdź filtr i nazwy pól albo użyj zbior_opis, żeby zobaczyć kolumny.</div></div>`, liczbaWierszy: 0 };
@@ -29,13 +51,15 @@ function tabelaTresc(d: any, plik: boolean): { tresc: string; liczbaWierszy: num
   const numeryczne = kol.filter((k) => wiersze.every((w) => w[k] == null || jestLiczba(w[k])) && wiersze.some((w) => jestLiczba(w[k])));
   const kategorie = kol.filter((k) => !numeryczne.includes(k));
   const moznaSlupki = numeryczne.length > 0 && kategorie.length > 0 && wiersze.length <= 40;
-  const tryb = moznaSlupki && stan.tryb === "slupki" ? "slupki" : "tabela";
+  const maGeometrie = wiersze.some((w) => w._geometria);
+  const tryb: "tabela" | "slupki" | "mapa" = stan.tryb === "slupki" && moznaSlupki ? "slupki" : stan.tryb === "tabela" ? "tabela" : maGeometrie ? "mapa" : "tabela";
   const wybrana = numeryczne.includes(stan.metryka) ? stan.metryka : numeryczne[0];
 
   const sortKol: string | undefined = stan.sortKol, sortDir: number = stan.sortDir ?? 1;
   const dane = sortKol ? wiersze.slice().sort((a, b) => (a[sortKol] == null ? 1 : b[sortKol] == null ? -1 : a[sortKol] > b[sortKol] ? sortDir : a[sortKol] < b[sortKol] ? -sortDir : 0)) : wiersze;
 
-  const przelacznik = moznaSlupki ? `<div class="przelacznik" role="group" aria-label="Widok"><button data-tryb="tabela" aria-pressed="${tryb === "tabela"}">Tabela</button><button data-tryb="slupki" aria-pressed="${tryb === "slupki"}">Słupki</button></div>` : "";
+  const przyciskiTrybu = [["tabela", "Tabela"], ...(maGeometrie ? [["mapa", "Mapa"]] : []), ...(moznaSlupki ? [["slupki", "Słupki"]] : [])];
+  const przelacznik = przyciskiTrybu.length > 1 ? `<div class="przelacznik" role="group" aria-label="Widok">${przyciskiTrybu.map(([k, e]) => `<button data-tryb="${k}" aria-pressed="${tryb === k}">${e}</button>`).join("")}</div>` : "";
   const metryki = tryb === "slupki" && numeryczne.length > 1 ? `<div class="przelacznik" role="group" aria-label="Wartość">${numeryczne.slice(0, 4).map((k) => `<button data-metryka="${esc(k)}" aria-pressed="${k === wybrana}">${esc(k)}</button>`).join("")}</div>` : "";
   const pasek = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--lk-szary-linia)"><div class="mono szary-t" style="font-size:12px;min-width:0;overflow-wrap:anywhere">${esc(opisZapytania(d._zapytanie) || (plik ? `${d.format}${d.arkusze?.length ? ` · arkusz: ${d.arkusze[0]}` : ""}` : "bez filtra"))}</div><div style="display:flex;gap:8px;flex-wrap:wrap">${metryki}${przelacznik}</div></div>`;
 
@@ -44,9 +68,13 @@ function tabelaTresc(d: any, plik: boolean): { tresc: string; liczbaWierszy: num
     const maks = Math.max(...dane.map((w) => Math.abs(w[wybrana] ?? 0)), 1e-9);
     ciało = `<div class="slupki">${dane.map((w) => `<div class="slupek"><div class="n">${esc(kategorie.map((k) => w[k]).join(" · "))}</div><div class="slupek-tlo"><div style="width:${Math.max(1, Math.round((Math.abs(w[wybrana] ?? 0) / maks) * 100))}%"></div></div><div class="w">${esc(liczba(w[wybrana], 2))}</div></div>`).join("")}</div>`;
   } else {
-    const szer = kol.map((k) => (numeryczne.includes(k) ? "minmax(70px,120px)" : "minmax(90px,1fr)")).join(" ");
-    ciało = `<div class="przewijane"><div style="min-width:${Math.max(0, kol.length * 110)}px"><div class="naglowek-tabeli" style="--kol:${szer}">${kol.map((k) => `<button data-sort="${esc(k)}" class="${numeryczne.includes(k) ? "p" : ""}" aria-label="Sortuj po ${esc(k)}">${esc(k)}${sortKol === k ? (sortDir > 0 ? " ▲" : " ▼") : ""}</button>`).join("")}</div>${dane.slice(0, 200).map((w) => `<div class="rzad" style="--kol:${szer};font-size:14px">${kol.map((k) => `<div class="${numeryczne.includes(k) ? "p" : ""}" style="${numeryczne.includes(k) ? "font-weight:900" : ""}">${esc(numeryczne.includes(k) ? liczba(w[k], 2) : tekstKomorki(w[k]))}</div>`).join("")}</div>`).join("")}</div></div>`;
+    // Kolumny z długim tekstem (nazwy, opisy) dostają więcej miejsca, żeby nie łamały się co trzy litery.
+    const dlugi = (k: string) => !numeryczne.includes(k) && wiersze.slice(0, 30).reduce((n, w) => n + String(w[k] ?? "").length, 0) / Math.min(wiersze.length, 30) > 22;
+    const minSzer = (k: string) => (numeryczne.includes(k) ? 70 : dlugi(k) ? 220 : 90);
+    const szer = kol.map((k) => (numeryczne.includes(k) ? "minmax(70px,120px)" : dlugi(k) ? "minmax(220px,2.5fr)" : "minmax(90px,1fr)")).join(" ");
+    ciało = `<div class="przewijane"><div style="min-width:${kol.reduce((n, k) => n + minSzer(k), 0)}px"><div class="naglowek-tabeli" style="--kol:${szer}">${kol.map((k) => `<button data-sort="${esc(k)}" class="${numeryczne.includes(k) ? "p" : ""}" aria-label="Sortuj po ${esc(k)}">${esc(k)}${sortKol === k ? (sortDir > 0 ? " ▲" : " ▼") : ""}</button>`).join("")}</div>${dane.slice(0, 200).map((w) => `<div class="rzad" style="--kol:${szer};font-size:14px">${kol.map((k) => `<div class="${numeryczne.includes(k) ? "p" : ""}" style="${numeryczne.includes(k) ? "font-weight:900" : ""}">${esc(numeryczne.includes(k) ? liczba(w[k], 2) : tekstKomorki(w[k]))}</div>`).join("")}</div>`).join("")}</div></div>`;
   }
+  if (tryb === "mapa") ciało = mapaZWierszy(dane, kategorie) + ciało;
   let profil = "";
   if (plik && d.kolumny_profil?.length) {
     // Profil tylko kolumn widocznych w tabeli, żeby przy szerokim pliku nie zajmował pół karty.
@@ -68,7 +96,7 @@ export const tabela: Widok = {
   render(d) {
     const { tresc, liczbaWierszy } = tabelaTresc(d, false);
     return kafel({
-      id: "dane_zapytaj", tytul: tytulZbioru(d.zbior), znacznik: { tekst: `${liczbaWierszy} ${liczbaWierszy === 1 ? "wiersz" : "wierszy"}`, rodzaj: "obrys" }, tresc,
+      id: "dane_zapytaj", tytul: String(d.zbior).startsWith("msip:") && String(d.zrodlo).includes(" / ") ? String(d.zrodlo).split(" / ").pop()! : tytulZbioru(d.zbior), znacznik: { tekst: `${liczbaWierszy} ${liczbaWierszy === 1 ? "wiersz" : "wierszy"}`, rodzaj: "obrys" }, tresc,
       zrodlo: zrodlo(d.zrodlo ?? "źródło nieznane", (d.uwagi ?? []).join(" ") + (d.nastepny_kursor ? " Są kolejne strony (kursor)." : "") + " Sumy i agregacje liczy serwer, nie model."),
     });
   },
@@ -189,8 +217,24 @@ export const parki: Widok = {
 export const katalog: Widok = {
   render(d) {
     const w: any[] = d.wyniki ?? [];
-    const tresc = w.length ? `<ul class="pole-lista" style="padding:0">${w.map((x) => `<li style="grid-template-columns:minmax(0,1fr) auto"><div><div style="font-weight:900;overflow-wrap:anywhere">${esc(String(x.tytul).split(" / ").pop())}</div><div class="mono szary-t" style="font-size:12px;overflow-wrap:anywhere">${esc(x.id)}</div><div class="szary-t" style="font-size:13px;padding-top:2px">${esc((x.pola ?? []).slice(0, 8).join(", "))}${x.pol_razem ? ` (+${x.pol_razem - 8})` : ""}</div></div><div><span class="znacznik obrys" style="color:var(--lk-niebieski);border-color:var(--lk-niebieski)">${x.zrodlo === "msip" ? "MAPA" : "TABELA"}</span></div></li>`).join("")}</ul>` : `<div class="puste"><div style="font-size:17px;font-weight:900">Brak zbiorów dla tych słów.</div><div class="szary-t">${esc(d.podpowiedz ?? "Spróbuj innych słów kluczowych.")}</div></div>`;
-    return kafel({ id: "katalog_szukaj", tytul: "Zbiory danych o Krakowie", znacznik: { tekst: `${w.length} wyników`, rodzaj: "obrys" }, tresc, zrodlo: zrodlo("katalog 1 203 zbiorów: Otwarte Dane UMK i warstwy MSIP.", "Użyj zbior_opis(id), a potem dane_zapytaj.") });
+    const wiersz = (x: any) => {
+      const id = esc(x.id), msip = x.zrodlo === "msip";
+      return `<li style="grid-template-columns:minmax(0,1fr) auto"><div><div style="font-weight:900;overflow-wrap:anywhere">${esc(String(x.tytul).split(" / ").pop())}</div><div class="mono szary-t" style="font-size:12px;overflow-wrap:anywhere">${id}</div><div class="szary-t" style="font-size:13px;padding-top:2px">${esc((x.pola ?? []).slice(0, 8).join(", "))}${x.pol_razem ? ` (+${x.pol_razem - 8})` : ""}</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="przycisk" style="min-height:34px;padding:5px 12px;font-size:13px" data-akcja="${msip ? "mapa" : "dane"}" data-id="${id}">${msip ? "Pokaż na mapie" : "Pokaż dane"}</button><button class="przycisk obrys" style="min-height:34px;padding:3px 10px;font-size:13px" data-akcja="opis" data-id="${id}">Opis pól</button></div></li>`;
+    };
+    const tresc = w.length ? `<ul class="pole-lista" style="padding:0">${w.map(wiersz).join("")}</ul>` : `<div class="puste"><div style="font-size:17px;font-weight:900">Brak zbiorów dla tych słów.</div><div class="szary-t">${esc(d.podpowiedz ?? "Spróbuj innych słów kluczowych.")}</div></div>`;
+    const brak = d.brak_w_katalogu ? `<div class="ostrzezenia"><span class="etykieta">BRAK</span>${esc(d.brak_w_katalogu)}</div>` : "";
+    return kafel({ id: "katalog_szukaj", tytul: "Zbiory danych o Krakowie", znacznik: { tekst: `${w.length} wyników`, rodzaj: "obrys" }, tresc: brak + tresc, zrodlo: zrodlo("katalog 1 203 zbiorów: Otwarte Dane UMK i warstwy MSIP.", "Przyciski pobierają dane na żywo z tego zbioru.") });
+  },
+  podlacz(root, _d, c) {
+    root.querySelectorAll<HTMLButtonElement>("[data-akcja]").forEach((b) => {
+      b.onclick = async () => {
+        const etykieta = b.textContent, id = b.dataset.id!, akcja = b.dataset.akcja;
+        b.disabled = true; b.textContent = "Pobieram…";
+        try {
+          c.przejdz(await c.wywolaj(akcja === "opis" ? "zbior_opis" : "dane_zapytaj", akcja === "opis" ? { id } : akcja === "mapa" ? { id, limit: 150, kontury: true } : { id, limit: 100 }));
+        } catch { b.disabled = false; b.textContent = "Nie udało się, ponów"; setTimeout(() => { b.textContent = etykieta; }, 2500); }
+      };
+    });
   },
 };
 
@@ -202,7 +246,17 @@ export const opisZbioru: Widok = {
     const tresc = `<div class="kafle3"><div><div class="et">Rodzaj</div><div class="liczba" style="font-size:18px">${d.zrodlo === "msip" ? "Warstwa mapy" : "Tabela"}</div></div><div><div class="et">${d.zrodlo === "msip" ? "Obiektów" : "Wierszy"}</div><div class="liczba">${liczba(liczbaObj, 0)}</div></div><div><div class="et">Pól</div><div class="liczba">${pola.length}</div></div></div>
 <ul class="pole-lista przewijane" style="max-height:300px">${pola.map((p) => { const [n, t] = p.split(":"); return `<li><span style="font-weight:700;overflow-wrap:anywhere">${esc(n)}${d.aliasy?.[n] ? ` <span class="szary-t" style="font-weight:400">(${esc(d.aliasy[n])})</span>` : ""}</span><span class="mono szary-t" style="font-size:12px;text-align:right">${esc(t ?? "")}</span></li>`; }).join("")}</ul>
 ${probka.length ? `<div class="profil" style="border-top:1px solid var(--lk-szary-linia)"><span>Próbka: ${esc(JSON.stringify(probka[0]).slice(0, 180))}…</span></div>` : ""}`;
-    return kafel({ id: "zbior_opis", tytul: String(d.tytul ?? d.id).split(" / ").pop()!, znacznik: { tekst: d.zrodlo === "msip" ? "MSIP" : "OD", rodzaj: "obrys" }, tresc, zrodlo: `<strong>Id:</strong> <span class="mono">${esc(d.id)}</span>. ${esc(d.jak_pytac ?? "")}` });
+    return kafel({ id: "zbior_opis", tytul: String(d.tytul ?? d.id).split(" / ").pop()!, znacznik: { tekst: d.zrodlo === "msip" ? "MSIP" : "OD", rodzaj: "obrys" }, tresc, akcja: `<button class="przycisk" data-pokaz>${d.zrodlo === "msip" ? "Pokaż na mapie" : "Pokaż dane"}</button>`, zrodlo: `<strong>Id:</strong> <span class="mono">${esc(d.id)}</span>. ${esc(d.jak_pytac ?? "")}` });
+  },
+  podlacz(root, d, c) {
+    const b = root.querySelector<HTMLButtonElement>("[data-pokaz]");
+    if (!b) return;
+    b.onclick = async () => {
+      const etykieta = b.textContent;
+      b.disabled = true; b.textContent = "Pobieram…";
+      try { c.przejdz(await c.wywolaj("dane_zapytaj", d.zrodlo === "msip" ? { id: d.id, limit: 150, kontury: true } : { id: d.id, limit: 100 })); }
+      catch { b.disabled = false; b.textContent = "Nie udało się, ponów"; setTimeout(() => { b.textContent = etykieta; }, 2500); }
+    };
   },
 };
 

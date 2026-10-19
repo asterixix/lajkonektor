@@ -37,8 +37,10 @@ export function podsumuj(nazwa: string, d: any): string {
         const p: any = d.prognoza?.[0];
         return `Projekcja metodą ${d.metoda}: ${p ? `${p.x}: ${f(p.wartosc, 2)} (przedział 95%: ${f(p.dolna_95, 2)}–${f(p.gorna_95, 2)})` : "brak"}. To projekcja trendu, nie przewidywanie.${d.ostrzezenia?.length ? " Ostrzeżenia: " + d.ostrzezenia.join(" ") : ""}`;
       }
+      case "widok":
+        return `Karta „${d.tytul}”: ${(d.bloki ?? []).map((b: any) => b.typ + (b.razem ? ` (${b.razem} wierszy)` : "")).join(", ")}. Źródło: ${d.zrodlo}.`;
       case "katalog_szukaj":
-        return `Znaleziono ${d.liczba} zbiorów. Najlepszy: ${d.wyniki?.[0]?.id ?? "brak"}.`;
+        return `Znaleziono ${d.liczba} zbiorów. Najlepszy: ${d.wyniki?.[0]?.id ?? "brak"}.${d.brak_w_katalogu ? " " + d.brak_w_katalogu : ""}`;
       case "adres_na_punkt":
         return d.liczba ? `Adres: ${d.kandydaci[0].ulica} ${d.kandydaci[0].numer}, ${d.kandydaci[0].kod_pocztowy}, ${d.kandydaci[0].dzielnica}; współrzędne ${d.kandydaci[0].lat?.toFixed(5)}, ${d.kandydaci[0].lon?.toFixed(5)}.` : "Nie znaleziono adresu.";
       default:

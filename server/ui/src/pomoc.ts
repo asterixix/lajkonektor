@@ -17,7 +17,7 @@ export interface OpisKafla {
 }
 
 export const znacznik = (z?: Znacznik) => (z ? `<span class="znacznik ${z.rodzaj ?? "obrys"}">${esc(z.tekst)}</span>` : "");
-export const nr = (linia: string, maly = false) => `<span class="nr${maly ? " maly" : ""}">${esc(linia)}</span>`;
+export const nr = (linia: string, maly = false) => `<span class="nr${maly ? " maly" : ""}${linia.length > 3 ? " dlugi" : ""}">${esc(linia)}</span>`;
 
 export function kafel(o: OpisKafla): string {
   return `<article class="kafel" aria-label="${esc(o.id)}: ${esc(o.tytul)}">

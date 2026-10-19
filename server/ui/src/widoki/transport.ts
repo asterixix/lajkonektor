@@ -4,8 +4,12 @@ import { mapa } from "../mapa.ts";
 import { stan, type Ctx, type Widok } from "./typy.ts";
 
 const hhmm = (ts?: number) => (ts ? new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" }).format(new Date(ts * 1000)) : "");
-// „prof. Stanisława Łojasiewicza 4, 30-348 (Dzielnica VIII Dębniki)” → „prof. Stanisława Łojasiewicza 4” do tytułu karty.
-const krotko = (opis?: string) => (opis ?? "?").replace(/,\s*\d{2}-\d{3}.*$/, "");
+// Do tytułu karty: „prof. Stanisława Łojasiewicza 4, 30-348 (Dzielnica VIII Dębniki)” → „prof. Stanisława Łojasiewicza 4”,
+// „Dworzec Główny Tunel 01, Antresola, Wesoła” → „Dworzec Główny Tunel 01”, „15, Staniątki, gmina Niepołomice” → „Staniątki 15”.
+const krotko = (opis?: string) => {
+  const cz = (opis ?? "?").replace(/,\s*\d{2}-\d{3}.*$/, "").split(",").map((x) => x.trim());
+  return /^\d+\w?$/.test(cz[0]) && cz[1] ? `${cz[1]} ${cz[0]}` : cz[0];
+};
 const najnowszy = (o?: Record<string, number>) => (o ? Math.max(0, ...Object.values(o)) : 0);
 
 // --- odjazdy
@@ -15,17 +19,18 @@ export const odjazdy: Widok = {
     const przystanki = [...new Set(lista.map((x) => x.przystanek))];
     const tytul = d._zapytanie?.nazwa ?? (przystanki.length === 1 ? przystanki[0] : przystanki[0] ? `${przystanki[0]} i okolica` : "Odjazdy");
     const ts = najnowszy(d.czas_feedu);
-    const zywo = lista.length > 0 && !(d.bledy?.length);
+    const rozklad = (x: any) => String(x.zrodlo ?? "").startsWith("rozkład"); // pociągi: godzina z rozkładu, bez opóźnień
+    const zywo = lista.some((x) => !rozklad(x)) && !(d.bledy?.length);
     const wiersze = lista.map((x) => {
-      const p = punktualnosc(x.opoznienie_s, x.odjazd);
+      const p = rozklad(x) ? { tekst: `${x.odjazd} wg rozkładu`, klasa: "szary-t" } : punktualnosc(x.opoznienie_s, x.odjazd);
       return `<div class="rzad" style="--kol:72px minmax(0,1fr) 88px"><div>${nr(x.linia)}</div><div style="font-size:16px;line-height:1.3">${esc(x.kierunek || "kierunek nieznany")}<div class="mala ${p.klasa}">${esc(p.tekst)}${przystanki.length > 1 ? " · " + esc(x.przystanek) : ""}</div></div><div class="p"><span class="wartosc">${liczba(x.za_min, 0)}</span><span class="jednostka"> min</span></div></div>`;
     }).join("");
     const tresc = `${komunikatyHtml(d.komunikaty)}
 ${lista.length ? `<div><div class="naglowek-tabeli" style="--kol:72px minmax(0,1fr) 88px"><div>Linia</div><div>Kierunek</div><div class="p">Za</div></div>${wiersze}</div>` : `<div class="puste"><div class="tr" style="font-size:17px;font-weight:900">Brak odjazdów w feedzie.</div><div class="szary-t">Feed GTFS-RT zawiera kursy już będące w trasie. Odległe odjazdy mogą się jeszcze nie pojawić.</div></div>`}
 ${d.bledy?.length ? `<div class="ostrzezenia"><span class="etykieta">UWAGA</span>${esc(d.bledy.join("; "))}</div>` : ""}`;
     return kafel({
-      id: "odjazdy", tytul, znacznik: zywo ? { tekst: "NA ŻYWO", rodzaj: "zielony" } : { tekst: "BRAK DANYCH", rodzaj: "atrament" }, tresc,
-      zrodlo: zrodlo("ZTP Kraków, GTFS-RT" + (ts ? `, stan ${hhmm(ts)}.` : "."), "Kursy jeszcze niewyjechane mogą nie być w feedzie."),
+      id: "odjazdy", tytul, znacznik: zywo ? { tekst: "NA ŻYWO", rodzaj: "zielony" } : lista.length ? { tekst: "ROZKŁAD", rodzaj: "atrament" } : { tekst: "BRAK DANYCH", rodzaj: "atrament" }, tresc,
+      zrodlo: zrodlo("ZTP Kraków, GTFS-RT" + (ts ? `, stan ${hhmm(ts)}.` : ".") + (lista.some(rozklad) ? " Pociągi: rozkład PKP PLK (mkuran.pl), bez opóźnień." : ""), "Kursy jeszcze niewyjechane mogą nie być w feedzie."),
       akcja: d._zapytanie ? `<button class="przycisk" data-odswiez>Odśwież</button>` : "",
     });
   },
@@ -57,7 +62,7 @@ export const trasa: Widok = {
     const dojscie = (tytul: string, opis: string) => `<div class="kol"><span class="punkt"></span><span class="linia-kropki"></span></div><div class="opis"><strong>${esc(tytul)}</strong><div class="mala">${esc(opis)}</div></div>`;
     wiersze.push(dojscie(`Dojście ${o.dojscie_start.min} min`, `${liczba(o.dojscie_start.m, 0)} m do przystanku ${o.dojscie_start.przystanek}${o.czekanie_pierwsza_noga_min != null ? `, potem czekanie ${o.czekanie_pierwsza_noga_min} min` : ""}`));
     o.nogi.forEach((n: any, i: number) => {
-      wiersze.push(`<div class="kol">${nr(n.linia)}<span class="linia-pelna"></span></div><div class="opis"><strong>${esc(n.wsiadanie)} do ${esc(n.wysiadanie)}</strong><div class="mala">kierunek ${esc(n.kierunek)} · ${n.przystankow} ${n.przystankow === 1 ? "przystanek" : "przystanków"} · ${n.jazda_min} min</div></div>`);
+      wiersze.push(`<div class="kol">${nr(n.linia)}<span class="linia-pelna"></span></div><div class="opis"><strong>${esc(n.wsiadanie)} do ${esc(n.wysiadanie)}</strong><div class="mala">kierunek ${esc(n.kierunek)} · ${n.przystankow} ${n.przystankow === 1 ? "przystanek" : "przystanków"} · ${n.jazda_min} min${n.odjazd_wg_rozkladu ? ` · odjazd ${esc(n.odjazd_wg_rozkladu)} wg rozkładu` : ""}</div></div>`);
       if (i < o.nogi.length - 1 && o.przesiadka) wiersze.push(dojscie("Przesiadka", `${esc(o.przesiadka.przystanek)}, dojście ${o.przesiadka.dojscie_min} min`));
     });
     wiersze.push(`<div class="kol"><span class="punkt"></span></div><div class="opis"><strong>Dojście ${o.dojscie_cel.min} min</strong><div class="mala">${liczba(o.dojscie_cel.m, 0)} m z przystanku ${esc(o.dojscie_cel.przystanek)} do celu</div></div>`);

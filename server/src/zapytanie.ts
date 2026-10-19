@@ -1,5 +1,5 @@
 // Uniwersalne zapytanie do dowolnej pozycji katalogu (tabela OD albo warstwa MSIP), z agregacją i filtrem przestrzennym.
-import { bbox, centroid, type Ring } from "./geo.ts";
+import { bbox, centroid, uprosc, zaokragl, type Ring } from "./geo.ts";
 import { znajdz, type Pozycja } from "./katalog.ts";
 import { PARKI_OSM_ID, parkiRings, pokrycieParkow } from "./parki.ts";
 import { arcgisQuery, getJson } from "./sources.ts";
@@ -22,6 +22,8 @@ export interface Zapytanie {
   agreguj?: { fn: Fn; pole: string; nazwa?: string }[];
   geometria?: Geometria;
   zwroc_geometrie?: boolean;
+  /** MSIP: dołącz uproszczone kontury (do mapy); implikuje zwroc_geometrie. */
+  kontury?: boolean;
   tylko_liczba?: boolean;
 }
 
@@ -146,10 +148,12 @@ async function zasieg(g: Geometria, uwagi: string[]): Promise<Record<string, str
   return out;
 }
 
-function geomOut(geometry: any) {
+function geomOut(geometry: any, kontury = false) {
   if (!geometry) return undefined;
-  if (geometry.rings) return { srodek: centroid(geometry.rings as Ring[]), bbox: bbox(geometry.rings as Ring[]) };
-  if (geometry.paths) { const pts = geometry.paths.flat(); return { punkty: pts.length, bbox: bbox([pts as Ring]) }; }
+  // Kontury upraszczamy (ok. 3 m), żeby 200 obiektów mieściło się w odpowiedzi i w karcie.
+  const uproszcz = (r: Ring) => zaokragl(uprosc(r, 0.00003), 5);
+  if (geometry.rings) return { srodek: centroid(geometry.rings as Ring[]), bbox: bbox(geometry.rings as Ring[]), ...(kontury ? { kontury: (geometry.rings as Ring[]).map(uproszcz) } : {}) };
+  if (geometry.paths) { const pts = geometry.paths.flat(); return { punkty: pts.length, bbox: bbox([pts as Ring]), ...(kontury ? { linie_geom: (geometry.paths as Ring[]).map(uproszcz) } : {}) }; }
   if (geometry.x != null) return { lat: geometry.y, lon: geometry.x };
   return undefined;
 }
@@ -171,8 +175,9 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
     return { wiersze: wiersze.slice(0, limit), ile_zrodlo: wiersze.length, nastepny_kursor: null, uwagi };
   }
   params.outFields = q.pola?.length ? q.pola.join(",") : "*";
-  params.returnGeometry = q.zwroc_geometrie ? "true" : "false";
-  if (q.zwroc_geometrie) { params.outSR = "4326"; params.geometryPrecision = "6"; }
+  const geom = q.zwroc_geometrie || q.kontury;
+  params.returnGeometry = geom ? "true" : "false";
+  if (geom) { params.outSR = "4326"; params.geometryPrecision = "6"; }
   if (q.sortuj) params.orderByFields = q.sortuj;
   params.resultRecordCount = String(limit);
   if (q.offset) params.resultOffset = String(q.offset);
@@ -198,7 +203,7 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
   const wiersze = (r.features ?? []).map((f: any) => {
     const a = { ...f.attributes };
     for (const k of daty) if (typeof a[k] === "number") a[k] = new Date(a[k]).toISOString().slice(0, 10);
-    const g = q.zwroc_geometrie ? geomOut(f.geometry) : undefined;
+    const g = geom ? geomOut(f.geometry, q.kontury) : undefined;
     return g ? { ...a, _geometria: g } : a;
   });
   if (r.exceededTransferLimit && wiersze.length) uwagi.push(`Są kolejne wiersze: ponów z offset=${(q.offset ?? 0) + wiersze.length}.`);

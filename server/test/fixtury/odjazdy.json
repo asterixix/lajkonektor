@@ -5,85 +5,85 @@
   "promien_m": 400,
   "limit": 8
  },
- "podsumowanie": "Najbliższe odjazdy (na żywo): linia 152 → Cmentarz Olszanica o 21:10 (za 0 min, opóźnienie 2 min); linia 12 → Czerwone Maki P+R o 21:12 (za 2 min); linia 74 → Wzg. Krzesławickie o 21:12 (za 2 min); linia 3 → Krowodrza G. P+R o 21:14 (za 4 min); linia 5 → Wzg. Krzesławickie o 21:14 (za 4 min).",
+ "podsumowanie": "Najbliższe odjazdy (na żywo): linia 662 → Czerwone Maki P+R o 22:21 (za 0 min); linia 152 → Czyżyny Dworzec o 22:23 (za 3 min, opóźnienie 2 min); linia 12 → Czerwone Maki P+R o 22:24 (za 3 min); linia 12 → Os.Piastów o 22:24 (za 3 min); linia 14 → Mistrzejowice o 22:24 (za 3 min).",
  "zrodlo": "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)",
  "przystankow": 9,
  "bledy": [],
  "czas_feedu": {
-  "M": 1792437015,
-  "A": 1792437014,
-  "T": 1792437022
+  "T": 1792441259,
+  "M": 1792441261,
+  "A": 1792441258
  },
  "odjazdy": [
   {
-   "linia": "152",
-   "kierunek": "Cmentarz Olszanica",
+   "linia": "662",
+   "kierunek": "Czerwone Maki P+R",
    "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "21:10",
+   "odjazd": "22:21",
    "za_min": 0,
-   "opoznienie_s": 134,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "152",
+   "kierunek": "Czyżyny Dworzec",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "22:23",
+   "za_min": 3,
+   "opoznienie_s": 106,
    "zrodlo": "GTFS-RT (na żywo)"
   },
   {
    "linia": "12",
    "kierunek": "Czerwone Maki P+R",
    "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "21:12",
-   "za_min": 2,
+   "odjazd": "22:24",
+   "za_min": 3,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   },
   {
-   "linia": "74",
-   "kierunek": "Wzg. Krzesławickie",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "21:12",
-   "za_min": 2,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "3",
-   "kierunek": "Krowodrza G. P+R",
+   "linia": "12",
+   "kierunek": "Os.Piastów",
    "przystanek": "Teatr Słowackiego 03",
-   "odjazd": "21:14",
-   "za_min": 4,
+   "odjazd": "22:24",
+   "za_min": 3,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "14",
+   "kierunek": "Mistrzejowice",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "22:24",
+   "za_min": 3,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   },
   {
    "linia": "5",
-   "kierunek": "Wzg. Krzesławickie",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "21:14",
-   "za_min": 4,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "3",
-   "kierunek": "Nowy Bieżanów P+R",
-   "przystanek": "Teatr Słowackiego 04",
-   "odjazd": "21:14",
+   "kierunek": "Górka Narodowa P+R",
+   "przystanek": "Teatr Słowackiego 01",
+   "odjazd": "22:24",
    "za_min": 4,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   },
   {
    "linia": "78",
-   "kierunek": "Mały Płaszów P+R",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "21:15",
-   "za_min": 5,
+   "kierunek": "Borek Fałęcki",
+   "przystanek": "Teatr Słowackiego 01",
+   "odjazd": "22:24",
+   "za_min": 4,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   },
   {
-   "linia": "72",
-   "kierunek": "Cmentarz Rakowicki",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "21:16",
-   "za_min": 6,
+   "linia": "14",
+   "kierunek": "Cichy Kącik",
+   "przystanek": "Teatr Słowackiego 01",
+   "odjazd": "22:25",
+   "za_min": 4,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   }

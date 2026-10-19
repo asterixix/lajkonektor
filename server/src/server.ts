@@ -2,10 +2,11 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { RESOURCE_MIME_TYPE, registerAppResource, registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { addressToPoint } from "./adres.ts";
-import { pozycje, szukaj } from "./katalog.ts";
+import { brakiTematu, pozycje, szukaj } from "./katalog.ts";
 import { konturyParkow, parkGeometry } from "./parki.ts";
 import { KARTA_HTML } from "./ui/karta.generated.ts";
 import { podsumuj } from "./podsumowanie.ts";
+import { widokSchema, zlozWidok } from "./widok.ts";
 import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
 import { statusZrodel } from "./status.ts";
 import { plikOdczyt } from "./plik.ts";
@@ -14,6 +15,7 @@ import { geokodujOsm, kandydaciOsm, kandydaciPara } from "./osm.ts";
 import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
 import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
+import { czyZtp } from "./siec.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
 
@@ -32,8 +34,20 @@ const KARTA_URI = "ui://lajkonektor/karta.html";
 export const WIDOK: Record<string, string> = {
   katalog_szukaj: "katalog", zbior_opis: "opis_zbioru", dane_zapytaj: "tabela", adres_na_punkt: "adres", parki_geometria: "parki",
   bdl_szukaj: "bdl_lista", bdl_dane: "szereg", dane_gov: "dane_gov", przystanki_w_poblizu: "przystanki", odjazdy: "odjazdy",
-  trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik",
+  trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik", widok: "zlozony",
 };
+
+// Kontury i przebiegi do rysowania map są potrzebne karcie (structuredContent), a nie modelowi: w tekście wyniku ich nie powtarzamy.
+const bezKonturow = (k: string, v: unknown) => (k === "kontury" || k === "linie_geom" ? undefined : v);
+
+const INSTRUKCJE = `Lajkonektor: otwarte dane Krakowa (Otwarte Dane i MSIP Urzędu Miasta, GUS BDL, dane.gov.pl, rozkłady i pozycje pojazdów ZTP na żywo, OpenStreetMap). Tylko odczyt.
+Jak pracować:
+1. Nie znasz zbioru: katalog_szukaj(temat) → zbior_opis(id) → dane_zapytaj(id, filtr, agreguj, geometria). Sumy i średnie liczy serwer (agreguj), nie licz w pamięci. Obejmuje m.in. parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję, wybory. Czego nie ma (odpady i PSZOK, kina, targowiska, wypadki drogowe), katalog_szukaj mówi w polu brak_w_katalogu: wtedy powiedz to użytkownikowi, nie podsuwaj innych danych.
+2. Adres lub miejsce: adres_na_punkt; filtr przestrzenny w dane_zapytaj: {punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}.
+3. Komunikacja: przystanki_w_poblizu, odjazdy (na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne), utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity: dokładne godziny z rozkładu, bez opóźnień); miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Gdy źródło zwraca błąd 522, użyj status_zrodel.
+4. Szeregi GUS: bdl_szukaj → bdl_dane; projekcja: prognoza. Gdy użytkownik prosi o prognozę lub trend, wywołaj prognoza nawet dla krótkiej serii (od 3 punktów) i przekaż jej przedział oraz ostrzeżenia, zamiast odmawiać z góry. Pliki CSV/XLSX/GeoJSON: plik_odczyt.
+5. Każde narzędzie pokazuje kartę w klientach z MCP Apps (z mapą OSM, tabelą, wykresem). Gdy odpowiedź wymaga własnego układu (porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami), złóż kartę narzędziem widok; dane wskazuj przez pole z, zamiast przepisywać liczby.
+6. Podawaj źródło i datę danych oraz pokrycie (np. geometria jest tylko dla części parków). Nie zgaduj liczb, których narzędzia nie zwróciły.`;
 
 const geometria = z
   .union([
@@ -45,22 +59,36 @@ const geometria = z
     "Filtr przestrzenny (tylko warstwy MSIP): {punkt:{lat,lon},promien_m} | {bbox:[zach,pld,wsch,pln]} | {z:{id,where,bufor_m}} = obiekty innej warstwy (lub 'lokalne:parki_osm') z buforem",
   );
 
-export function createServer(cf?: { colo?: string; country?: string }): McpServer {
-  const server = new McpServer({ name: "lajkonektor", version: "0.3.0" });
+// origin: publiczny adres serwera; karty pobierają z niego kafelki mapy (CSP hosta musi go znać).
+export function createServer(cf?: { colo?: string; country?: string }, origin?: string): McpServer {
+  const server = new McpServer({ name: "lajkonektor", version: "0.4.0" }, { instructions: INSTRUKCJE });
 
   registerAppResource(server, "Karta Lajkonektora", KARTA_URI, { description: "Widoki wyników narzędzi: odjazdy, trasa, mapa parków, tabele, wykresy, prognoza." }, async () => ({
-    contents: [{ uri: KARTA_URI, mimeType: RESOURCE_MIME_TYPE, text: KARTA_HTML, _meta: { ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: [] } } } }],
+    contents: [{ uri: KARTA_URI, mimeType: RESOURCE_MIME_TYPE, text: KARTA_HTML, _meta: { ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: origin ? [origin] : [] } } } }],
   }));
 
   // Każde narzędzie ma kartę UI (klienci z MCP Apps) i pełny wynik tekstowy (pozostali). Do wyniku dokładamy widok,
   // zapytanie (do odświeżania) i krótkie podsumowanie po polsku dla klientów bez UI.
-  const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) =>
-    registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
+  // Rejestr surowych handlerów: narzędzie `widok` wykonuje przez niego zapytania wskazane w blokach (`z`).
+  const rejestr = new Map<string, { schema: z.ZodType; handler: (args: any) => Promise<any> }>();
+  const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) => {
+    rejestr.set(nazwa, { schema: cfg.inputSchema, handler });
+    return registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
       const r = await handler(args);
       if (!r.structuredContent) return r;
       const dane = { podsumowanie: podsumuj(nazwa, r.structuredContent), ...r.structuredContent };
-      return { content: [{ type: "text" as const, text: JSON.stringify(dane) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...dane } };
+      return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
     });
+  };
+  const wywolaj = async (nazwa: string, argumenty: unknown) => {
+    const t = rejestr.get(nazwa);
+    if (!t) throw new Error(`nieznane narzędzie ${nazwa}`);
+    const p = t.schema.safeParse(argumenty);
+    if (!p.success) throw new Error(`argumenty ${nazwa}: ${p.error.issues.map((i) => `${i.path.join(".") || "(korzeń)"}: ${i.message}`).join("; ")}`);
+    const r = await t.handler(p.data);
+    if (r.isError) throw new Error(String(r.content[0].text).replace(/^Błąd:\s*/, ""));
+    return r.structuredContent;
+  };
 
   narzedzie(
     "katalog_szukaj",
@@ -81,7 +109,8 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
           id: p.id, zrodlo: p.zrodlo, tytul: p.tytul, geometria: p.geometria ?? undefined,
           pola: p.pola.slice(0, 14).map((f) => f.split(":")[0]), ...(p.pola.length > 14 ? { pol_razem: p.pola.length } : {}),
         }));
-        return { liczba: wyniki.length, wyniki, podpowiedz: wyniki.length ? "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj." : "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'." };
+        const brak = brakiTematu(temat);
+        return { liczba: wyniki.length, wyniki, ...(brak ? { brak_w_katalogu: brak } : {}), podpowiedz: wyniki.length ? "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj." : "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'." };
       }),
   );
 
@@ -114,6 +143,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
         agreguj: z.array(z.object({ fn: z.enum(["sum", "count", "avg", "min", "max"]), pole: z.string(), nazwa: z.string().optional() })).optional(),
         geometria: geometria.optional(),
         zwroc_geometrie: z.boolean().optional().describe("MSIP: dołącz środek i ramkę obiektu"),
+        kontury: z.boolean().optional().describe("MSIP: dołącz uproszczone kontury obiektów (do mapy w karcie; używaj z limit ≤ 200)"),
         tylko_liczba: z.boolean().optional().describe("MSIP: zwróć tylko liczbę obiektów"),
       }),
       annotations: readOnly,
@@ -216,21 +246,26 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       }),
   );
 
-  const punkt = z.object({ lat: z.number().min(49.9).max(50.2), lon: z.number().min(19.7).max(20.2) });
-  const adres = z.object({ ulica: z.string().min(2), numer: z.string(), kod_pocztowy: z.string().optional() });
-  const nazwaMiejsca = z.object({ tekst: z.string().min(2).describe("Nazwa miejsca, np. 'Rynek Główny', 'Dworzec Główny', 'AGH' (geokodowanie OSM)") });
+  const punkt = z.object({ lat: z.number().min(49.2).max(50.5), lon: z.number().min(18.9).max(21.5) });
+  const adres = z.object({ ulica: z.string().min(2), numer: z.string(), kod_pocztowy: z.string().optional() }).describe("Adres w Krakowie (punkty adresowe MSIP); poza Krakowem użyj {tekst}");
+  const nazwaMiejsca = z.object({ tekst: z.string().min(2).describe("Nazwa miejsca lub adres, np. 'Rynek Główny', 'Dworzec Główny', 'AGH', a poza Krakowem 'Staniątki 15', 'Niepołomice rynek', 'Wieliczka kopalnia' (geokodowanie OSM, Małopolska)") });
   const miejsce = z
     .union([punkt, adres, nazwaMiejsca])
-    .describe("Miejsce: {lat,lon} | adres {ulica,numer[,kod_pocztowy]} (MSIP) | {tekst} nazwa miejsca (OpenStreetMap)");
+    .describe("Miejsce: {lat,lon} | adres w Krakowie {ulica,numer[,kod_pocztowy]} (MSIP) | {tekst} nazwa miejsca lub adres w Krakowie i Małopolsce (OpenStreetMap)");
   const rozwiaz = async (m: z.infer<typeof miejsce>) => {
     if ("lat" in m) return { lat: m.lat, lon: m.lon, etykieta: `${m.lat.toFixed(5)}, ${m.lon.toFixed(5)}`, zrodlo: "współrzędne podane" };
     if ("tekst" in m) {
       const g = await geokodujOsm(m.tekst);
-      if (!g) throw new Error(`Nie znaleziono miejsca w Krakowie: ${m.tekst}`);
+      if (!g) throw new Error(`Nie znaleziono miejsca w Krakowie ani w Małopolsce: ${m.tekst}. Spróbuj z nazwą miejscowości, np. 'Staniątki 15'.`);
       return { lat: g.lat, lon: g.lon, etykieta: g.nazwa, zrodlo: "OpenStreetMap (Nominatim)" };
     }
     const r = await addressToPoint(m);
-    if (!r.liczba) throw new Error(`Nie znaleziono adresu: ${m.ulica} ${m.numer}. ${r.uwaga}`);
+    if (!r.liczba) {
+      // Poza Krakowem punktów adresowych MSIP nie ma: próbujemy OSM.
+      const g = await geokodujOsm(`${m.ulica} ${m.numer}`);
+      if (g) return { lat: g.lat, lon: g.lon, etykieta: g.nazwa, zrodlo: "OpenStreetMap (Nominatim); adres spoza punktów adresowych MSIP" };
+      throw new Error(`Nie znaleziono adresu: ${m.ulica} ${m.numer}. ${r.uwaga}`);
+    }
     const k = r.kandydaci[0];
     return { lat: k.lat as number, lon: k.lon as number, etykieta: `${k.ulica} ${k.numer}, ${k.kod_pocztowy} (${k.dzielnica})`, zrodlo: "MSIP Kraków (punkty adresowe)" };
   };
@@ -240,7 +275,7 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
     {
       title: "Przystanki komunikacji w pobliżu",
       description:
-        "Przystanki autobusowe, tramwajowe i aglomeracyjne (ZTP Kraków) w pobliżu miejsca: odległość i czas dojścia pieszo po sieci OSM (OSRM), linie. Miejsce: współrzędne, adres albo nazwa miejsca.",
+        "Przystanki autobusowe, tramwajowe, aglomeracyjne (ZTP Kraków) i stacje kolejowe (Koleje Małopolskie, PolRegio, Intercity) w pobliżu miejsca: odległość i czas dojścia pieszo po sieci OSM (OSRM), linie. Miejsce: współrzędne, adres albo nazwa miejsca, także w gminach wokół Krakowa.",
       inputSchema: z.object({ miejsce, promien_m: z.number().int().min(100).max(1500).default(500), limit: z.number().int().min(1).max(10).default(6) }),
       annotations: readOnly,
     },
@@ -295,27 +330,35 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       title: "Planer trasy komunikacją miejską",
       description:
         "Jak dojechać komunikacją miejską z A do B (współrzędne, adres albo nazwa miejsca): geokodowanie i dojście do przystanku po sieci pieszej OSM (OSRM), linie bezpośrednie i z jedną przesiadką, najbliższe odjazdy na żywo (GTFS-RT) dla pierwszego odcinka oraz komunikaty o utrudnieniach (ServiceAlerts). Czasy są szacunkami: oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu.",
-      inputSchema: z.object({ z: miejsce, do: miejsce, max_dojscie_m: z.number().int().min(200).max(1500).default(800) }),
+      inputSchema: z.object({ z: miejsce, do: miejsce, max_dojscie_m: z.number().int().min(200).max(3000).default(800).describe("Maks. dojście pieszo do przystanku; gdy brak połączenia, serwer sam poszerza do 1500 i 3000 m (wsie, stacje poza miastem)") }),
       annotations: readOnly,
     },
     ({ z: a, do: b, max_dojscie_m }) =>
       run(async () => {
         const [pa, pb, S] = await Promise.all([rozwiaz(a), rozwiaz(b), wczytajSiec()]);
-        const { start: ks, cel: kc } = await kandydaciPara(S, pa, pb, max_dojscie_m);
-        const opcje = planuj(S, ks.kandydaci, kc.kandydaci);
+        // Poza miastem przystanki są daleko od adresu: gdy nic nie znaleziono, poszerzamy promień dojścia.
+        let promien = max_dojscie_m, opcje: ReturnType<typeof planuj> = [];
+        let ks!: Awaited<ReturnType<typeof kandydaciPara>>["start"], kc!: Awaited<ReturnType<typeof kandydaciPara>>["cel"];
+        for (const r of [max_dojscie_m, 1500, 3000].filter((x) => x >= max_dojscie_m)) {
+          promien = r;
+          ({ start: ks, cel: kc } = await kandydaciPara(S, pa, pb, r));
+          opcje = planuj(S, ks.kandydaci, kc.kandydaci);
+          if (opcje.length) break;
+        }
         const rt = await uzupelnijNaZywo(S, opcje.slice(0, 5));
         const pokazane = opcje.slice(0, 5);
-        const feedyOpcji = [...new Set(pokazane.flatMap((o) => o.nogi.map((n) => S.przystanki[n.wsiadanie_idx][0])))];
+        const feedyOpcji = [...new Set(pokazane.flatMap((o) => o.nogi.map((n) => S.przystanki[n.wsiadanie_idx][0])))].filter(czyZtp);
         const k = feedyOpcji.length ? await pobierzKomunikaty(S, feedyOpcji) : { komunikaty: [], bledy: [] as string[] };
         const linie = new Set(pokazane.flatMap((o) => o.nogi.map((n) => n.linia)));
         const przyst = new Set(pokazane.flatMap((o) => o.nogi.flatMap((n) => [S.przystanki[n.wsiadanie_idx][2], S.przystanki[n.wysiadanie_idx][2]])));
         const bledy = [...rt.bledy, ...k.bledy];
         return {
-          zrodlo: "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; dojście: OSM",
-          uwaga: "Szacunek, nie gwarancja: brak pełnego rozkładu, transfery do 200 m, maks. jedna przesiadka.",
+          zrodlo: "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; pociągi: rozkłady PKP PLK (mkuran.pl); dojście: OSM",
+          uwaga: "Szacunek, nie gwarancja: autobusy i tramwaje liczone z częstotliwości kursów (pierwsza noga na żywo), pociągi z dokładnych godzin rozkładu PKP PLK (bez opóźnień), transfery do 200 m, maks. jedna przesiadka.",
           z: { opis: pa.etykieta, zrodlo: pa.zrodlo, lat: pa.lat, lon: pa.lon }, do: { opis: pb.etykieta, zrodlo: pb.zrodlo, lat: pb.lat, lon: pb.lon },
           odleglosc_prosta_m: Math.round(odleglosc(pa.lat, pa.lon, pb.lat, pb.lon)),
           opcji: opcje.length,
+          promien_dojscia_m: promien,
           ...(bledy.length ? { bledy_realtime: bledy } : {}),
           komunikaty_o_utrudnieniach: dotyczace(k.komunikaty, linie, przyst).slice(0, 8),
           opcje: pokazane.map(({ nogi, ...o }) => ({ ...o, nogi: nogi.map(({ wsiadanie_idx, wysiadanie_idx, wzorzec, ...n }) => ({ ...n, wsiadanie_pkt: { lat: S.przystanki[wsiadanie_idx][3], lon: S.przystanki[wsiadanie_idx][4] }, wysiadanie_pkt: { lat: S.przystanki[wysiadanie_idx][3], lon: S.przystanki[wysiadanie_idx][4] } })) })),
@@ -382,6 +425,18 @@ export function createServer(cf?: { colo?: string; country?: string }): McpServe
       annotations: readOnly,
     },
     (args) => run(() => plikOdczyt(args)),
+  );
+
+  narzedzie(
+    "widok",
+    {
+      title: "Złóż własną kartę z danych",
+      description:
+        "Składa jedną kartę z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Użyj, gdy odpowiedź wymaga własnego układu: porównania, zestawienia z kilku źródeł, mapy z kilkoma warstwami, podsumowania dla urzędnika lub badacza. NIE powtarzaj nim wyniku pojedynczego narzędzia (ma już własną kartę). Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam; wtedy nie przepisujesz liczb. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Podaj zrodlo (zbiory, daty, pokrycie).",
+      inputSchema: widokSchema,
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    (args) => run(() => zlozWidok(args, wywolaj)),
   );
 
   // Tylko dla aplikacji (niewidoczne dla modelu): uproszczone kontury parków do narysowania mapy, żeby nie zalewać kontekstu.

@@ -7,7 +7,7 @@ import { blad, ladowanie, ogolny } from "../src/widoki/stany.ts";
 import type { Ctx } from "../src/widoki/typy.ts";
 
 const katalog = new URL("../../test/fixtury/", import.meta.url);
-const ctx: Ctx = { wywolaj: async () => ({}), pokaz() {}, przerysuj() {}, otworz() {}, czyMoznaWolac: true };
+const ctx: Ctx = { wywolaj: async () => ({}), pokaz() {}, przejdz() {}, przerysuj() {}, otworz() {}, czyMoznaWolac: true };
 const fixtury = readdirSync(katalog).filter((f) => f.endsWith(".json")).map((f) => [f, JSON.parse(readFileSync(new URL(f, katalog), "utf-8"))] as const);
 
 // Takie napisy w HTML oznaczają dziurę w danych albo błąd w szablonie.

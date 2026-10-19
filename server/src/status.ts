@@ -4,6 +4,7 @@ const CELE = [
   "https://msip3.um.krakow.pl/server/rest/services?f=json",
   "https://bdl.stat.gov.pl/api/v1/subjects?format=json&page-size=1",
   "https://gtfs.ztp.krakow.pl/",
+  "https://mkuran.pl/gtfs/",
 ];
 
 export async function statusZrodel(cf: { colo?: string; country?: string } | undefined) {

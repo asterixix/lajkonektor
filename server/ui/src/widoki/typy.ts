@@ -4,6 +4,8 @@ export interface Ctx {
   wywolaj(nazwa: string, argumenty: Record<string, unknown>): Promise<any>;
   /** Podmienia kartę na wynik nowego wywołania (np. po odświeżeniu). */
   pokaz(dane: any): void;
+  /** Przechodzi do innego widoku z przyciskiem „Wróć” (np. z listy katalogu do opisu zbioru). */
+  przejdz(dane: any): void;
   /** Ponownie rysuje bieżący widok (po zmianie stanu lokalnego). */
   przerysuj(): void;
   otworz(url: string): void;

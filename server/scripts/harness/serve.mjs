@@ -5,6 +5,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { build } from "esbuild";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { createServer as nowySerwerMcp } from "../../src/server.ts";
+import { kafelek } from "../../src/kafelki.ts";
 
 // Serwer MCP działa w tym samym procesie (bez wrangler dev), więc harness uruchamiaj przez: node --experimental-strip-types scripts/harness/serve.mjs
 const handler = createMcpHandler(() => nowySerwerMcp());
@@ -22,6 +23,7 @@ createServer(async (req, res) => {
   const wyslij = (typ, tresc, kod = 200) => { res.writeHead(kod, { "content-type": typ }); res.end(tresc); };
   try {
     if (u.pathname === "/") return wyslij("text/html; charset=utf-8", index);
+    if (u.pathname.startsWith("/kafelki/")) { console.log("tile", u.pathname, req.headers["sec-fetch-dest"], req.headers.origin, req.headers["sec-fetch-site"]); const r = await kafelek(u.pathname); res.writeHead(r.status, Object.fromEntries(r.headers)); return res.end(Buffer.from(await r.arrayBuffer())); }
     if (u.pathname === "/karta.html") return wyslij("text/html; charset=utf-8", readFileSync(new URL("ui/dist/karta.html", korzen)));
     if (u.pathname.startsWith("/fixtury/")) {
       const p = new URL(`test/fixtury/${u.pathname.split("/").pop()}`, korzen);

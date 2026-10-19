@@ -19,7 +19,7 @@ const fontFace = fontsMeta.map((f) => {
 
 const logo = readFileSync(rel("../../brand/znak-128.png")).toString("base64");
 const css = readFileSync(rel("../ui/src/styles.css"), "utf-8");
-const html = `<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Lajkonektor</title><style>:root{--lk-logo:url(data:image/png;base64,${logo})}\n${fontFace}\n${css}</style></head><body><div id="app"></div><script>${js}</script></body></html>`;
+const html = `<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lajkonektor</title><style>:root{--lk-logo:url(data:image/png;base64,${logo})}\n${fontFace}\n${css}</style></head><body><div id="app"></div><script>${js}</script></body></html>`;
 
 mkdirSync(rel("../src/ui/"), { recursive: true });
 mkdirSync(rel("../ui/dist/"), { recursive: true });

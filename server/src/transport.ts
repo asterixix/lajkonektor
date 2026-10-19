@@ -1,7 +1,7 @@
 // Transport publiczny: przystanki w pobliżu, odjazdy na żywo (GTFS-RT) i planer tras (linie bezpośrednie i z jedną przesiadką).
 // Sieć pochodzi z GTFS statycznego ZTP pobieranego w czasie działania (siec.ts), czasy rzeczywiste z TripUpdates przy każdym zapytaniu.
 import { decodeFeed } from "./gtfsrt.ts";
-import { BAZA_ZTP, FEEDY, siecFeedu, type Feed, type Linia, type Przystanek, type Wzorzec } from "./siec.ts";
+import { BAZA_ZTP, FEEDY, czyZtp, siecFeedu, type Feed, type Linia, type Przystanek, type Wzorzec } from "./siec.ts";
 import { getBytes } from "./sources.ts";
 
 export interface Siec {
@@ -30,7 +30,7 @@ export function polaczSiec(czesci: Awaited<ReturnType<typeof siecFeedu>>[]): Sie
     for (const [id, v] of Object.entries(c.kursy ?? {})) kursLinia.set(`${c.feed}:${id}`, (Math.floor(v / 2) + lo) * 2 + (v % 2));
     przystanki.push(...c.przystanki);
     linie.push(...c.linie);
-    for (const w of c.wzorce) wzorce.push([w[0] + lo, w[1], w[2], w[3].map((x) => x + po), w[4], w[5], w[6], w[7]]);
+    for (const w of c.wzorce) wzorce.push([w[0] + lo, w[1], w[2], w[3].map((x) => x + po), w[4], w[5], w[6], w[7], w[8]]);
     feedy[c.feed] = { opis: FEEDY[c.feed], wersja: c.wersja, last_modified: c.last_modified, zbudowano: c.zbudowano };
   }
   const naPrzystanku: Siec["naPrzystanku"] = przystanki.map(() => []);
@@ -43,7 +43,10 @@ export function polaczSiec(czesci: Awaited<ReturnType<typeof siecFeedu>>[]): Sie
 let polaczona: { klucz: string; siec: Siec } | null = null;
 export async function wczytajSiec(): Promise<Siec> {
   const czesci = [];
-  for (const f of Object.keys(FEEDY) as Feed[]) czesci.push(await siecFeedu(f)); // po kolei, żeby ograniczyć szczytową pamięć
+  for (const f of Object.keys(FEEDY) as Feed[]) {
+    // po kolei, żeby ograniczyć szczytową pamięć; brak rozkładu pociągów (źródło zewnętrzne) nie może zablokować komunikacji miejskiej
+    try { czesci.push(await siecFeedu(f)); } catch (e) { if (czyZtp(f)) throw e; console.warn(`feed ${f}: ${(e as Error).message}`); }
+  }
   const klucz = czesci.map((c) => `${c.feed}:${c.last_modified}:${c.zbudowano}`).join("|");
   if (polaczona?.klucz === klucz) return polaczona.siec;
   polaczona = { klucz, siec: polaczSiec(czesci) };
@@ -71,10 +74,18 @@ const hhmmZ = (sekundy: number) => warszawa(new Date(sekundy * 1000)).hhmm;
 const TYP_DNIA = { wd: 5, sa: 6, su: 7 } as const; // indeks tablicy w Wzorzec
 const kursyNaGodzine = (w: Wzorzec, dzien: "wd" | "sa" | "su", godz: number) => w[TYP_DNIA[dzien]][godz % 24] as number;
 // Średnie oczekiwanie = połowa odstępu między kursami w tej godzinie; brak kursów = linia niedostępna.
-const czekanieMin = (w: Wzorzec, dzien: "wd" | "sa" | "su", godz: number) => {
-  const n = kursyNaGodzine(w, dzien, godz);
+// Pociągi mają dokładne odjazdy (czekamy do najbliższego, do 6 h); reszta: średnie oczekiwanie z częstotliwości kursów.
+const czekanieMin = (w: Wzorzec, dzien: "wd" | "sa" | "su", minutaDnia: number, pos: number) => {
+  const dok = w[8]?.[dzien];
+  if (dok) {
+    let naj = Infinity;
+    for (const s of dok) { const cz = s + w[4][pos] - minutaDnia; if (cz >= 0 && cz < naj) naj = cz; }
+    return naj <= 360 ? naj : Infinity;
+  }
+  const n = kursyNaGodzine(w, dzien, Math.floor(minutaDnia / 60));
   return n > 0 ? Math.min(30, 60 / n / 2) : Infinity;
 };
+const hhmmMin = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(Math.round(m) % 60).padStart(2, "0")}`;
 
 const etykieta = (S: Siec, w: Wzorzec) => S.linie[w[0]][2];
 
@@ -112,7 +123,7 @@ export interface RtKurs { feed: Feed; trip_id: string; route_id?: string; kier?:
 
 export async function pobierzTripUpdates(S: Siec, feedy: Feed[]): Promise<{ kursy: RtKurs[]; czas_feedu: Partial<Record<Feed, number>>; bledy: string[] }> {
   const kursy: RtKurs[] = [], czas: Partial<Record<Feed, number>> = {}, bledy: string[] = [];
-  await Promise.all(feedy.map(async (f) => {
+  await Promise.all(feedy.filter(czyZtp).map(async (f) => {
     try {
       const feed = decodeFeed(await getBytes(`${BAZA_ZTP}/TripUpdates_${f}.pb`));
       czas[f] = feed.header?.timestamp;
@@ -156,6 +167,25 @@ export function liniaKursu(S: Siec, k: RtKurs, odPos: number): { numer: string; 
   return null;
 }
 
+// Odjazdy pociągów z rozkładu (PKP PLK): dokładne godziny, ale bez opóźnień na żywo.
+export function odjazdyRozkladowe(S: Siec, idxs: number[], limit: number, teraz = Date.now()) {
+  const t = warszawa(new Date(teraz));
+  const minuta = t.godzina * 60 + t.minuta;
+  const out: { min: number; p: number; numer: string; kierunek: string }[] = [];
+  for (const i of idxs) {
+    if (S.przystanki[i][0] !== "K") continue;
+    for (const [wi, pos] of S.naPrzystanku[i]) {
+      const w = S.wzorce[wi], dok = w[8]?.[t.dzien];
+      if (!dok || pos === w[3].length - 1) continue; // na ostatnim przystanku pociąg kończy bieg
+      for (const s of dok) { const dep = s + w[4][pos]; if (dep >= minuta - 1) out.push({ min: dep, p: i, numer: etykieta(S, w), kierunek: w[2] }); }
+    }
+  }
+  return out.sort((a, b) => a.min - b.min).slice(0, limit).map((o) => ({
+    linia: o.numer, kierunek: o.kierunek, przystanek: `${S.przystanki[o.p][2]}${S.przystanki[o.p][5] ? " " + S.przystanki[o.p][5] : ""}`,
+    odjazd: hhmmMin(o.min), za_min: Math.max(0, Math.round(o.min - minuta)), opoznienie_s: null as number | null, zrodlo: "rozkład PKP PLK (bez danych na żywo)",
+  }));
+}
+
 export async function odjazdyZPrzystankow(S: Siec, idxs: number[], limit: number, teraz = Date.now()) {
   const feedy = [...new Set(idxs.map((i) => S.przystanki[i][0]))];
   const zbior = new Set(idxs);
@@ -170,19 +200,17 @@ export async function odjazdyZPrzystankow(S: Siec, idxs: number[], limit: number
     });
   }
   wyniki.sort((a, b) => a.t - b.t);
-  return {
-    bledy,
-    czas_feedu,
-    odjazdy: wyniki.slice(0, limit).map((w) => ({
-      linia: w.numer, kierunek: w.kierunek, przystanek: `${S.przystanki[w.p][2]}${S.przystanki[w.p][5] ? " " + S.przystanki[w.p][5] : ""}`,
-      odjazd: hhmmZ(w.t), za_min: Math.max(0, Math.round((w.t - nowSek) / 60)), opoznienie_s: w.opoznienie, zrodlo: "GTFS-RT (na żywo)",
-    })),
-  };
+  const naZywo = wyniki.slice(0, limit).map((w) => ({
+    linia: w.numer, kierunek: w.kierunek, przystanek: `${S.przystanki[w.p][2]}${S.przystanki[w.p][5] ? " " + S.przystanki[w.p][5] : ""}`,
+    odjazd: hhmmZ(w.t), za_min: Math.max(0, Math.round((w.t - nowSek) / 60)), opoznienie_s: w.opoznienie, zrodlo: "GTFS-RT (na żywo)",
+  }));
+  const rozklad = odjazdyRozkladowe(S, idxs, limit, teraz);
+  return { bledy, czas_feedu, odjazdy: [...naZywo, ...rozklad].sort((a, b) => a.za_min - b.za_min).slice(0, limit) };
 }
 
 // --- planer
 export interface Punkt { lat: number; lon: number }
-interface Noga { linia: string; kierunek: string; wsiadanie: string; wysiadanie: string; przystankow: number; jazda_min: number; wsiadanie_idx: number; wysiadanie_idx: number; wzorzec: number }
+interface Noga { linia: string; kierunek: string; wsiadanie: string; wysiadanie: string; przystankow: number; jazda_min: number; wsiadanie_idx: number; wysiadanie_idx: number; wzorzec: number; odjazd_wg_rozkladu?: string }
 export interface Opcja {
   rodzaj: "bezposrednia" | "z przesiadką";
   czas_min: number;
@@ -203,19 +231,20 @@ export interface Kand { idx: number; m: number; min: number; zrodlo: string }
 
 export function planuj(S: Siec, kz: Kand[], kd: Kand[], opt: { teraz?: Date } = {}): Opcja[] {
   const teraz = warszawa(opt.teraz ?? new Date());
+  const minutaTeraz = teraz.godzina * 60 + teraz.minuta;
   if (!kz.length || !kd.length) return [];
   const celem = new Map(kd.map((x) => [x.idx, x]));
   const nazwaP = (i: number) => S.przystanki[i][2] + (S.przystanki[i][5] ? ` ${S.przystanki[i][5]}` : "");
-  const noga = (wi: number, a: number, b: number): Noga => {
+  const noga = (wi: number, a: number, b: number, odjMin?: number): Noga => {
     const w = S.wzorce[wi];
-    return { linia: etykieta(S, w), kierunek: w[2], wsiadanie: nazwaP(w[3][a]), wysiadanie: nazwaP(w[3][b]), przystankow: b - a, jazda_min: Math.max(1, w[4][b] - w[4][a]), wsiadanie_idx: w[3][a], wysiadanie_idx: w[3][b], wzorzec: wi };
+    return { linia: etykieta(S, w), kierunek: w[2], wsiadanie: nazwaP(w[3][a]), wysiadanie: nazwaP(w[3][b]), przystankow: b - a, jazda_min: Math.max(1, w[4][b] - w[4][a]), wsiadanie_idx: w[3][a], wysiadanie_idx: w[3][b], wzorzec: wi, ...(w[8] && odjMin !== undefined ? { odjazd_wg_rozkladu: hhmmMin(odjMin) } : {}) };
   };
 
   // 1) linie bezpośrednie
   const naj = new Map<string, Opcja>();
   for (const s of kz) for (const [wi, pos] of S.naPrzystanku[s.idx]) {
     const w = S.wzorce[wi];
-    const cz = czekanieMin(w, teraz.dzien, teraz.godzina);
+    const cz = czekanieMin(w, teraz.dzien, minutaTeraz + s.min, pos);
     if (!isFinite(cz)) continue;
     for (let j = pos + 1; j < w[3].length; j++) {
       const kk = celem.get(w[3][j]);
@@ -227,8 +256,8 @@ export function planuj(S: Siec, kz: Kand[], kd: Kand[], opt: { teraz?: Date } = 
         naj.set(klucz, {
           rodzaj: "bezposrednia", czas_min: Math.round(czas),
           dojscie_start: { przystanek: nazwaP(s.idx), m: Math.round(s.m), min: s.min, zrodlo: s.zrodlo },
-          nogi: [noga(wi, pos, j)], dojscie_cel: { przystanek: nazwaP(w[3][j]), m: Math.round(kk.m), min: kk.min, zrodlo: kk.zrodlo },
-          czekanie_min: Math.round(cz), czekanie_pierwsza_noga_min: Math.round(cz), zrodlo_czasu: "szacunek z rozkładu (częstotliwość kursów)",
+          nogi: [noga(wi, pos, j, minutaTeraz + s.min + cz)], dojscie_cel: { przystanek: nazwaP(w[3][j]), m: Math.round(kk.m), min: kk.min, zrodlo: kk.zrodlo },
+          czekanie_min: Math.round(cz), czekanie_pierwsza_noga_min: Math.round(cz), zrodlo_czasu: w[8] ? "rozkład pociągu (dokładny odjazd)" : "szacunek z rozkładu (częstotliwość kursów)",
         });
       }
       break; // pierwszy przystanek docelowy na tym wzorcu wystarczy
@@ -240,13 +269,13 @@ export function planuj(S: Siec, kz: Kand[], kd: Kand[], opt: { teraz?: Date } = 
   const wDol = new Map<number, { wi: number; k: number; l: number; kd: Kand }[]>();
   for (const s of kd) for (const [wi, l] of S.naPrzystanku[s.idx]) {
     const w = S.wzorce[wi];
-    if (!isFinite(czekanieMin(w, teraz.dzien, teraz.godzina))) continue;
+    if (!isFinite(czekanieMin(w, teraz.dzien, minutaTeraz, 0))) continue;
     for (let k = 0; k < l; k++) (wDol.get(w[3][k]) ?? wDol.set(w[3][k], []).get(w[3][k])!).push({ wi, k, l, kd: s });
   }
   const przes = new Map<string, Opcja>();
   for (const s of kz) for (const [wi, pos] of S.naPrzystanku[s.idx]) {
     const w = S.wzorce[wi];
-    const cz1 = czekanieMin(w, teraz.dzien, teraz.godzina);
+    const cz1 = czekanieMin(w, teraz.dzien, minutaTeraz + s.min, pos);
     if (!isFinite(cz1)) continue;
     for (let j = pos + 1; j < w[3].length; j++) {
       const s1 = w[3][j];
@@ -260,21 +289,21 @@ export function planuj(S: Siec, kz: Kand[], kd: Kand[], opt: { teraz?: Date } = 
         for (const e of wDol.get(n) ?? []) {
           const w2 = S.wzorce[e.wi];
           if (w2[0] === w[0]) continue;
-          const godz = (teraz.godzina + Math.floor((s.min + cz1 + (w[4][j] - w[4][pos])) / 60)) % 24;
-          const cz2 = czekanieMin(w2, teraz.dzien, godz);
-          if (!isFinite(cz2)) continue;
           const jazda1 = Math.max(1, w[4][j] - w[4][pos]), jazda2 = Math.max(1, w2[4][e.l] - w2[4][e.k]);
           const dojT = mt ? dojscieMin(mt) : 0;
+          const naPrzesiadce = minutaTeraz + s.min + cz1 + jazda1 + dojT + BUFOR_PRZESIADKI_MIN;
+          const cz2 = czekanieMin(w2, teraz.dzien, naPrzesiadce, e.k);
+          if (!isFinite(cz2)) continue;
           const czas = s.min + cz1 + jazda1 + dojT + BUFOR_PRZESIADKI_MIN + cz2 + jazda2 + e.kd.min;
           const klucz = `${etykieta(S, w)}|${w[2]}|${etykieta(S, w2)}|${w2[2]}`;
           if (!przes.has(klucz) || przes.get(klucz)!.czas_min > czas) {
             przes.set(klucz, {
               rodzaj: "z przesiadką", czas_min: Math.round(czas),
               dojscie_start: { przystanek: nazwaP(s.idx), m: Math.round(s.m), min: s.min, zrodlo: s.zrodlo },
-              nogi: [noga(wi, pos, j), noga(e.wi, e.k, e.l)],
+              nogi: [noga(wi, pos, j, minutaTeraz + s.min + cz1), noga(e.wi, e.k, e.l, naPrzesiadce + cz2)],
               przesiadka: { przystanek: nazwaP(s1), dojscie_min: dojT },
               dojscie_cel: { przystanek: nazwaP(w2[3][e.l]), m: Math.round(e.kd.m), min: e.kd.min, zrodlo: e.kd.zrodlo },
-              czekanie_min: Math.round(cz1 + cz2), czekanie_pierwsza_noga_min: Math.round(cz1), zrodlo_czasu: "szacunek z rozkładu (częstotliwość kursów)",
+              czekanie_min: Math.round(cz1 + cz2), czekanie_pierwsza_noga_min: Math.round(cz1), zrodlo_czasu: w[8] || w2[8] ? "rozkład pociągu (dokładny odjazd) i szacunek dla pozostałych linii" : "szacunek z rozkładu (częstotliwość kursów)",
             });
           }
         }
@@ -292,11 +321,13 @@ export function planuj(S: Siec, kz: Kand[], kd: Kand[], opt: { teraz?: Date } = 
 // Uzupełnia opcje o czasy z GTFS-RT dla pierwszej nogi: pierwsze kursy, które jadą z przystanku wsiadania do wysiadania.
 export async function uzupelnijNaZywo(S: Siec, opcje: Opcja[], teraz = Date.now()) {
   if (!opcje.length) return { bledy: [] as string[], czas_feedu: {} };
-  const feedy = [...new Set(opcje.map((o) => S.przystanki[o.nogi[0].wsiadanie_idx][0]))];
+  const feedy = [...new Set(opcje.map((o) => S.przystanki[o.nogi[0].wsiadanie_idx][0]))].filter(czyZtp);
+  if (!feedy.length) return { bledy: [] as string[], czas_feedu: {} };
   const { kursy, czas_feedu, bledy } = await pobierzTripUpdates(S, feedy);
   const nowSek = teraz / 1000;
   for (const o of opcje) {
     const n = o.nogi[0];
+    if (!czyZtp(S.przystanki[n.wsiadanie_idx][0])) continue; // pociągi: rozkład, bez danych na żywo
     const dojdz = nowSek + o.dojscie_start.min * 60;
     const trafione: { dep: number; arr: number; opoz: number | null }[] = [];
     for (const k of kursy) {

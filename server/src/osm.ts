@@ -4,18 +4,24 @@
 import type { Kand, Punkt, Siec } from "./transport.ts";
 import { dojscieMin, przystankiBlisko } from "./transport.ts";
 
-const UA = "lajkonektor/0.2 (konkurs Open Data App Krakow; artur@sendyka.dev)";
-// Ramka Krakowa (zach, pln, wsch, pld) ogranicza wyniki geokodowania do miasta.
+const UA = "lajkonektor/0.4 (+https://lajkonektor.sendyka.workers.dev)";
+// Ramki (zach, pln, wsch, pld): najpierw sam Kraków, potem Małopolska (gminy aglomeracji i okolice stacji kolejowych).
 const VIEWBOX = "19.78,50.13,20.13,49.95";
+const VIEWBOX_REGION = "18.9,50.5,21.5,49.2";
 const SZACUNEK = "szacunek (linia prosta x1,3)";
 const OSRM = "OSM (OSRM, pieszo)";
 
-export async function geokodujOsm(tekst: string): Promise<{ lat: number; lon: number; nazwa: string } | null> {
-  const q = new URLSearchParams({ q: `${tekst}, Kraków`, format: "jsonv2", limit: "1", countrycodes: "pl", viewbox: VIEWBOX, bounded: "1" });
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?${q}`, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(12_000) });
+async function nominatim(q: string, viewbox: string) {
+  const p = new URLSearchParams({ q, format: "jsonv2", limit: "1", countrycodes: "pl", viewbox, bounded: "1" });
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?${p}`, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
   const j: any[] = await res.json();
   return j[0] ? { lat: +j[0].lat, lon: +j[0].lon, nazwa: String(j[0].display_name).split(",").slice(0, 3).join(",") } : null;
+}
+
+// Najpierw w Krakowie (nazwa bez miasta znaczy Kraków), a gdy tam nic nie ma, w całej Małopolsce (np. „Staniątki 15”, „Niepołomice rynek”).
+export async function geokodujOsm(tekst: string): Promise<{ lat: number; lon: number; nazwa: string } | null> {
+  return (await nominatim(`${tekst}, Kraków`, VIEWBOX)) ?? (await nominatim(tekst, VIEWBOX_REGION));
 }
 
 type Dojscie = { m: number; min: number };
@@ -35,10 +41,14 @@ async function tabelaPieszo(punkty: Punkt[], zrodla: number[], cele: number[]): 
   return null;
 }
 
+// Stacje kolejowe liczymy z większego zasięgu niż przystanki: pociąg bywa dużo szybszy, więc warto do niego dojść dalej.
+const ZASIEG_STACJI_M = 3000;
+const MAX_STACJI = 3;
+
 // Do OSRM trafia tylko kilka najbliższych przystanków (różne nazwy), nie cała sieć.
-function wyroznione(S: Siec, p: Punkt, maxM: number, limit: number) {
+function wyroznione(S: Siec, p: Punkt, maxM: number, limit: number, stacje = false) {
   const widziane = new Set<string>();
-  return przystankiBlisko(S, p.lat, p.lon, maxM, 80).filter((x) => {
+  const podstawowe = przystankiBlisko(S, p.lat, p.lon, maxM, 80).filter((x) => {
     const k = `${S.przystanki[x.idx][0]}|${S.przystanki[x.idx][2]}`;
     if (widziane.has(k) || widziane.size >= limit) return false;
     widziane.add(k);
@@ -47,13 +57,19 @@ function wyroznione(S: Siec, p: Punkt, maxM: number, limit: number) {
     // słupki o tej samej nazwie (inne kierunki) dokładamy po wyborze nazw, bo mają różne linie
     przystankiBlisko(S, p.lat, p.lon, maxM, 80).filter((x) => widziane.has(`${S.przystanki[x.idx][0]}|${S.przystanki[x.idx][2]}`)),
   ).filter((x, i, a) => a.findIndex((y) => y.idx === x.idx) === i).slice(0, limit * 3);
+  if (!stacje) return podstawowe;
+  const nazwyStacji = new Set<string>();
+  const stacjeBlisko = przystankiBlisko(S, p.lat, p.lon, ZASIEG_STACJI_M, 400).filter((x) => S.przystanki[x.idx][0] === "K");
+  for (const x of stacjeBlisko) if (nazwyStacji.size < MAX_STACJI) nazwyStacji.add(S.przystanki[x.idx][2]);
+  const dodatkowe = stacjeBlisko.filter((x) => nazwyStacji.has(S.przystanki[x.idx][2]) && !podstawowe.some((y) => y.idx === x.idx)).slice(0, 12);
+  return [...podstawowe, ...dodatkowe];
 }
 
 function naKand(S: Siec, bliskie: { idx: number; m: number }[], d: (Dojscie | null)[] | null, maxM: number): Kand[] {
   return bliskie.flatMap((x, i) => {
     const o = d?.[i];
     if (!o || Number.isNaN(o.m)) return [{ idx: x.idx, m: x.m, min: dojscieMin(x.m), zrodlo: SZACUNEK }];
-    return o.m <= maxM * 1.4 ? [{ idx: x.idx, m: o.m, min: o.min, zrodlo: OSRM }] : [];
+    return o.m <= maxM * 1.4 || (S.przystanki[x.idx][0] === "K" && o.m <= ZASIEG_STACJI_M * 1.4) ? [{ idx: x.idx, m: o.m, min: o.min, zrodlo: OSRM }] : [];
   });
 }
 const wDojscia = (sek: (number | null)[], m: (number | null)[], od: number, n: number): Dojscie[] =>
@@ -68,7 +84,7 @@ export async function kandydaciOsm(S: Siec, p: Punkt, maxM: number, limit = 8): 
 
 // Kandydaci przy starcie i celu jednym zapytaniem do OSRM.
 export async function kandydaciPara(S: Siec, a: Punkt, c: Punkt, maxM: number, limit = 8) {
-  const ba = wyroznione(S, a, maxM, limit), bc = wyroznione(S, c, maxM, limit);
+  const ba = wyroznione(S, a, maxM, limit, true), bc = wyroznione(S, c, maxM, limit, true);
   const pt = (x: { idx: number }) => ({ lat: S.przystanki[x.idx][3], lon: S.przystanki[x.idx][4] });
   const punkty = [a, ...ba.map(pt), c, ...bc.map(pt)];
   const iC = ba.length + 1; // indeks punktu docelowego

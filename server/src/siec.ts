@@ -7,14 +7,24 @@
 import { Unzip, UnzipInflate } from "fflate";
 
 export const BAZA_ZTP = "https://gtfs.ztp.krakow.pl";
-export const FEEDY = { A: "autobus", T: "tramwaj", M: "linie aglomeracyjne" } as const;
+export const FEEDY = { A: "autobus", T: "tramwaj", M: "linie aglomeracyjne", K: "pociągi (PKP PLK: Koleje Małopolskie, PolRegio, Intercity i in.)" } as const;
 export type Feed = keyof typeof FEEDY;
-const UA = "lajkonektor/0.2 (konkurs Open Data App Krakow)";
+// Feedy ZTP mają GTFS-RT (pozycje i opóźnienia na żywo) oraz komunikaty; pociągi (K) tylko rozkład.
+export const FEEDY_ZTP = ["A", "T", "M"] as const satisfies readonly Feed[];
+export const czyZtp = (f: Feed): boolean => (FEEDY_ZTP as readonly string[]).includes(f);
+// Rozkłady pociągów: zbiorczy GTFS z rozkładów PKP PLK składany codziennie przez mkuran.pl (ok. 33 MB); z całej Polski bierzemy Małopolskę.
+export const PKP_GTFS = "https://mkuran.pl/gtfs/polish_trains.zip";
+const ZIP_URL: Record<Feed, string> = { A: `${BAZA_ZTP}/GTFS_KRK_A.zip`, T: `${BAZA_ZTP}/GTFS_KRK_T.zip`, M: `${BAZA_ZTP}/GTFS_KRK_M.zip`, K: PKP_GTFS };
+// [zachód, południe, wschód, północ]: Małopolska z zapasem (Kraków, Tarnów, Nowy Sącz, Zakopane, Oświęcim, granica z Katowicami).
+const OBSZAR_K: [number, number, number, number] = [18.9, 49.2, 21.5, 50.5];
+const UA = "lajkonektor/0.4 (+https://lajkonektor.sendyka.workers.dev)";
 
 export type Przystanek = [feed: Feed, id: string, nazwa: string, lat: number, lon: number, kod: string];
 export type Linia = [feed: Feed, id: string, numer: string, nazwa: string, typ: number];
 // [indeks linii, kierunek, kierunek_opis, przystanki(indeksy), minuty skumulowane, kursy/h: dzień roboczy, sobota, niedziela]
-export type Wzorzec = [linia: number, kier: number, opis: string, stops: number[], min: number[], wd: number[], sa: number[], su: number[]];
+// Dla pociągów dodatkowo dokładne odjazdy z pierwszego przystanku wzorca (minuty od północy) osobno dla dnia roboczego, soboty i niedzieli.
+export type Odjazdy = Record<"wd" | "sa" | "su", number[]>;
+export type Wzorzec = [linia: number, kier: number, opis: string, stops: number[], min: number[], wd: number[], sa: number[], su: number[], odjazdy?: Odjazdy];
 export interface SiecFeedu {
   feed: Feed;
   wersja: string | null;
@@ -124,10 +134,12 @@ export class BudowniczySieci {
 
   private feed: Feed;
   private meta: { last_modified: string | null };
+  private dokladne: boolean;
 
   constructor(feed: Feed, meta: { last_modified: string | null }) {
     this.feed = feed;
     this.meta = meta;
+    this.dokladne = feed === "K";
     this.uz = new Unzip((file) => {
       const cz = this.czytnikDla(file.name);
       if (!cz) return;
@@ -148,7 +160,7 @@ export class BudowniczySieci {
       });
       case "routes.txt": return zNaglowkiem((r) => {
         this.idxL.set(r.route_id, this.linie.length);
-        this.linie.push([this.feed, r.route_id, r.route_short_name, r.route_long_name, +r.route_type]);
+        this.linie.push([this.feed, r.route_id, r.route_short_name || r.route_long_name, r.route_long_name, +r.route_type]);
       });
       case "calendar.txt": return zNaglowkiem((r) => { this.cal.push(r); });
       case "calendar_dates.txt": return zNaglowkiem((r) => { this.exc.push(r); });
@@ -202,7 +214,7 @@ export class BudowniczySieci {
     // lokalny indeks przystanku ze stop_times -> indeks w przystankach (lub -1)
     const mapaP = this.stopLokNazwy.map((id) => this.idxP.get(id) ?? -1);
 
-    type Agr = { l: number; dir: number; heads: Map<string, number>; ids: number[]; off: number[][]; wd: number[]; sa: number[]; su: number[] };
+    type Agr = { l: number; dir: number; heads: Map<string, number>; ids: number[]; off: number[][]; wd: number[]; sa: number[]; su: number[]; start: Odjazdy };
     const wz = new Map<string, Agr>();
     for (let k = 0; k < this.kursId.length; k++) {
       const t = tripsMeta.get(this.kursId[k]);
@@ -214,11 +226,11 @@ export class BudowniczySieci {
       if (zly || ids.length < 2) continue;
       const key = `${t[0]}|${t[1]}|${ids.join(",")}`;
       let w = wz.get(key);
-      if (!w) wz.set(key, (w = { l: t[0], dir: t[1], heads: new Map(), ids, off: ids.map(() => []), wd: Array(24).fill(0), sa: Array(24).fill(0), su: Array(24).fill(0) }));
+      if (!w) wz.set(key, (w = { l: t[0], dir: t[1], heads: new Map(), ids, off: ids.map(() => []), wd: Array(24).fill(0), sa: Array(24).fill(0), su: Array(24).fill(0), start: { wd: [], sa: [], su: [] } }));
       w.heads.set(t[2], (w.heads.get(t[2]) ?? 0) + 1);
       if (w.off[0].length < 30) for (let j = od; j < koniec; j++) w.off[j - od].push(this.tOff.tab[j]); // próbka do mediany
       const h = Math.floor(this.kursT0[k] / 3600) % 24;
-      for (const u of ["wd", "sa", "su"] as const) if (uslugi[u].has(t[3])) w[u][h]++;
+      for (const u of ["wd", "sa", "su"] as const) if (uslugi[u].has(t[3])) { w[u][h]++; if (this.dokladne) w.start[u].push(Math.round(this.kursT0[k] / 60)); }
     }
     const wzorce: Wzorzec[] = [];
     for (const w of wz.values()) {
@@ -226,12 +238,26 @@ export class BudowniczySieci {
       for (const [h, c] of w.heads) if (c > n) { opis = h; n = c; }
       let prev = 0;
       const min = w.off.map((o) => { prev = Math.max(prev, Math.round(mediana(o) / 60)); return prev; });
-      wzorce.push([w.l, w.dir, opis, w.ids, min, w.wd, w.sa, w.su]);
+      if (!this.dokladne) { wzorce.push([w.l, w.dir, opis, w.ids, min, w.wd, w.sa, w.su]); continue; }
+      // Pociągi: zostawiamy tylko przystanki z obszaru (reszta Polski jest nam zbędna), a odjazdy przeliczamy na pierwszy z zachowanych.
+      const wObszarze = w.ids.map((p) => { const q = this.przystanki[p]; return q[4] >= OBSZAR_K[0] && q[3] >= OBSZAR_K[1] && q[4] <= OBSZAR_K[2] && q[3] <= OBSZAR_K[3]; });
+      const zostaje = w.ids.map((_, j) => j).filter((j) => wObszarze[j]);
+      if (zostaje.length < 2) continue;
+      const przesuniecie = min[zostaje[0]];
+      const unik = (a: number[]) => [...new Set(a.map((x) => x + przesuniecie))].sort((x, y) => x - y);
+      wzorce.push([w.l, w.dir, opis, zostaje.map((j) => w.ids[j]), zostaje.map((j) => min[j] - przesuniecie), w.wd, w.sa, w.su, { wd: unik(w.start.wd), sa: unik(w.start.sa), su: unik(w.start.su) }]);
+    }
+    let przystanki = this.przystanki;
+    if (this.dokladne) {
+      // Zagęszczamy listę przystanków do tych, które występują we wzorcach, i przenumerowujemy indeksy.
+      const nowy = new Map<number, number>();
+      for (const w of wzorce) w[3] = w[3].map((p) => nowy.get(p) ?? (nowy.set(p, nowy.size), nowy.size - 1));
+      przystanki = [...nowy.keys()].map((p) => this.przystanki[p]);
     }
     return {
       feed: this.feed, wersja: this.fi.feed_version ?? null, last_modified: this.meta.last_modified, zbudowano: new Date().toISOString(),
       dni_wzorcowe: { wd: ymd(dz.wd), sa: ymd(dz.sa), su: ymd(dz.su) },
-      przystanki: this.przystanki, linie: this.linie, wzorce,
+      przystanki, linie: this.linie, wzorce,
       kursy: this.feed === "T" ? Object.fromEntries([...tripsMeta].map(([id, t]) => [id, t[0] * 2 + t[1]])) : undefined,
     };
   }
@@ -249,15 +275,15 @@ const pamiec = new Map<Feed, { klucz: string; sprawdzono: number; siec: SiecFeed
 const SPRAWDZ_CO_MS = 10 * 60_000;
 
 async function naglowek(feed: Feed): Promise<string | null> {
-  const r = await fetch(`${BAZA_ZTP}/GTFS_KRK_${feed}.zip`, { method: "HEAD", headers: { "user-agent": UA }, signal: AbortSignal.timeout(15_000) });
-  if (!r.ok) throw new Error(`ZTP HTTP ${r.status} (HEAD GTFS_KRK_${feed}.zip)`);
+  const r = await fetch(ZIP_URL[feed], { method: "HEAD", headers: { "user-agent": UA }, signal: AbortSignal.timeout(15_000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status} (HEAD ${ZIP_URL[feed]})`);
   return r.headers.get("last-modified");
 }
 
 // Pobiera zip na żywo i buduje sieć strumieniowo (bez trzymania całego pliku w pamięci).
 async function zbudujZeStrumienia(feed: Feed, lm: string | null): Promise<SiecFeedu> {
-  const res = await fetch(`${BAZA_ZTP}/GTFS_KRK_${feed}.zip`, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(90_000) });
-  if (!res.ok || !res.body) throw new Error(`ZTP HTTP ${res.status} (GTFS_KRK_${feed}.zip)`);
+  const res = await fetch(ZIP_URL[feed], { headers: { "user-agent": UA }, signal: AbortSignal.timeout(120_000) });
+  if (!res.ok || !res.body) throw new Error(`HTTP ${res.status} (${ZIP_URL[feed]})`);
   const b = new BudowniczySieci(feed, { last_modified: lm });
   const reader = res.body.getReader();
   for (;;) {
@@ -273,7 +299,7 @@ export async function siecFeedu(feed: Feed): Promise<SiecFeedu> {
   if (mem && Date.now() - mem.sprawdzono < SPRAWDZ_CO_MS) return mem.siec;
   let lm: string | null = null;
   try { lm = await naglowek(feed); } catch (e) { if (mem) return mem.siec; throw e; }
-  const klucz = `https://lajkonektor.cache/siec/v4/${feed}/${encodeURIComponent(lm ?? "brak")}`;
+  const klucz = `https://lajkonektor.cache/siec/v5/${feed}/${encodeURIComponent(lm ?? "brak")}`;
   if (mem && mem.klucz === klucz) { mem.sprawdzono = Date.now(); return mem.siec; }
 
   const cache = typeof caches !== "undefined" ? (caches as any).default : null;

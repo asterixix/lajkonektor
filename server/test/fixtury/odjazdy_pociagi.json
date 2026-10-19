@@ -1,0 +1,88 @@
+{
+ "_widok": "odjazdy",
+ "_zapytanie": {
+  "nazwa": "Kraków Główny",
+  "promien_m": 400,
+  "limit": 8
+ },
+ "podsumowanie": "Najbliższe odjazdy (na żywo): linia K63 → Kraków Nowa Huta o 22:23 (za 2 min); linia SKA3 → Tarnów o 22:29 (za 8 min); linia SKA1 → Kraków Lotnisko o 22:33 (za 12 min); linia K5 → Sucha Beskidzka o 22:34 (za 13 min); linia SKA1 → Wieliczka Rynek-Kopalnia o 22:34 (za 13 min).",
+ "zrodlo": "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)",
+ "przystankow": 11,
+ "bledy": [],
+ "czas_feedu": {},
+ "odjazdy": [
+  {
+   "linia": "K63",
+   "kierunek": "Kraków Nowa Huta",
+   "przystanek": "Kraków Główny 5 t. 10",
+   "odjazd": "22:23",
+   "za_min": 2,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA3",
+   "kierunek": "Tarnów",
+   "przystanek": "Kraków Główny 1 t. 9",
+   "odjazd": "22:29",
+   "za_min": 8,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA1",
+   "kierunek": "Kraków Lotnisko",
+   "przystanek": "Kraków Główny 3 t. 2",
+   "odjazd": "22:33",
+   "za_min": 12,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "K5",
+   "kierunek": "Sucha Beskidzka",
+   "przystanek": "Kraków Główny 2 t. 3",
+   "odjazd": "22:34",
+   "za_min": 13,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA1",
+   "kierunek": "Wieliczka Rynek-Kopalnia",
+   "przystanek": "Kraków Główny 1 t. 9",
+   "odjazd": "22:34",
+   "za_min": 13,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA3",
+   "kierunek": "Oświęcim",
+   "przystanek": "Kraków Główny 2 t. 3",
+   "odjazd": "22:45",
+   "za_min": 24,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA2",
+   "kierunek": "Sędziszów",
+   "przystanek": "Kraków Główny 5 t. 12",
+   "odjazd": "22:50",
+   "za_min": 29,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA2",
+   "kierunek": "Oświęcim",
+   "przystanek": "Kraków Główny 1 t. 11",
+   "odjazd": "22:50",
+   "za_min": 29,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  }
+ ],
+ "komunikaty": []
+}

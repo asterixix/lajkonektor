@@ -144,10 +144,12 @@ test("komunikaty: komunikaty testowe ZTP są oznaczone i pomijane w dopasowaniu"
 });
 
 // --- na żywo (ZTP, OSM, MSIP): wolniejsze, wymagają internetu
-test("na żywo: sieć ZTP z trzech feedów (autobusy, tramwaje, aglomeracja)", { timeout: 240_000 }, async () => {
+test("na żywo: sieć z czterech feedów (autobusy, tramwaje, aglomeracja, pociągi)", { timeout: 240_000 }, async () => {
   const S = await wczytajSiec();
   assert.ok(S.przystanki.length > 3500 && S.wzorce.length > 300);
-  assert.deepEqual(Object.keys(S.feedy).sort(), ["A", "M", "T"]);
+  assert.deepEqual(Object.keys(S.feedy).sort(), ["A", "K", "M", "T"]);
+  assert.ok(S.przystanki.some((p) => p[0] === "K" && p[2] === "Kraków Główny"), "stacje kolejowe z rozkładów PKP PLK");
+  assert.ok(S.wzorce.some((w) => w[8]?.wd.length), "pociągi mają dokładne odjazdy");
   assert.ok(S.feedy.A.last_modified, "Last-Modified z serwera ZTP");
 });
 
@@ -173,4 +175,9 @@ test("na żywo: geokodowanie OSM nazwy miejsca w Krakowie", { timeout: 60_000 },
   const g = await geokodujOsm("Rynek Główny");
   assert.ok(g && Math.abs(g.lat - 50.0615) < 0.01 && Math.abs(g.lon - 19.937) < 0.01);
   assert.equal(await geokodujOsm("zzzxxxnieistniejace miejsce 123"), null);
+});
+
+test("na żywo: geokodowanie miejscowości poza Krakowem (gmina Niepołomice)", { timeout: 60_000 }, async () => {
+  const g = await geokodujOsm("Staniątki 15");
+  assert.ok(g && Math.abs(g.lat - 50.013) < 0.02 && Math.abs(g.lon - 20.19) < 0.05, JSON.stringify(g));
 });

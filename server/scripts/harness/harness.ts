@@ -6,7 +6,7 @@ const lista = document.getElementById("lista") as HTMLSelectElement;
 const szer = document.getElementById("szer") as HTMLSelectElement;
 const scena = document.getElementById("scena")!;
 const log = document.getElementById("log")!;
-const FIXTURY = ["odjazdy", "odjazdy_puste", "trasa", "przystanki", "parki_jordana", "parki_wszystkie", "tabela_parki", "plik_xlsx", "szereg", "prognoza", "katalog", "opis_zbioru", "bdl_lista", "dane_gov", "adres", "komunikaty", "status", "blad_522"];
+const FIXTURY = ["odjazdy", "odjazdy_puste", "trasa", "przystanki", "parki_jordana", "parki_wszystkie", "tabela_parki", "plik_xlsx", "szereg", "prognoza", "katalog", "opis_zbioru", "bdl_lista", "dane_gov", "adres", "komunikaty", "status", "blad_522", "mapa_msip", "widok_zlozony", "katalog_brak", "trasa_pociag", "trasa_wies", "odjazdy_pociagi"];
 const stanyDodatkowe = ["ladowanie"];
 for (const f of [...FIXTURY, ...stanyDodatkowe]) lista.add(new Option(f, f));
 
@@ -24,7 +24,8 @@ async function pokaz(nazwa: string) {
   if (!html) html = await (await fetch("/karta.html")).text();
   scena.innerHTML = "";
   const iframe = document.createElement("iframe");
-  iframe.setAttribute("sandbox", "allow-scripts"); // jak w prawdziwych hostach: bez allow-same-origin
+  // Jak w prawdziwych hostach: bez allow-same-origin. Z ?same=1 dodajemy je tylko po to, żeby z konsoli zajrzeć do DOM karty.
+  iframe.setAttribute("sandbox", location.search.includes("same=1") ? "allow-scripts allow-same-origin" : "allow-scripts");
   iframe.style.cssText = `width:${szer.value}px;height:200px;border:0;background:transparent;display:block`;
   iframe.srcdoc = html;
   scena.appendChild(iframe);
@@ -41,6 +42,8 @@ async function pokaz(nazwa: string) {
     if (nazwa === "ladowanie") return;
     await new Promise((r) => setTimeout(r, 400));
     const f = await (await fetch(`/fixtury/${nazwa}.json`)).json();
+    // Kafelki OSM przez lokalny proxy harnessu (jak na serwerze); ?kafelki=URL podmienia szablon adresu (np. wdrożony serwer).
+    f._kafelki = new URLSearchParams(location.search).get("kafelki") ?? `${location.origin}/kafelki/{z}/{x}/{y}.png`;
     if (f.isError) bridge.sendToolResult({ isError: true, content: [{ type: "text", text: f.tekst }] });
     else bridge.sendToolResult({ content: [{ type: "text", text: JSON.stringify(f) }], structuredContent: f });
   };

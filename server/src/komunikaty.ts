@@ -1,6 +1,6 @@
 // Komunikaty o utrudnieniach ZTP (GTFS-RT ServiceAlerts), pobierane na żywo. Feedy są małe (setki bajtów do kilku KB).
 import { decodeFeed } from "./gtfsrt.ts";
-import { BAZA_ZTP, FEEDY, type Feed } from "./siec.ts";
+import { BAZA_ZTP, FEEDY_ZTP, czyZtp, type Feed } from "./siec.ts";
 import { getBytes } from "./sources.ts";
 import type { Siec } from "./transport.ts";
 
@@ -21,10 +21,10 @@ const tekst = (t: any): string => {
 };
 const iso = (s?: number) => (s ? new Date(s * 1000).toISOString() : null);
 
-export async function pobierzKomunikaty(S: Siec, feedy: Feed[] = Object.keys(FEEDY) as Feed[], teraz = Date.now()) {
+export async function pobierzKomunikaty(S: Siec, feedy: Feed[] = [...FEEDY_ZTP], teraz = Date.now()) {
   const komunikaty: Komunikat[] = [], bledy: string[] = [];
   const nowSek = teraz / 1000;
-  await Promise.all(feedy.map(async (f) => {
+  await Promise.all(feedy.filter(czyZtp).map(async (f) => { // komunikaty publikuje tylko ZTP; pociągi ich w naszym źródle nie mają
     try {
       const feed = decodeFeed(await getBytes(`${BAZA_ZTP}/ServiceAlerts_${f}.pb`));
       for (const e of feed.entity ?? []) {

@@ -1,0 +1,12 @@
+{
+ "_widok": "katalog",
+ "_zapytanie": {
+  "temat": "kina w Krakowie",
+  "limit": 4
+ },
+ "podsumowanie": "Znaleziono 0 zbiorów. Najlepszy: brak. Kin nie ma w katalogu. Instytucje kultury: muzea, teatry, biblioteki, galerie (Kultura/Miejskie_Instytucje_Kultury).",
+ "liczba": 0,
+ "wyniki": [],
+ "brak_w_katalogu": "Kin nie ma w katalogu. Instytucje kultury: muzea, teatry, biblioteki, galerie (Kultura/Miejskie_Instytucje_Kultury).",
+ "podpowiedz": "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'."
+}

@@ -16,6 +16,7 @@ async function wywolaj(nazwa, args) {
   return JSON.parse(m ? m[1] : t).result;
 }
 
+const MPZP = "msip:Planowanie/BP_MPZP/3";
 const ZESTAW = {
   odjazdy: ["odjazdy", { nazwa: "Teatr Słowackiego", limit: 8 }],
   trasa: ["trasa", { z: { ulica: "Łojasiewicza", numer: "4" }, do: { ulica: "Basztowa", numer: "20" } }],
@@ -26,6 +27,10 @@ const ZESTAW = {
   plik_xlsx: ["plik_odczyt", { url: "https://api.dane.gov.pl/resources/2826170,ceny-ofertowe-mieszkan-dewelopera-dom-development-krakow-sp-z-oo-2026-10-18/file", pola: ["Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł]", "Cena części nieruchomości, będących przedmiotem umowy [zł]"], sortuj: "Cena m 2 powierzchni użytkowej lokalu mieszkalnego / domu jednorodzinnego [zł] desc", limit: 6 }],
   szereg: ["bdl_dane", { zmienne: [60270], lata: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025] }],
   katalog: ["katalog_szukaj", { temat: "przedszkola", limit: 6 }],
+  katalog_brak: ["katalog_szukaj", { temat: "kina w Krakowie", limit: 4 }],
+  trasa_pociag: ["trasa", { z: { tekst: "Dworzec Główny" }, do: { tekst: "Wieliczka Rynek" } }],
+  trasa_wies: ["trasa", { z: { tekst: "Dworzec Główny" }, do: { tekst: "Staniątki 15" } }],
+  odjazdy_pociagi: ["odjazdy", { nazwa: "Kraków Główny", limit: 8 }],
   opis_zbioru: ["zbior_opis", { id: "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia" }],
   bdl_lista: ["bdl_szukaj", { nazwa: "stopa bezrobocia", limit: 5 }],
   dane_gov: ["dane_gov", { q: "Kraków ceny mieszkań", limit: 4 }],
@@ -33,6 +38,7 @@ const ZESTAW = {
   komunikaty: ["utrudnienia", {}],
   status: ["status_zrodel", {}],
   kontury: ["ui_kontury_parkow", { wokol_lp: 17, promien_m: 900 }],
+  mapa_msip: ["dane_zapytaj", { id: MPZP, filtr: "oznaczenie LIKE 'ZP%'", geometria: { punkt: { lat: 50.0614, lon: 19.9372 }, promien_m: 1500 }, kontury: true, limit: 30 }],
 };
 
 mkdirSync(new URL("../test/fixtury/", import.meta.url), { recursive: true });
@@ -43,6 +49,16 @@ for (const [nazwa, [narz, args]] of Object.entries(ZESTAW)) {
   zapisz(nazwa, r.structuredContent);
   console.log(`${nazwa}: ${(JSON.stringify(r.structuredContent).length / 1024).toFixed(1)} KB, widok=${r.structuredContent._widok ?? "-"}`);
 }
+// Karta złożona z komponentów: tabela, wykres i mapa pobierane przez serwer (pole z), a nie przepisywane przez model
+const wz = await wywolaj("widok", { tytul: "Zieleń w centrum Krakowa", podtytul: "Parki miejskie i tereny zieleni z planów miejscowych", zrodlo: "Otwarte Dane UMK (parki), MSIP (MPZP), GUS BDL", bloki: [
+  { typ: "metryki", pozycje: [{ etykieta: "Parki w rejestrze", wartosc: 78 }, { etykieta: "Z konturem OSM", wartosc: 46, opis: "44,9% powierzchni" }, { etykieta: "Bezrobocie 2025", wartosc: "2,5%" }] },
+  { typ: "tabela", tytul: "Powierzchnia parków wg dzielnic (ha)", z: { narzedzie: "dane_zapytaj", argumenty: { id: "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia", grupuj_po: ["Dzielnica"], agreguj: [{ fn: "sum", pole: "Powierzchnia_ha", nazwa: "ha" }], sortuj: "ha desc", limit: 6 } } },
+  { typ: "wykres", rodzaj: "slupki", tytul: "Stopa bezrobocia rejestrowanego", jednostka: "%", z: { narzedzie: "bdl_dane", argumenty: { zmienne: [60270], lata: [2021, 2022, 2023, 2024, 2025] } } },
+  { typ: "mapa", tytul: "Tereny zieleni (ZP) w promieniu 1,5 km od Rynku", kolumna_etykiety: "oznaczenie", z: { narzedzie: "dane_zapytaj", argumenty: { id: MPZP, filtr: "oznaczenie LIKE 'ZP%'", geometria: { punkt: { lat: 50.0614, lon: 19.9372 }, promien_m: 1500 }, kontury: true, limit: 30 } } },
+  { typ: "tekst", wariant: "uwaga", tekst: "Oznaczenie ZP w planie miejscowym to teren zieleni, niekoniecznie park miejski z rejestru." },
+] });
+zapisz("widok_zlozony", wz.structuredContent);
+console.log(`widok_zlozony: ${(JSON.stringify(wz.structuredContent).length / 1024).toFixed(1)} KB`);
 // Szereg dla prognozy z prawdziwych danych BDL
 const sz = JSON.parse((await import("node:fs")).readFileSync(new URL("../test/fixtury/szereg.json", import.meta.url), "utf-8"));
 const pr = await wywolaj("prognoza", { serie: sz.wiersze.map((w) => ({ x: w.rok, y: w.wartosc })), horyzont: 3, etykieta: "Stopa bezrobocia rejestrowanego, Kraków (%)" });
