@@ -1,29 +1,15 @@
 // Geometria parków: migawka zbudowana skryptem scripts/build-parki-osm.mjs (OSM, ODbL) i dołączona do Workera.
 import snapshot from "../data/parki-osm.json" with { type: "json" };
+import { bbox, centroid, clockwise, type Ring } from "./geo.ts";
 
-type Ring = [number, number][];
 type Park = (typeof snapshot.parki)[number];
 
-// Środek ciężkości największego pierścienia (rzutowanie lokalne), do pokazania punktu na mapie.
-function centroid(rings: Ring[]): { lat: number; lon: number } {
-  const ring = rings.reduce((a, b) => (b.length > a.length ? b : a));
-  const k = Math.cos((50.06 * Math.PI) / 180);
-  let a = 0, cx = 0, cy = 0;
-  for (let i = 0; i < ring.length; i++) {
-    const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
-    const f = x1 * k * y2 - x2 * k * y1;
-    a += f; cx += (x1 * k + x2 * k) * f; cy += (y1 + y2) * f;
-  }
-  return a === 0
-    ? { lat: ring[0][1], lon: ring[0][0] }
-    : { lat: +(cy / (3 * a)).toFixed(6), lon: +(cx / (3 * a) / k).toFixed(6) };
-}
+export const PARKI_OSM_ID = "lokalne:parki_osm";
 
-const bbox = (rings: Ring[]) => {
-  const pts = rings.flat();
-  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
-};
+// Wszystkie dopasowane pierścienie parków, do użycia jako obszar w zapytaniach przestrzennych.
+export function parkiRings(): Ring[] {
+  return (snapshot.parki as Park[]).flatMap((p) => (p.osm?.rings as Ring[] | undefined) ?? []).map(clockwise);
+}
 
 export function parkGeometry(opts: { nazwa?: string; dzielnica?: string; tylko_z_geometria?: boolean }) {
   const n = opts.nazwa?.toLowerCase(), d = opts.dzielnica?.toLowerCase();

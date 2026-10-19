@@ -1,7 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
-import { addressToPoint, listParks, mpzpAtPoint, populationWithin } from "./core.ts";
+import { addressToPoint } from "./adres.ts";
+import { pozycje, szukaj } from "./katalog.ts";
 import { parkGeometry } from "./parki.ts";
+import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
+import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
 
@@ -11,53 +14,80 @@ async function run(fn: () => Promise<Record<string, unknown>>) {
     const data = await fn();
     return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }], structuredContent: data };
   } catch (e) {
-    return { isError: true, content: [{ type: "text" as const, text: `Błąd źródła danych: ${(e as Error).message}` }] };
+    return { isError: true, content: [{ type: "text" as const, text: `Błąd: ${(e as Error).message}` }] };
   }
 }
 
-const lat = z.number().min(49.9).max(50.2).describe("Szerokość geograficzna WGS84 w granicach Krakowa, np. 50.0614");
-const lon = z.number().min(19.7).max(20.2).describe("Długość geograficzna WGS84 w granicach Krakowa, np. 19.9372");
+const geometria = z
+  .union([
+    z.object({ punkt: z.object({ lat: z.number().min(49.9).max(50.2), lon: z.number().min(19.7).max(20.2) }), promien_m: z.number().min(1).max(5000).optional() }),
+    z.object({ bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]) }),
+    z.object({ z: z.object({ id: z.string(), where: z.string().optional(), bufor_m: z.number().min(1).max(5000).optional() }) }),
+  ])
+  .describe(
+    "Filtr przestrzenny (tylko warstwy MSIP): {punkt:{lat,lon},promien_m} | {bbox:[zach,pld,wsch,pln]} | {z:{id,where,bufor_m}} = obiekty innej warstwy (lub 'lokalne:parki_osm') z buforem",
+  );
 
 export function createServer(): McpServer {
-  const server = new McpServer({ name: "lajkonektor", version: "0.1.0" });
+  const server = new McpServer({ name: "lajkonektor", version: "0.2.0" });
 
   server.registerTool(
-    "parki_lista",
+    "katalog_szukaj",
     {
-      title: "Parki Krakowa",
+      title: "Szukaj danych o Krakowie",
       description:
-        "Lista parków miejskich lub kieszonkowych Krakowa z Otwartych Danych UMK (nazwa, typ, dzielnica, powierzchnia w ha). Bez geometrii.",
+        `Szukaj w katalogu ${pozycje.length} zbiorów danych miasta Krakowa (tabele Otwartych Danych UMK i warstwy mapowe MSIP: plany miejscowe, demografia, hałas, transport, edukacja, zdrowie, zieleń i inne) po temacie lub nazwie pola. Zwraca id do użycia w zbior_opis i dane_zapytaj. ZACZNIJ OD TEGO NARZĘDZIA, gdy pytanie dotyczy danych o mieście.`,
       inputSchema: z.object({
-        rodzaj: z.enum(["miejskie", "kieszonkowe"]).default("miejskie"),
-        dzielnica: z.string().optional().describe("Fragment nazwy dzielnicy, np. 'Podgórze' lub 'VII'"),
+        temat: z.string().min(2).describe("Słowa kluczowe po polsku, np. 'parki', 'cudzoziemcy', 'bezrobocie', 'miejscowy plan', 'hałas', 'przystanki'"),
+        zrodlo: z.enum(["od", "msip"]).optional().describe("od = tabele Otwartych Danych, msip = warstwy mapowe"),
+        limit: z.number().int().min(1).max(30).default(10),
       }),
       annotations: readOnly,
     },
-    ({ rodzaj, dzielnica }) => run(() => listParks({ rodzaj, dzielnica })),
+    ({ temat, zrodlo, limit }) =>
+      run(async () => {
+        const wyniki = szukaj(temat, { zrodlo, limit }).map((p) => ({
+          id: p.id, zrodlo: p.zrodlo, tytul: p.tytul, geometria: p.geometria ?? undefined,
+          pola: p.pola.slice(0, 14).map((f) => f.split(":")[0]), ...(p.pola.length > 14 ? { pol_razem: p.pola.length } : {}),
+        }));
+        return { liczba: wyniki.length, wyniki, podpowiedz: wyniki.length ? "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj." : "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'." };
+      }),
   );
 
   server.registerTool(
-    "mpzp_w_punkcie",
+    "zbior_opis",
     {
-      title: "Plan miejscowy w punkcie",
-      description:
-        "Przeznaczenie terenu z miejscowego planu zagospodarowania przestrzennego (MPZP) w punkcie (MSIP Kraków). Symbole ZP oznaczają tereny zieleni.",
-      inputSchema: z.object({ lat, lon }),
+      title: "Opis zbioru danych",
+      description: "Pełny opis zbioru z katalogu: pola i typy, aliasy, słowniki kodów, liczba rekordów, próbka danych i wskazówki do zapytań.",
+      inputSchema: z.object({ id: z.string().describe("id z katalog_szukaj, np. 'msip:Planowanie/BP_MPZP/3'") }),
       annotations: readOnly,
     },
-    ({ lat, lon }) => run(() => mpzpAtPoint(lat, lon)),
+    ({ id }) => run(() => zbiorOpis(id)),
   );
 
   server.registerTool(
-    "ludnosc_w_promieniu",
+    "dane_zapytaj",
     {
-      title: "Zameldowani w promieniu",
+      title: "Zapytaj zbiór danych",
       description:
-        "Liczba osób zameldowanych na pobyt stały w siatce heksagonów 100 m w promieniu od punktu (MSIP Kraków, najnowszy snapshot). Do wskaźników dostępności usług.",
-      inputSchema: z.object({ lat, lon, promien_m: z.number().int().min(50).max(3000).default(500) }),
+        "Uniwersalne zapytanie do zbioru z katalogu: filtr, wybór pól, sortowanie, agregacje (sum/count/avg/min/max z grupowaniem), stronicowanie oraz filtr przestrzenny dla warstw MSIP (punkt z promieniem, ramka, albo bufor wokół obiektów innej warstwy). Liczby liczy serwer, nie model. Współrzędne WGS84.",
+      inputSchema: z.object({
+        id: z.string().describe("id zbioru z katalog_szukaj"),
+        pola: z.array(z.string()).optional().describe("Kolumny do zwrócenia (domyślnie wszystkie)"),
+        filtr: z.string().optional().describe("MSIP: SQL where, np. \"oznaczenie LIKE 'ZP%'\". OD: OData $filter, np. \"Dzielnica eq 'VIII Dębniki'\""),
+        sortuj: z.string().optional().describe("np. 'Powierzchnia_ha desc' (OD) lub 'pole DESC' (MSIP)"),
+        limit: z.number().int().min(1).max(1000).default(100),
+        offset: z.number().int().min(0).optional().describe("MSIP: przesunięcie stronicowania"),
+        kursor: z.string().optional().describe("OD: nastepny_kursor z poprzedniej odpowiedzi"),
+        grupuj_po: z.array(z.string()).optional(),
+        agreguj: z.array(z.object({ fn: z.enum(["sum", "count", "avg", "min", "max"]), pole: z.string(), nazwa: z.string().optional() })).optional(),
+        geometria: geometria.optional(),
+        zwroc_geometrie: z.boolean().optional().describe("MSIP: dołącz środek i ramkę obiektu"),
+        tylko_liczba: z.boolean().optional().describe("MSIP: zwróć tylko liczbę obiektów"),
+      }),
       annotations: readOnly,
     },
-    ({ lat, lon, promien_m }) => run(() => populationWithin(lat, lon, promien_m)),
+    (args) => run(() => daneZapytaj(args)),
   );
 
   server.registerTool(
@@ -65,7 +95,7 @@ export function createServer(): McpServer {
     {
       title: "Adres na współrzędne",
       description:
-        "Geokodowanie adresu w Krakowie (punkty adresowe MSIP): zwraca lat/lon, kod pocztowy i dzielnicę. Użyj przed narzędziami przyjmującymi lat/lon.",
+        "Geokodowanie adresu w Krakowie (punkty adresowe MSIP): zwraca lat/lon, kod pocztowy i dzielnicę. Użyj przed zapytaniami przestrzennymi z punktem.",
       inputSchema: z.object({
         ulica: z.string().min(2).describe("Nazwa ulicy, np. 'Telimeny' (bez 'ul.'; polskie litery opcjonalne)"),
         numer: z.string().describe("Numer budynku dokładnie jak w adresie, np. '11' lub '4A'"),
@@ -81,7 +111,7 @@ export function createServer(): McpServer {
     {
       title: "Parki z geometrią (OSM)",
       description:
-        "Parki miejskie z tabeli OD uzupełnione o dopasowaną geometrię z OpenStreetMap: środek, ramka, powierzchnia OSM i miara zgodności. Pokrycie jest częściowe (patrz pole 'pokrycie').",
+        "Parki miejskie z tabeli OD z dopasowaną geometrią z OpenStreetMap: środek, ramka, zgodność powierzchni i pokrycie. Zbiór 'lokalne:parki_osm' można podać jako obszar w dane_zapytaj (geometria.z), by liczyć np. mieszkańców w zasięgu parków. Pokrycie jest częściowe.",
       inputSchema: z.object({
         nazwa: z.string().optional().describe("Fragment nazwy parku, np. 'Jordana'"),
         dzielnica: z.string().optional().describe("Fragment nazwy dzielnicy, np. 'Podgórze'"),
@@ -90,6 +120,58 @@ export function createServer(): McpServer {
       annotations: readOnly,
     },
     (args) => run(async () => parkGeometry(args)),
+  );
+
+  server.registerTool(
+    "bdl_szukaj",
+    {
+      title: "Szukaj wskaźników GUS (BDL)",
+      description:
+        "Szukaj zmiennych w Banku Danych Lokalnych GUS (bezrobocie, ludność, wynagrodzenia, mieszkania, edukacja, środowisko i inne) dostępnych dla Krakowa. Zwraca id do bdl_dane. Użyj do pytań o sytuację makro i trendy w czasie.",
+      inputSchema: z.object({
+        nazwa: z.string().min(3).describe("np. 'stopa bezrobocia', 'bezrobotni zarejestrowani', 'przeciętne wynagrodzenie', 'ludność ogółem'"),
+        limit: z.number().int().min(1).max(50).default(15),
+      }),
+      annotations: readOnly,
+    },
+    ({ nazwa, limit }) => run(() => bdlSzukaj(nazwa, limit)),
+  );
+
+  server.registerTool(
+    "bdl_dane",
+    {
+      title: "Dane GUS (BDL) dla Krakowa",
+      description:
+        "Wartości zmiennych BDL w czasie dla Krakowa (domyślnie powiat m. Kraków). Zwraca wiersze {zmienna, rok, wartość} gotowe do analizy trendu i prognozy.",
+      inputSchema: z.object({
+        zmienne: z.array(z.number().int()).min(1).max(20).describe("id z bdl_szukaj"),
+        jednostka: z.string().default("powiat").describe("'powiat' (m. Kraków), 'gmina', 'podregion' albo surowe id jednostki BDL"),
+        lata: z.array(z.number().int()).max(40).optional().describe("Lata; domyślnie wszystkie dostępne"),
+      }),
+      annotations: readOnly,
+    },
+    (args) => run(() => bdlDane(args)),
+  );
+
+  server.registerTool(
+    "dane_gov",
+    {
+      title: "Portal dane.gov.pl",
+      description:
+        "Szukaj zbiorów danych otwartych instytucji publicznych w dane.gov.pl (po 'q') albo pobierz listę zasobów (plików) zbioru (po 'zbior_id'). Linki do plików można dalej przetwarzać.",
+      inputSchema: z.object({
+        q: z.string().optional().describe("Szukana fraza, np. 'Kraków ceny mieszkań'"),
+        zbior_id: z.string().optional().describe("id zbioru z poprzedniego wyniku: zwróci jego zasoby i linki do plików"),
+        limit: z.number().int().min(1).max(25).default(10),
+      }),
+      annotations: readOnly,
+    },
+    ({ q, zbior_id, limit }) =>
+      run(async () => {
+        if (zbior_id) return daneGovZasoby(zbior_id);
+        if (!q) throw new Error("Podaj 'q' (fraza) albo 'zbior_id'.");
+        return daneGovSzukaj(q, limit);
+      }),
   );
 
   return server;
