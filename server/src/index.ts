@@ -25,7 +25,7 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     // Handler per żądanie (bezstanowy), żeby narzędzie status_zrodel znało colo/kraj bieżącego żądania.
     if (pathname === "/mcp") return withCors(await createMcpHandler(() => createServer((request as any).cf, new URL(request.url).origin)).fetch(request));
-    if (pathname.startsWith("/kafelki/")) return kafelek(pathname);
+    if (pathname.startsWith("/kafelki/")) return kafelek(pathname, request.headers.get("cf-connecting-ip") ?? "");
     if (pathname === "/diag") return Response.json(await statusZrodel((request as any).cf), { headers: CORS });
     if (pathname === "/health") return Response.json({ ok: true, name: "lajkonektor", version: WERSJA }, { headers: CORS });
     return new Response("Lajkonektor: serwer MCP z otwartymi danymi Krakowa. Endpoint: /mcp", { status: 200 });
