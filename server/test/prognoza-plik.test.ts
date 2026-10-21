@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { zipSync, strToU8 } from "fflate";
 import { prognoza } from "../src/prognoza.ts";
 import { obrobka, plikOdczyt, sprawdzUrl, wTabele, wykryjFormat } from "../src/plik.ts";
+import { naZywo } from "./na-zywo.ts";
 
 const seria = (f: (x: number) => number, od: number, n: number) => Array.from({ length: n }, (_, i) => ({ x: od + i, y: f(od + i) }));
 const bajty = (s: string) => new TextEncoder().encode(s);
@@ -173,7 +174,7 @@ test("wykryjFormat i obróbka: sortowanie, agregacja i walidacja nazw kolumn", (
 const CSV = "https://api.dane.gov.pl/resources/2826441,ceny-ofertowe-mieszkan-dewelopera-novy-mateczny-krakow-2026-10-19/file";
 const XLSX = "https://api.dane.gov.pl/resources/2826170,ceny-ofertowe-mieszkan-dewelopera-dom-development-krakow-sp-z-oo-2026-10-18/file";
 
-test("na żywo: CSV z dane.gov.pl (przekierowanie do serwera dostawcy), profil kolumn", { timeout: 60_000 }, async () => {
+naZywo("na żywo: CSV z dane.gov.pl (przekierowanie do serwera dostawcy), profil kolumn", { timeout: 60_000 }, async () => {
   const r = await plikOdczyt({ url: CSV, limit: 3 });
   assert.equal(r.format, "csv");
   assert.ok(r.wierszy_w_pliku > 0 && r.kolumny.length > 10);
@@ -181,7 +182,7 @@ test("na żywo: CSV z dane.gov.pl (przekierowanie do serwera dostawcy), profil k
   assert.ok(r.wiersze.length <= 3);
 });
 
-test("na żywo: XLSX z dane.gov.pl, agregacja po stronie serwera", { timeout: 60_000 }, async () => {
+naZywo("na żywo: XLSX z dane.gov.pl, agregacja po stronie serwera", { timeout: 60_000 }, async () => {
   const r = await plikOdczyt({ url: XLSX, limit: 2 });
   assert.equal(r.format, "xlsx");
   assert.ok(r.arkusze && r.wierszy_w_pliku > 50);
@@ -192,7 +193,7 @@ test("na żywo: XLSX z dane.gov.pl, agregacja po stronie serwera", { timeout: 60
   assert.ok(Math.abs(s.wiersze[0].suma - liczbowa.suma) < 1e-3 * Math.abs(liczbowa.suma) + 1, "suma serwera zgodna z profilem");
 });
 
-test("na żywo: GeoJSON z MSIP (dzielnice Krakowa), pola wielokątów", { timeout: 60_000 }, async () => {
+naZywo("na żywo: GeoJSON z MSIP (dzielnice Krakowa), pola wielokątów", { timeout: 60_000 }, async () => {
   const url = "https://msip3.um.krakow.pl/server/rest/services/Pobieranie/Dzielnice/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson";
   const r = await plikOdczyt({ url, limit: 30 });
   assert.equal(r.format, "geojson");
@@ -201,6 +202,7 @@ test("na żywo: GeoJSON z MSIP (dzielnice Krakowa), pola wielokątów", { timeou
   assert.ok(pole && pole.suma > 20_000 && pole.suma < 40_000, `suma pól dzielnic ${pole?.suma} ha (Kraków ~32 700 ha)`);
 });
 
-test("na żywo: nieznany host jest odrzucony przed pobraniem", async () => {
+naZywo("na żywo: nieznany host jest odrzucony przed pobraniem", async () => {
   await assert.rejects(plikOdczyt({ url: "https://example.com/dane.csv" }), /nie jest dozwolony/);
 });
+
