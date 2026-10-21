@@ -77,6 +77,11 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
   // zapytanie (do odświeżania) i krótkie podsumowanie po polsku dla klientów bez UI.
   // Rejestr surowych handlerów: narzędzie `widok` wykonuje przez niego zapytania wskazane w blokach (`z`).
   const rejestr = new Map<string, { schema: z.ZodType; handler: (args: any) => Promise<any> }>();
+  // Wynik narzędzia dostaje widok, zapytanie i podsumowanie. Tę samą ścieżkę używa MCP i /api/wywolaj.
+  const otocz = (nazwa: string, args: unknown, sc: Record<string, unknown>) => {
+    const dane = { podsumowanie: podsumuj(nazwa, sc), ...sc };
+    return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
+  };
   const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) => {
     rejestr.set(nazwa, { schema: cfg.inputSchema, handler });
     return registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
@@ -86,8 +91,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
         // żeby odróżnić „źródło padło" od „mój błąd" (wrangler tail).
         if (r?.isError) console.error(JSON.stringify({ narzedzie: nazwa, blad: String(r.content?.[0]?.text ?? "(bez komunikatu)").replace(/^Błąd:\s*/, "") }));
         if (!r.structuredContent) return r;
-        const dane = { podsumowanie: podsumuj(nazwa, r.structuredContent), ...r.structuredContent };
-        return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
+        return otocz(nazwa, args, r.structuredContent);
       } catch (e) {
         console.error(JSON.stringify({ narzedzie: nazwa, blad: e instanceof Error ? e.message : String(e) }));
         throw e;
@@ -101,7 +105,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     if (!p.success) throw new Error(`argumenty ${nazwa}: ${p.error.issues.map((i) => `${i.path.join(".") || "(korzeń)"}: ${i.message}`).join("; ")}`);
     const r = await t.handler(p.data);
     if (r.isError) throw new Error(String(r.content[0].text).replace(/^Błąd:\s*/, ""));
-    return r.structuredContent;
+    return otocz(nazwa, p.data, r.structuredContent).structuredContent;
   };
 
   narzedzie(
@@ -471,5 +475,6 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     async (args: any) => run(async () => konturyParkow(args)) as any,
   );
 
-  return server;
+  // wywolaj: ta sama ścieżka co w MCP (walidacja zod, wzbogacenie wyniku); używa jej trasa /api/wywolaj.
+  return Object.assign(server, { wywolaj });
 }
