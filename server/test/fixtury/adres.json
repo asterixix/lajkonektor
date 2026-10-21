@@ -5,6 +5,9 @@
   "numer": "11"
  },
  "podsumowanie": "Adres: Telimeny 11, 30-838, Dzielnica XII Bieżanów-Prokocim; współrzędne 50.01980, 20.01435.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:55.444Z"
+ },
  "zrodlo": "MSIP Kraków, Pobieranie/Adresy (punkty adresowe)",
  "uwaga": "Współrzędne WGS84 punktu adresowego; użyj lat/lon w innych narzędziach.",
  "liczba": 1,

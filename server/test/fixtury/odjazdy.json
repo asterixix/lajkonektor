@@ -5,85 +5,88 @@
   "promien_m": 400,
   "limit": 8
  },
- "podsumowanie": "Najbliższe odjazdy (na żywo): linia 662 → Czerwone Maki P+R o 22:21 (za 0 min); linia 152 → Czyżyny Dworzec o 22:23 (za 3 min, opóźnienie 2 min); linia 12 → Czerwone Maki P+R o 22:24 (za 3 min); linia 12 → Os.Piastów o 22:24 (za 3 min); linia 14 → Mistrzejowice o 22:24 (za 3 min).",
+ "podsumowanie": "Najbliższe odjazdy (na żywo): linia 3 → Nowy Bieżanów P+R o 00:20 (za 5 min); linia 902 → Dworzec Główny Wschód o 00:45 (za 30 min); linia 610 → Prądnik Czerwony P+R o 00:54 (za 39 min); linia 904 → Prądnik Biały o 00:54 (za 39 min); linia 605 → Teatr Słowackiego o 00:55 (za 40 min).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:14.050Z"
+ },
  "zrodlo": "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)",
  "przystankow": 9,
  "bledy": [],
  "czas_feedu": {
-  "T": 1792441259,
-  "M": 1792441261,
-  "A": 1792441258
+  "A": 1792620906,
+  "T": 1792620912,
+  "M": 1792620911
  },
  "odjazdy": [
+  {
+   "linia": "3",
+   "kierunek": "Nowy Bieżanów P+R",
+   "przystanek": "Teatr Słowackiego 04",
+   "odjazd": "00:20",
+   "za_min": 5,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "902",
+   "kierunek": "Dworzec Główny Wschód",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "00:45",
+   "za_min": 30,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "610",
+   "kierunek": "Prądnik Czerwony P+R",
+   "przystanek": "Teatr Słowackiego 03",
+   "odjazd": "00:54",
+   "za_min": 39,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "904",
+   "kierunek": "Prądnik Biały",
+   "przystanek": "Teatr Słowackiego 03",
+   "odjazd": "00:54",
+   "za_min": 39,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "605",
+   "kierunek": "Teatr Słowackiego",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "00:55",
+   "za_min": 40,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "664",
+   "kierunek": "Os. Piastów",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "00:55",
+   "za_min": 40,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
+  {
+   "linia": "610",
+   "kierunek": "Borek Fałęcki",
+   "przystanek": "Teatr Słowackiego 02",
+   "odjazd": "00:55",
+   "za_min": 40,
+   "opoznienie_s": null,
+   "zrodlo": "GTFS-RT (na żywo)"
+  },
   {
    "linia": "662",
    "kierunek": "Czerwone Maki P+R",
    "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "22:21",
-   "za_min": 0,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "152",
-   "kierunek": "Czyżyny Dworzec",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "22:23",
-   "za_min": 3,
-   "opoznienie_s": 106,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "12",
-   "kierunek": "Czerwone Maki P+R",
-   "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "22:24",
-   "za_min": 3,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "12",
-   "kierunek": "Os.Piastów",
-   "przystanek": "Teatr Słowackiego 03",
-   "odjazd": "22:24",
-   "za_min": 3,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "14",
-   "kierunek": "Mistrzejowice",
-   "przystanek": "Teatr Słowackiego 02",
-   "odjazd": "22:24",
-   "za_min": 3,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "5",
-   "kierunek": "Górka Narodowa P+R",
-   "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "22:24",
-   "za_min": 4,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "78",
-   "kierunek": "Borek Fałęcki",
-   "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "22:24",
-   "za_min": 4,
-   "opoznienie_s": null,
-   "zrodlo": "GTFS-RT (na żywo)"
-  },
-  {
-   "linia": "14",
-   "kierunek": "Cichy Kącik",
-   "przystanek": "Teatr Słowackiego 01",
-   "odjazd": "22:25",
-   "za_min": 4,
+   "odjazd": "00:55",
+   "za_min": 40,
    "opoznienie_s": null,
    "zrodlo": "GTFS-RT (na żywo)"
   }

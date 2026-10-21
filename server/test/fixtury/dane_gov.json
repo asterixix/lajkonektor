@@ -5,56 +5,56 @@
   "limit": 4
  },
  "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:55.277Z"
+ },
  "zrodlo": "dane.gov.pl (Portal Danych Otwartych)",
- "razem": 21620,
+ "razem": 21703,
  "zbiory": [
   {
-   "id": "7732",
-   "tytul": "FHU Małgorzata Bugiel, ceny mieszkań, naziemnych miejsc parkingowych oraz komórek lokatorskich Panorama Słoneczna",
-   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera udostępniane zgodnie",
-   "formaty": [
-    "csv",
-    "jsonld",
-    "xlsx"
-   ],
-   "url": "https://dane.gov.pl/pl/dataset/7732",
-   "slowa_kluczowe": [
-    "mieszkania ceny"
-   ]
-  },
-  {
-   "id": "42145",
-   "tytul": "Ceny ofertowe mieszkań dewelopera Osiedle w Dolinie Sp. z o.o. na dzień 19.10.2026 r.",
-   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań",
-   "formaty": [
-    "xlsx"
-   ],
-   "url": "https://dane.gov.pl/pl/dataset/42145",
-   "slowa_kluczowe": [
-    "Domovo",
-    "Deweloper Osiedle w Dolinie"
-   ]
-  },
-  {
-   "id": "42144",
-   "tytul": "Dane dewelopera Bursztynowy Park w Rumi budynek B5 aktualizacja 19.10.2026r.",
-   "opis": "Dane dotyczące cen ofertowych mieszkań dewelopera Bursztynowy Park udostępnione zgodnie z art",
+   "id": "42270",
+   "tytul": "Ceny ofertowe nieruchomości dewelopera Maison Sp. z o.o. w 2026r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera Maison Sp. z o.o",
    "formaty": [],
-   "url": "https://dane.gov.pl/pl/dataset/42144",
+   "url": "https://dane.gov.pl/pl/dataset/42270",
    "slowa_kluczowe": [
-    "Rumia"
+    "Deweloper Maison Sp. z o.o."
    ]
   },
   {
-   "id": "6746",
-   "tytul": "Ceny ofertowe mieszkań dewelopera AB ARCHI – INWEST SPÓŁKA JAWNA A. ŚWIERCZEK, S. CAŁKA SPÓŁKA KOMANDYTOWA w 2025 r.",
-   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera AB ARCHI – INWEST",
+   "id": "22403",
+   "tytul": "Ceny ofertowe mieszkań dewelopera SAINZ PROJEKT 2 Sp. z o.o. w 2026 r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera SAINZ PROJEKT 2 Sp",
    "formaty": [
-    "xlsx"
+    "csv"
    ],
-   "url": "https://dane.gov.pl/pl/dataset/6746",
+   "url": "https://dane.gov.pl/pl/dataset/22403",
    "slowa_kluczowe": [
-    "deweloper AB ARCHI-INWEST"
+    "deweloper SAINZ PROJEKT 2 Sp. z o.o."
+   ]
+  },
+  {
+   "id": "22405",
+   "tytul": "Ceny ofertowe mieszkań dewelopera SAINZ PROJEKT BRONISZE Sp. z o.o. w 2026 r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera SAINZ PROJEKT BRONISZE",
+   "formaty": [
+    "csv"
+   ],
+   "url": "https://dane.gov.pl/pl/dataset/22405",
+   "slowa_kluczowe": [
+    "deweloper SAINZ PROJEKT BRONISZE Sp. z o.o."
+   ]
+  },
+  {
+   "id": "22406",
+   "tytul": "Ceny ofertowe mieszkań dewelopera SAINZ PROJEKT RASZYN Sp. z o.o. w 2026 r.",
+   "opis": "Zbiór danych zawiera informacje o cenach ofertowych mieszkań dewelopera SAINZ PROJEKT RASZYN Sp",
+   "formaty": [
+    "csv"
+   ],
+   "url": "https://dane.gov.pl/pl/dataset/22406",
+   "slowa_kluczowe": [
+    "deweloper SAINZ PROJEKT RASZYN Sp. z o.o."
    ]
   }
  ]

@@ -9,7 +9,10 @@
   },
   "max_dojscie_m": 800
  },
- "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 54 min. Dojście 3 min do przystanku Kraków Główny 1 t. 9, linia SKA3 (Kraków Główny 1 t. 9 → Podłęże 1 t. 1, 25 min), dojście 21 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 1.",
+ "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 288 min. Dojście 3 min do przystanku Kraków Główny 1 t. 11, linia K7 (Kraków Główny 1 t. 11 → Podłęże 1 t. 1, 24 min), dojście 21 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 4.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:50.068Z"
+ },
  "zrodlo": "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; pociągi: rozkłady PKP PLK (mkuran.pl); dojście: OSM",
  "uwaga": "Szacunek, nie gwarancja: autobusy i tramwaje liczone z częstotliwości kursów (pierwsza noga na żywo), pociągi z dokładnych godzin rozkładu PKP PLK (bez opóźnień), transfery do 200 m, maks. jedna przesiadka.",
  "z": {
@@ -25,15 +28,15 @@
   "lon": 20.1853151
  },
  "odleglosc_prosta_m": 18023,
- "opcji": 1,
+ "opcji": 4,
  "promien_dojscia_m": 800,
  "komunikaty_o_utrudnieniach": [],
  "opcje": [
   {
    "rodzaj": "bezposrednia",
-   "czas_min": 54,
+   "czas_min": 288,
    "dojscie_start": {
-    "przystanek": "Kraków Główny 1 t. 9",
+    "przystanek": "Kraków Główny 1 t. 11",
     "m": 220,
     "min": 3,
     "zrodlo": "OSM (OSRM, pieszo)"
@@ -44,18 +47,132 @@
     "min": 21,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 5,
-   "czekanie_pierwsza_noga_min": 5,
+   "czekanie_min": 240,
+   "czekanie_pierwsza_noga_min": 240,
+   "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
+   "nogi": [
+    {
+     "linia": "K7",
+     "kierunek": "Piwniczna",
+     "wsiadanie": "Kraków Główny 1 t. 11",
+     "wysiadanie": "Podłęże 1 t. 1",
+     "przystankow": 9,
+     "jazda_min": 24,
+     "odjazd_wg_rozkladu": "04:18",
+     "wsiadanie_pkt": {
+      "lat": 50.06861,
+      "lon": 19.9478
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.01815,
+      "lon": 20.16897
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 321,
+   "dojscie_start": {
+    "przystanek": "Kraków Główny 5 t. 12",
+    "m": 220,
+    "min": 3,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Podłęże 1 t. 1",
+    "m": 1502,
+    "min": 21,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 274,
+   "czekanie_pierwsza_noga_min": 274,
    "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
    "nogi": [
     {
      "linia": "SKA3",
      "kierunek": "Tarnów",
-     "wsiadanie": "Kraków Główny 1 t. 9",
+     "wsiadanie": "Kraków Główny 5 t. 12",
      "wysiadanie": "Podłęże 1 t. 1",
      "przystankow": 9,
-     "jazda_min": 25,
-     "odjazd_wg_rozkladu": "22:29",
+     "jazda_min": 23,
+     "odjazd_wg_rozkladu": "04:52",
+     "wsiadanie_pkt": {
+      "lat": 50.06861,
+      "lon": 19.9478
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.01815,
+      "lon": 20.16897
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 363,
+   "dojscie_start": {
+    "przystanek": "Kraków Główny 2 t. 3",
+    "m": 220,
+    "min": 3,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Podłęże 1 t. 1",
+    "m": 1502,
+    "min": 21,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 316,
+   "czekanie_pierwsza_noga_min": 316,
+   "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
+   "nogi": [
+    {
+     "linia": "K7P",
+     "kierunek": "Krynica-Zdrój",
+     "wsiadanie": "Kraków Główny 2 t. 3",
+     "wysiadanie": "Podłęże 1 t. 1",
+     "przystankow": 6,
+     "jazda_min": 23,
+     "odjazd_wg_rozkladu": "05:34",
+     "wsiadanie_pkt": {
+      "lat": 50.06861,
+      "lon": 19.9478
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.01815,
+      "lon": 20.16897
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 376,
+   "dojscie_start": {
+    "przystanek": "Kraków Główny 1 t. 9",
+    "m": 220,
+    "min": 3,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Podłęże 2 t. 4",
+    "m": 1502,
+    "min": 21,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 314,
+   "czekanie_pierwsza_noga_min": 314,
+   "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
+   "nogi": [
+    {
+     "linia": "K63",
+     "kierunek": "Bochnia",
+     "wsiadanie": "Kraków Główny 1 t. 9",
+     "wysiadanie": "Podłęże 2 t. 4",
+     "przystankow": 7,
+     "jazda_min": 38,
+     "odjazd_wg_rozkladu": "05:32",
      "wsiadanie_pkt": {
       "lat": 50.06861,
       "lon": 19.9478

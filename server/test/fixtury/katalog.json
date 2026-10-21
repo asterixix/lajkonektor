@@ -5,12 +5,17 @@
   "limit": 6
  },
  "podsumowanie": "Znaleziono 6 zbiorów. Najlepszy: od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2025-2026.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.636Z",
+  "migawka_katalogu": "2026-10-19"
+ },
  "liczba": 6,
  "wyniki": [
   {
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2025-2026",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2025-2026",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",
@@ -33,6 +38,7 @@
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2024-2025",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2024-2025",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",
@@ -55,6 +61,7 @@
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2023-2024",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-samorzadowe-2023-2024",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",
@@ -77,6 +84,7 @@
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",
@@ -98,6 +106,7 @@
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2024-2025",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2024-2025",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",
@@ -119,6 +128,7 @@
    "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2023-2024",
    "zrodlo": "od",
    "tytul": "OD-OswiataPrzedszkolaLiczbaDzieci / liczba-dzieci-przedszkola-niesamorzadowe-2023-2024",
+   "dopasowanie": "pelne",
    "pola": [
     "Lp",
     "Numer RSPO",

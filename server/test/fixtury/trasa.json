@@ -11,7 +11,10 @@
   },
   "max_dojscie_m": 800
  },
- "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 40 min. Dojście 7 min do przystanku Norymberska 02, linia 12 (Norymberska 02 → Teatr Słowackiego 03, 19 min), dojście 4 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 4.",
+ "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 45 min. Dojście 8 min do przystanku Norymberska 03, linia 662 (Norymberska 03 → Teatr Słowackiego 03, 19 min), dojście 5 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 4.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:14.582Z"
+ },
  "zrodlo": "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; pociągi: rozkłady PKP PLK (mkuran.pl); dojście: OSM",
  "uwaga": "Szacunek, nie gwarancja: autobusy i tramwaje liczone z częstotliwości kursów (pierwsza noga na żywo), pociągi z dokładnych godzin rozkładu PKP PLK (bez opóźnień), transfery do 200 m, maks. jedna przesiadka.",
  "z": {
@@ -33,88 +36,88 @@
  "opcje": [
   {
    "rodzaj": "bezposrednia",
-   "czas_min": 40,
+   "czas_min": 45,
    "dojscie_start": {
-    "przystanek": "Norymberska 02",
-    "m": 510,
-    "min": 7,
+    "przystanek": "Norymberska 03",
+    "m": 570,
+    "min": 8,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
    "dojscie_cel": {
     "przystanek": "Teatr Słowackiego 03",
-    "m": 279,
-    "min": 4,
+    "m": 336,
+    "min": 5,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 10,
-   "czekanie_pierwsza_noga_min": 10,
-   "zrodlo_czasu": "szacunek z rozkładu (częstotliwość kursów)",
-   "nogi": [
-    {
-     "linia": "12",
-     "kierunek": "Os.Piastów",
-     "wsiadanie": "Norymberska 02",
-     "wysiadanie": "Teatr Słowackiego 03",
-     "przystankow": 12,
-     "jazda_min": 19,
-     "wsiadanie_pkt": {
-      "lat": 50.03013,
-      "lon": 19.91313
-     },
-     "wysiadanie_pkt": {
-      "lat": 50.06416,
-      "lon": 19.945
-     }
-    }
-   ]
-  },
-  {
-   "rodzaj": "bezposrednia",
-   "czas_min": 62,
-   "dojscie_start": {
-    "przystanek": "Norymberska 02",
-    "m": 510,
-    "min": 7,
-    "zrodlo": "OSM (OSRM, pieszo)"
-   },
-   "dojscie_cel": {
-    "przystanek": "Stary Kleparz 02",
-    "m": 298,
-    "min": 4,
-    "zrodlo": "OSM (OSRM, pieszo)"
-   },
-   "czekanie_min": 27,
-   "czekanie_pierwsza_noga_min": 27,
+   "czekanie_min": 13,
+   "czekanie_pierwsza_noga_min": 13,
    "zrodlo_czasu": "pierwsza noga z GTFS-RT (na żywo), reszta szacunek z rozkładu",
    "najblizsze_odjazdy_na_zywo": [
     {
-     "odjazd": "22:55",
-     "za_min": 34,
+     "odjazd": "00:36",
+     "za_min": 21,
      "opoznienie_s": null
     }
    ],
    "nogi": [
     {
-     "linia": "18",
-     "kierunek": "Górka Narodowa P+R",
-     "wsiadanie": "Norymberska 02",
-     "wysiadanie": "Stary Kleparz 02",
-     "przystankow": 15,
-     "jazda_min": 24,
+     "linia": "662",
+     "kierunek": "Plac Centralny im. R. Reagana",
+     "wsiadanie": "Norymberska 03",
+     "wysiadanie": "Teatr Słowackiego 03",
+     "przystankow": 11,
+     "jazda_min": 19,
      "wsiadanie_pkt": {
-      "lat": 50.03013,
-      "lon": 19.91313
+      "lat": 50.02999,
+      "lon": 19.91368
      },
      "wysiadanie_pkt": {
-      "lat": 50.06623,
-      "lon": 19.93862
+      "lat": 50.06401,
+      "lon": 19.94509
      }
     }
    ]
   },
   {
    "rodzaj": "bezposrednia",
-   "czas_min": 83,
+   "czas_min": 68,
+   "dojscie_start": {
+    "przystanek": "Rostworowskiego 05",
+    "m": 844,
+    "min": 11,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "dojscie_cel": {
+    "przystanek": "Stary Kleparz 03",
+    "m": 300,
+    "min": 4,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 30,
+   "czekanie_pierwsza_noga_min": 30,
+   "zrodlo_czasu": "szacunek z rozkładu (częstotliwość kursów)",
+   "nogi": [
+    {
+     "linia": "608",
+     "kierunek": "Os. Na Stoku",
+     "wsiadanie": "Rostworowskiego 05",
+     "wysiadanie": "Stary Kleparz 03",
+     "przystankow": 16,
+     "jazda_min": 23,
+     "wsiadanie_pkt": {
+      "lat": 50.02765,
+      "lon": 19.91488
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.0667,
+      "lon": 19.9389
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "bezposrednia",
+   "czas_min": 306,
    "dojscie_start": {
     "przystanek": "Kraków Łagiewniki 2 t. 2",
     "m": 2696,
@@ -127,18 +130,18 @@
     "min": 17,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 21,
-   "czekanie_pierwsza_noga_min": 21,
+   "czekanie_min": 244,
+   "czekanie_pierwsza_noga_min": 244,
    "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
    "nogi": [
     {
-     "linia": "K52",
+     "linia": "K5",
      "kierunek": "Kraków Główny",
      "wsiadanie": "Kraków Łagiewniki 2 t. 2",
      "wysiadanie": "Kraków Grzegórzki 2 t. 2",
      "przystankow": 4,
      "jazda_min": 9,
-     "odjazd_wg_rozkladu": "23:18",
+     "odjazd_wg_rozkladu": "04:55",
      "wsiadanie_pkt": {
       "lat": 50.02325,
       "lon": 19.93378
@@ -152,7 +155,7 @@
   },
   {
    "rodzaj": "bezposrednia",
-   "czas_min": 95,
+   "czas_min": 337,
    "dojscie_start": {
     "przystanek": "Kraków Łagiewniki 2 t. 2",
     "m": 2696,
@@ -165,8 +168,8 @@
     "min": 17,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 33,
-   "czekanie_pierwsza_noga_min": 33,
+   "czekanie_min": 275,
+   "czekanie_pierwsza_noga_min": 275,
    "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
    "nogi": [
     {
@@ -176,7 +179,7 @@
      "wysiadanie": "Kraków Grzegórzki 2 t. 2",
      "przystankow": 4,
      "jazda_min": 9,
-     "odjazd_wg_rozkladu": "23:30",
+     "odjazd_wg_rozkladu": "05:26",
      "wsiadanie_pkt": {
       "lat": 50.02325,
       "lon": 19.93378

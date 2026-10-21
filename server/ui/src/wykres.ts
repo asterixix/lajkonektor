@@ -58,3 +58,15 @@ export function wykres(o: { punkty: PunktSerii[]; prognoza?: PunktPrognozy[]; je
   const koniecProg = prog.length ? `<circle class="pkt ostatni" cx="${X(prog[prog.length - 1].x)}" cy="${Y(prog[prog.length - 1].y)}" r="5"/><text class="et-w" x="${X(prog[prog.length - 1].x)}" y="${Y(prog[prog.length - 1].y) - 12}" text-anchor="end">${esc(fmt(prog[prog.length - 1].y))}</text>` : "";
   return `<div class="wykres"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.opis)}">${siatka}${pasma}<polyline class="linia" points="${linia}"/>${liniaProg}${punkty}${koniecProg}${osX}</svg></div>`;
 }
+
+/** Wykres punktowy (korelacja) z prostą regresji; punkty z podpisem pokazują go po najechaniu. */
+export function punktowy(p: { x: number; y: number; etykieta?: string | number }[], regresja?: { a: number; b: number }): string {
+  const W = 600, H = 300, L = 54, R = 20, T = 16, B = 34;
+  const xs = p.map((q) => q.x), ys = p.map((q) => q.y);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const X = (v: number) => +(L + ((v - x0) / (x1 - x0 || 1)) * (W - L - R)).toFixed(1), Y = (v: number) => +(T + (1 - (v - y0) / (y1 - y0 || 1)) * (H - T - B)).toFixed(1);
+  const kropki = p.map((q) => `<circle cx="${X(q.x)}" cy="${Y(q.y)}" r="5" fill="#0063AF" fill-opacity=".75" stroke="#fff"><title>${esc(q.etykieta ?? "")} (${liczba(q.x, 2)}; ${liczba(q.y, 2)})</title></circle>`).join("");
+  const linia = regresja && Number.isFinite(regresja.a) ? `<line x1="${X(x0)}" y1="${Y(regresja.b + regresja.a * x0)}" x2="${X(x1)}" y2="${Y(regresja.b + regresja.a * x1)}" stroke="#071F32" stroke-width="2" stroke-dasharray="6 4"/>` : "";
+  const osie = `<line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="#BFBFBF"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H - B}" stroke="#BFBFBF"/><text class="os-t" x="${L}" y="${H - 12}">${liczba(x0, 1)}</text><text class="os-t" x="${W - R}" y="${H - 12}" text-anchor="end">${liczba(x1, 1)}</text><text class="os-t" x="${L - 6}" y="${H - B}" text-anchor="end">${liczba(y0, 1)}</text><text class="os-t" x="${L - 6}" y="${T + 10}" text-anchor="end">${liczba(y1, 1)}</text>`;
+  return `<div class="wykres"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Wykres punktowy, ${p.length} punktów">${osie}${linia}${kropki}</svg></div>`;
+}

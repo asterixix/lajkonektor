@@ -9,6 +9,9 @@
   "limit": 6
  },
  "podsumowanie": "12 przystanków w pobliżu: Norymberska (7 min pieszo, linie 662); Norymberska (7 min pieszo, linie 578); Norymberska (7 min pieszo, linie 11, 12, 17, 18, 62, 71); Ruczaj (7 min pieszo, linie 11, 12, 17, 18, 62, 71); Ruczaj (8 min pieszo, linie 662).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:24.415Z"
+ },
  "miejsce": "prof. Stanisława Łojasiewicza 4, 30-348 (Dzielnica VIII Dębniki)",
  "punkt": {
   "lat": 50.029916607804964,
@@ -19,27 +22,27 @@
  "feedy": {
   "A": {
    "opis": "autobus",
-   "wersja": "20261017_20261020",
-   "last_modified": "Mon, 19 Oct 2026 07:12:17 GMT",
-   "zbudowano": "2026-10-19T20:20:57.649Z"
+   "wersja": "20261020_20261021",
+   "last_modified": "Tue, 20 Oct 2026 06:57:20 GMT",
+   "zbudowano": "2026-10-21T22:15:05.639Z"
   },
   "T": {
    "opis": "tramwaj",
    "wersja": "20261017",
    "last_modified": "Fri, 16 Oct 2026 22:46:33 GMT",
-   "zbudowano": "2026-10-19T20:21:00.003Z"
+   "zbudowano": "2026-10-21T22:15:07.923Z"
   },
   "M": {
    "opis": "linie aglomeracyjne",
-   "wersja": "1691_1692",
-   "last_modified": "Mon, 19 Oct 2026 14:06:07 GMT",
-   "zbudowano": "2026-10-19T20:21:01.474Z"
+   "wersja": "1692_1693",
+   "last_modified": "Tue, 20 Oct 2026 14:16:27 GMT",
+   "zbudowano": "2026-10-21T22:15:09.399Z"
   },
   "K": {
    "opis": "pociągi (PKP PLK: Koleje Małopolskie, PolRegio, Intercity i in.)",
-   "wersja": "2026-10-19T10:59:54.474930+02:00",
-   "last_modified": "Mon, 19 Oct 2026 09:05:57 GMT",
-   "zbudowano": "2026-10-19T20:21:04.892Z"
+   "wersja": "2026-10-21T02:45:11.586352+02:00",
+   "last_modified": "Wed, 21 Oct 2026 00:49:11 GMT",
+   "zbudowano": "2026-10-21T22:15:13.637Z"
   }
  },
  "przystanki": [

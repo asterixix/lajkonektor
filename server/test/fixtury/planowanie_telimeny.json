@@ -1,0 +1,316 @@
+{
+ "_widok": "zlozony",
+ "_zapytanie": {
+  "miejsce": {
+   "ulica": "Telimeny",
+   "numer": "11"
+  }
+ },
+ "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.454Z"
+ },
+ "tytul": "Co obowiązuje w tym miejscu: Telimeny 11, 30-838 (Dzielnica XII Bieżanów-Prokocim)",
+ "podtytul": "Dzielnica XII Bieżanów-Prokocim",
+ "zrodlo": "MSIP Kraków: BP_MPZP, BP_Projekt_planu_ogolnego, BP_STUDIUM_K1, PI_Rewitalizacja_od_2022, BP_UCHWALA_KRAJOBRAZOWA, Zabytki, Pobieranie/Dzialki",
+ "bloki": [
+  {
+   "typ": "metryki",
+   "pozycje": [
+    {
+     "etykieta": "Miejscowy plan",
+     "wartosc": "brak"
+    },
+    {
+     "etykieta": "Strefa planu ogólnego",
+     "wartosc": "SW",
+     "opis": "STREFA WIELOFUNKCYJNA Z ZABUDOWĄ MIESZKANIOWĄ WIELORODZINNĄ"
+    },
+    {
+     "etykieta": "Intensywność / wysokość",
+     "wartosc": "2,3 / 20 m"
+    },
+    {
+     "etykieta": "Zabudowa maks. / bio. czynna min.",
+     "wartosc": "50% / 30%"
+    }
+   ]
+  },
+  {
+   "typ": "mapa",
+   "tytul": "Telimeny 11, 30-838 (Dzielnica XII Bieżanów-Prokocim)",
+   "punkty": [
+    {
+     "lat": 50.01979720027121,
+     "lon": 20.014348988419574,
+     "etykieta": "Tu"
+    }
+   ],
+   "kontury": [
+    {
+     "etykieta": "działka",
+     "pierscien": [
+      [
+       20.013561,
+       50.01978
+      ],
+      [
+       20.015214,
+       50.019843
+      ],
+      [
+       20.015224,
+       50.01974
+      ],
+      [
+       20.013571,
+       50.019677
+      ],
+      [
+       20.013561,
+       50.01978
+      ]
+     ],
+     "pierscienie": [
+      [
+       [
+        20.013561,
+        50.01978
+       ],
+       [
+        20.015214,
+        50.019843
+       ],
+       [
+        20.015224,
+        50.01974
+       ],
+       [
+        20.013571,
+        50.019677
+       ],
+       [
+        20.013561,
+        50.01978
+       ]
+      ]
+     ],
+     "kolor": "#AFCDE9"
+    }
+   ]
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Projekt planu ogólnego Krakowa: strefa planistyczna",
+   "kolumny": [
+    "Parametr",
+    "Wartość"
+   ],
+   "wiersze": [
+    [
+     "Strefa",
+     "SW: STREFA WIELOFUNKCYJNA Z ZABUDOWĄ MIESZKANIOWĄ WIELORODZINNĄ"
+    ],
+    [
+     "Odmiana",
+     null
+    ],
+    [
+     "Przeznaczenie podstawowe",
+     "teren zabudowy mieszkaniowej wielorodzinnej; teren usług; teren komunikacji; teren zieleni urządzonej; teren ogrodów działkowych; teren infrastruktury technicznej"
+    ],
+    [
+     "Przeznaczenie dopuszczalne",
+     "teren zieleni naturalnej; teren lasu; teren wód"
+    ],
+    [
+     "Maks. nadziemna intensywność zabudowy",
+     2.3
+    ],
+    [
+     "Maks. wysokość zabudowy (m)",
+     20
+    ],
+    [
+     "Maks. udział powierzchni zabudowy (%)",
+     50
+    ],
+    [
+     "Min. udział powierzchni biologicznie czynnej (%)",
+     30
+    ]
+   ],
+   "razem": 8
+  },
+  {
+   "typ": "tekst",
+   "wariant": "informacja",
+   "tekst": "W tym miejscu nie ma obowiązującego miejscowego planu zagospodarowania; zasady zabudowy wynikają z decyzji o warunkach zabudowy oraz (od wejścia w życie) z planu ogólnego."
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Działka ewidencyjna",
+   "kolumny": [
+    "Pole",
+    "Wartość"
+   ],
+   "wiersze": [
+    [
+     "id",
+     62476312
+    ],
+    [
+     "id_dzialki",
+     "126104_9.0056.169/13"
+    ],
+    [
+     "numer_dzialki",
+     "169/13"
+    ],
+    [
+     "numer_obrebu",
+     "0056"
+    ],
+    [
+     "numer_jednostki",
+     "126104_9"
+    ],
+    [
+     "nazwa_obrebu",
+     "P-56"
+    ],
+    [
+     "nazwa_jednostki",
+     "Podgórze"
+    ],
+    [
+     "pow_graf",
+     1359
+    ]
+   ],
+   "razem": 8
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Obszary specjalne i ograniczenia w tym miejscu",
+   "kolumny": [
+    "Warstwa",
+    "Wynik"
+   ],
+   "wiersze": [
+    [
+     "Studium: kierunki zagospodarowania (K1)",
+     "tak: GDB$G_BP_K1_PRZEZ_OB_2_BP_K.952fd16d-6dfa-5498-e055-000000000001, MW, 31"
+    ],
+    [
+     "Obszar zabudowy śródmiejskiej",
+     "nie"
+    ],
+    [
+     "Obszar uzupełnienia zabudowy",
+     "nie"
+    ],
+    [
+     "Obszar standardów dostępności infrastruktury",
+     "tak: Obszar Intensywny"
+    ],
+    [
+     "Podobszar rewitalizacji (od 2022)",
+     "nie"
+    ],
+    [
+     "Uchwała krajobrazowa: strefa",
+     "tak: Strefa I, GDB$G_STREFY_UCHW_KRAJ_0506.a756366e-3962-79fb-e055-000000000001, Tak"
+    ],
+    [
+     "Obszar UNESCO",
+     "nie"
+    ],
+    [
+     "Strefa buforowa UNESCO",
+     "nie"
+    ],
+    [
+     "Park kulturowy",
+     "nie"
+    ]
+   ],
+   "razem": 12
+  },
+  {
+   "typ": "tekst",
+   "wariant": "uwaga",
+   "tekst": "Dane informacyjne z MSIP, w tym projekt planu ogólnego (nie jest jeszcze uchwalony). Nie zastępują wypisu i wyrysu z planu ani decyzji o warunkach zabudowy; parametry strefy mogą się zmienić do uchwalenia."
+  }
+ ],
+ "plan": {
+  "miejscowy_plan": [],
+  "strefa_planu_ogolnego": {
+   "oznaczenie": "1426SW",
+   "symbol": "SW",
+   "nazwa": "STREFA WIELOFUNKCYJNA Z ZABUDOWĄ MIESZKANIOWĄ WIELORODZINNĄ",
+   "profil_p": "teren zabudowy mieszkaniowej wielorodzinnej,teren usług,teren komunikacji,teren zieleni urządzonej,teren ogrodów działkowych,teren infrastruktury technicznej,",
+   "profil_d": "teren zieleni naturalnej,teren lasu,teren wód,",
+   "max_niz": 2.3,
+   "max_wz": 20,
+   "max_upz": 50,
+   "min_upbc": 30
+  },
+  "obszar_standardow": {
+   "nazwa": "Obszar Intensywny",
+   "oznaczenie": "1255OSD",
+   "symbol": "OSD",
+   "odszkpod": 1000,
+   "odziel3": 500,
+   "odziel15": 2000
+  },
+  "dzialka": {
+   "id": 62476312,
+   "id_dzialki": "126104_9.0056.169/13",
+   "numer_dzialki": "169/13",
+   "numer_obrebu": "0056",
+   "numer_jednostki": "126104_9",
+   "nazwa_obrebu": "P-56",
+   "nazwa_jednostki": "Podgórze",
+   "pow_graf": 1359
+  },
+  "obszary": [
+   {
+    "warstwa": "Studium: kierunki zagospodarowania (K1)",
+    "dane": {
+     "isdp_fid": "GDB$G_BP_K1_PRZEZ_OB_2_BP_K.952fd16d-6dfa-5498-e055-000000000001",
+     "ozn": "MW",
+     "pow": 345939.97,
+     "nr_ju": "31"
+    }
+   },
+   {
+    "warstwa": "Obszar standardów dostępności infrastruktury",
+    "dane": {
+     "nazwa": "Obszar Intensywny",
+     "oznaczenie": "1255OSD",
+     "symbol": "OSD",
+     "odszkpod": 1000,
+     "odziel3": 500,
+     "odziel15": 2000
+    }
+   },
+   {
+    "warstwa": "Uchwała krajobrazowa: strefa",
+    "dane": {
+     "strefa": "Strefa I",
+     "fid_1": "GDB$G_STREFY_UCHW_KRAJ_0506.a756366e-3962-79fb-e055-000000000001",
+     "baner": "Tak",
+     "baner2": "Tak",
+     "billboard": "Tak",
+     "panel": "Tak",
+     "okraglak": "Tak",
+     "reklama5m": "Tak",
+     "reklama": "Tak",
+     "informacje": "https://www.bip.krakow.pl/zalaczniki/dokumenty/n/342460/karta"
+    }
+   }
+  ],
+  "niedostepne": []
+ }
+}

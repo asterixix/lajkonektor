@@ -16,6 +16,8 @@ import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
 import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
 import { czyZtp } from "./siec.ts";
+import { planowanieWPunkcie } from "./planowanie.ts";
+import { NAZWY_RODZAJOW, NAZWY_WSKAZNIKOW, dostepnosc, najblizszeObiekty, statystyka, wskaznikDzielnic } from "./analizy.ts";
 import { WERSJA } from "./wersja.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
@@ -35,7 +37,7 @@ const KARTA_URI = "ui://lajkonektor/karta.html";
 export const WIDOK: Record<string, string> = {
   katalog_szukaj: "katalog", zbior_opis: "opis_zbioru", dane_zapytaj: "tabela", adres_na_punkt: "adres", parki_geometria: "parki",
   bdl_szukaj: "bdl_lista", bdl_dane: "szereg", dane_gov: "dane_gov", przystanki_w_poblizu: "przystanki", odjazdy: "odjazdy",
-  trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik", widok: "zlozony",
+  trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik", widok: "zlozony", wskaznik_dzielnic: "zlozony", dostepnosc: "zlozony", obiekty_w_poblizu: "zlozony", statystyka: "zlozony", planowanie_w_punkcie: "zlozony",
 };
 
 // Narzędzia opierające się na migawce katalogu (zbiory dodane po jej dacie mogą nie być widoczne).
@@ -55,6 +57,8 @@ Adresy i miejsca: adres_na_punkt geokoduje adres i podaje dzielnicę; nazwę mie
 Komunikacja: przystanki_w_poblizu, odjazdy (GTFS-RT na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne; dojście piesze po sieci OSM, jedna przesiadka) oraz utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity — dokładne godziny z rozkładu PKP PLK, bez opóźnień). Miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Czasy trasy są szacunkami (oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu). Gdy źródło zwraca błąd 522, status_zrodel pokazuje colo, kraj i dostępność każdego źródła.
 
 Szeregi GUS: bdl_szukaj znajduje wskaźnik, bdl_dane zwraca szereg; prognoza robi deterministyczną projekcję z przedziałami 80% i 95% (trend liniowy, wzrost wykładniczy, Holt) i wymaga co najmniej 3 punktów. Pliki CSV/XLSX/GeoJSON z adresów *.gov.pl i *.krakow.pl czyta plik_odczyt (limit 8 MB) z profilem kolumn i agregacją po stronie serwera.
+
+Analizy: wskaznik_dzielnic (ranking, mapa koropletowa i profil dzielnicy), dostepnosc (standardy dostępności z planu ogólnego, pokrycie ludności usługą, białe plamy), obiekty_w_poblizu (najbliższe apteki, szkoły, toalety itd.), planowanie_w_punkcie (plan, strefa planu ogólnego i działka dla adresu), statystyka (korelacja, trend, nierówność, odstające); liczby liczy serwer.
 
 Karty: każde narzędzie zwraca kartę w klientach z MCP Apps (mapa OSM, tabela, wykres) i pełny wynik tekstowy z polskim podsumowaniem w pozostałych. widok składa własną kartę z bloków (tekst, metryki, tabela, wykres, mapa, lista, oś czasu), gdy odpowiedź łączy dane z kilku źródeł.
 
@@ -458,6 +462,107 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
       annotations: readOnly,
     },
     (args) => run(() => plikOdczyt(args)),
+  );
+
+  narzedzie(
+    "wskaznik_dzielnic",
+    {
+      title: "Wskaźnik w przekroju dzielnic i profil dzielnicy",
+      description:
+        "Liczy wskaźnik dla 18 dzielnic Krakowa: wartość, miejsce w rankingu, mediana, nierówność (Gini), mapa koropletowa i wykres. Licznik i mianownik wybiera się z gotowych wskaźników (ludność wg wieku, parki, żłobki, przedszkola, szkoły, apteki, biblioteki, cena m²), np. przedszkola na 1000 dzieci 3–6 lat albo parki w m² na mieszkańca. Bez licznika zwraca profil dzielnicy (albo miasta) na tle pozostałych. Ludność to zameldowani na pobyt stały.",
+      inputSchema: z.object({
+        licznik: z.enum(NAZWY_WSKAZNIKOW).optional().describe("Wskaźnik w liczniku; pominięty = profil dzielnicy"),
+        mianownik: z.enum(NAZWY_WSKAZNIKOW).optional().describe("Wskaźnik w mianowniku, np. ludnosc (na 10 tys. mieszkańców) albo dzieci_3_6 (na 1000 dzieci)"),
+        dzielnica: z.string().optional().describe("Dzielnica do wyróżnienia lub profilu: numer 1–18 albo nazwa, np. 'VIII Dębniki'"),
+        klasy: z.number().int().min(2).max(7).optional().describe("Liczba klas koloru na mapie (domyślnie 5)"),
+      }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    (args) => run(() => wskaznikDzielnic(args)),
+  );
+
+  narzedzie(
+    "dostepnosc",
+    {
+      title: "Dostępność usług i standardy planu ogólnego",
+      description:
+        "Trzy tryby. (1) Z polem miejsce: czy ten adres spełnia standardy dostępności projektu planu ogólnego Krakowa (szkoła podstawowa, zieleń ≥ 3 ha i ≥ 15 ha; progi zależą od obszaru intensywnego lub ekstensywnego). (2) Bez miejsca, usluga=standardy (domyślnie): ilu mieszkańców spełnia standardy, wg dzielnic, z białymi plamami. (3) usluga=apteka, zlobek, przedszkole itd. z promieniem: jaki odsetek mieszkańców ma obiekt w zasięgu i gdzie jest największy brak. Odległości w linii prostej przeliczone na drogę dojścia ×1,3; ludność z siatki 100 m (zameldowani).",
+      inputSchema: z.object({
+        miejsce: miejsce.optional(),
+        usluga: z.enum(["standardy", ...NAZWY_RODZAJOW]).optional(),
+        promien_m: z.number().int().min(100).max(10_000).optional().describe("Zasięg usługi w metrach (domyślny zależy od rodzaju usługi)"),
+      }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    ({ miejsce: m, usluga, promien_m }) =>
+      run(async () => dostepnosc({ miejsce: m ? await rozwiaz(m) .then((p) => ({ lat: p.lat, lon: p.lon, etykieta: p.etykieta })) : undefined, usluga, promien_m })),
+  );
+
+  narzedzie(
+    "obiekty_w_poblizu",
+    {
+      title: "Najbliższe obiekty z danych miasta",
+      description:
+        "Najbliższe obiekty wybranego rodzaju (apteki, szpitale, żłobki, przedszkola, szkoły, biblioteki, muzea, teatry, toalety, pitniki, parkomaty, P+R, posterunki, stacje kolejowe, punkty obsługi urzędu) względem miejsca, posortowane po odległości, z mapą. Odległość w linii prostej, czas pieszo szacowany (×1,3, 4,5 km/h).",
+      inputSchema: z.object({
+        miejsce,
+        rodzaj: z.enum(NAZWY_RODZAJOW),
+        promien_m: z.number().int().min(100).max(10_000).optional(),
+        limit: z.number().int().min(1).max(20).default(8),
+      }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    ({ miejsce: m, rodzaj, promien_m, limit }) => run(async () => { const p = await rozwiaz(m); return najblizszeObiekty({ lat: p.lat, lon: p.lon, etykieta: p.etykieta }, rodzaj, promien_m, limit); }),
+  );
+
+  narzedzie(
+    "planowanie_w_punkcie",
+    {
+      title: "Co obowiązuje w danym miejscu (plan, strefa, ograniczenia)",
+      description:
+        "Zestawia dla adresu lub punktu: obowiązujący miejscowy plan (przeznaczenie, oznaczenie), strefę z projektu planu ogólnego Krakowa z parametrami (maks. intensywność, wysokość, udział zabudowy, min. powierzchnia biologicznie czynna), obszary standardów dostępności, zabudowy śródmiejskiej i uzupełnienia, program rewitalizacji, uchwałę krajobrazową, UNESCO, park kulturowy oraz działkę ewidencyjną. Dane informacyjne, nie zastępują wypisu z planu.",
+      inputSchema: z.object({ miejsce }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    ({ miejsce: m }) => run(async () => { const p = await rozwiaz(m); return planowanieWPunkcie({ lat: p.lat, lon: p.lon, etykieta: p.etykieta }); }),
+  );
+
+  narzedzie(
+    "statystyka",
+    {
+      title: "Statystyka na liczbach z danych",
+      description:
+        "Deterministyczne obliczenia na liczbach: opis (średnia, mediana, kwartyle, odchylenie, histogram), korelacja (Pearson, Spearman, wartość p, prosta regresji), trend (Mann-Kendall, nachylenie Sena), wzrost (zmiana, CAGR), nierównosc (Gini, krzywa Lorenza), klasy (kwantyle, równe przedziały, Jenks), odstajace (z-score, IQR). Liczby podaje się wprost (x, y) albo wskazuje zapytanie z (dane_zapytaj, plik_odczyt, bdl_dane) i nazwy kolumn.",
+      inputSchema: z.object({
+        operacja: z.enum(["opis", "korelacja", "trend", "wzrost", "nierownosc", "klasy", "odstajace"]),
+        x: z.array(z.number().nullable()).max(5000).optional(),
+        y: z.array(z.number().nullable()).max(5000).optional().describe("Druga zmienna (korelacja), ta sama długość co x"),
+        etykiety: z.array(z.union([z.string(), z.number()])).max(5000).optional().describe("Podpisy obserwacji (dzielnice, lata)"),
+        z: z.object({ narzedzie: z.enum(["dane_zapytaj", "plik_odczyt", "bdl_dane"]), argumenty: z.record(z.string(), z.unknown()) }).optional().describe("Zamiast x i y: serwer pobierze wiersze tym narzędziem"),
+        kolumna_x: z.string().optional(), kolumna_y: z.string().optional(), kolumna_etykiet: z.string().optional(),
+        klasy: z.number().int().min(2).max(10).optional(), metoda: z.enum(["kwantyle", "rowne", "jenks"]).optional(),
+        lata: z.number().min(0.1).optional().describe("Liczba okresów dla CAGR (domyślnie liczba punktów − 1)"),
+      }),
+      annotations: { ...readOnly, openWorldHint: false },
+    },
+    (args) =>
+      run(async () => {
+        let { x, y, etykiety } = args;
+        if (args.z) {
+          const r: any = await wywolaj(args.z.narzedzie, args.z.argumenty);
+          const w: Record<string, any>[] = r.wiersze ?? [];
+          if (!w.length) throw new Error("zapytanie z nie zwróciło wierszy");
+          const bdl = args.z.narzedzie === "bdl_dane";
+          const kx = args.kolumna_x ?? (bdl ? "wartosc" : undefined);
+          if (!kx || !(kx in w[0])) throw new Error(`Podaj kolumna_x z listy: ${Object.keys(w[0]).filter((k) => k !== "_geometria").join(", ")}`);
+          x = w.map((v) => (typeof v[kx] === "number" ? v[kx] : null));
+          if (args.kolumna_y) y = w.map((v) => (typeof v[args.kolumna_y!] === "number" ? v[args.kolumna_y!] : null));
+          const ke = args.kolumna_etykiet ?? (bdl ? "rok" : undefined);
+          if (ke) etykiety = w.map((v) => v[ke]);
+        }
+        if (!x) throw new Error("Podaj x albo z.");
+        return statystyka({ operacja: args.operacja, x, y: y ?? undefined, etykiety, nazwa_x: args.kolumna_x, nazwa_y: args.kolumna_y, klasy: args.klasy, metoda: args.metoda, lata: args.lata });
+      }),
   );
 
   narzedzie(

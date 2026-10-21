@@ -5,38 +5,41 @@
   "limit": 5
  },
  "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:54.716Z"
+ },
  "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
- "uwaga": "Wiele zmiennych ma tę samą nazwę dla różnych okresów (np. kwartałów); sprawdź pole 'nazwa' i użyj bdl_dane z kilkoma id.",
+ "uwaga": "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
  "razem_w_bdl": 334,
  "zwrocono": 5,
  "zmienne": [
   {
    "id": 450231,
-   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
+   "temat": "Aktywność ekonomiczna ludności w wieku 15 lat i więcej według płci",
    "nazwa": "ogółem | ogółem | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   },
   {
    "id": 450230,
-   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
+   "temat": "Aktywność ekonomiczna ludności w wieku 15 lat i więcej według płci",
    "nazwa": "ogółem | ogółem | stopa bezrobocia | wskaźnik precyzji",
    "jednostka_miary": "%"
   },
   {
    "id": 450285,
-   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
+   "temat": "Aktywność ekonomiczna ludności w wieku 15 lat i więcej według płci",
    "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   },
   {
    "id": 450284,
-   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
+   "temat": "Aktywność ekonomiczna ludności w wieku 15 lat i więcej według płci",
    "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wskaźnik precyzji",
    "jednostka_miary": "%"
   },
   {
    "id": 450339,
-   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
+   "temat": "Aktywność ekonomiczna ludności w wieku 15 lat i więcej według płci",
    "nazwa": "ogółem | kobiety | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   }

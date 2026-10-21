@@ -1,0 +1,119 @@
+{
+ "_widok": "zlozony",
+ "_zapytanie": {
+  "miejsce": {
+   "tekst": "Rynek Główny"
+  },
+  "rodzaj": "apteka_calodobowa",
+  "limit": 8
+ },
+ "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.049Z"
+ },
+ "tytul": "Apteki całodobowe w pobliżu",
+ "podtytul": "Rynek Główny, Stare Miasto, Kraków",
+ "zrodlo": "MSIP (Zdrowie/Placowki_sluzby_zdrowia/5); czas pieszo: linia prosta × 1.3, 4,5 km/h",
+ "bloki": [
+  {
+   "typ": "metryki",
+   "pozycje": [
+    {
+     "etykieta": "Najbliższy",
+     "wartosc": "678 m",
+     "opis": "Dr. Max"
+    },
+    {
+     "etykieta": "W promieniu 3000 m",
+     "wartosc": "3"
+    },
+    {
+     "etykieta": "Pieszo (szac.)",
+     "wartosc": "12 min"
+    }
+   ]
+  },
+  {
+   "typ": "mapa",
+   "tytul": "Apteki całodobowe wokół: Rynek Główny, Stare Miasto, Kraków",
+   "punkty": [
+    {
+     "lat": 50.0614956,
+     "lon": 19.9371133,
+     "etykieta": "Tu"
+    },
+    {
+     "lat": 50.065864,
+     "lon": 19.930463,
+     "etykieta": "1. Dr. Max"
+    },
+    {
+     "lat": 50.071744,
+     "lon": 19.913713,
+     "etykieta": "2. DOZ Apteka dbam o zdrowie Galla"
+    },
+    {
+     "lat": 50.037534,
+     "lon": 19.940799,
+     "etykieta": "3. Apteka Dbam o Zdrowie"
+    }
+   ]
+  },
+  {
+   "typ": "tabela",
+   "kolumny": [
+    "Obiekt",
+    "Adres",
+    "Odległość (m)",
+    "Pieszo (min, szac.)"
+   ],
+   "wiersze": [
+    [
+     "Dr. Max",
+     "Karmelicka 23, 31-131 Kraków",
+     678,
+     12
+    ],
+    [
+     "DOZ Apteka dbam o zdrowie Galla",
+     "Kronikarza Galla 26, 30-053 Kraków",
+     2020,
+     36
+    ],
+    [
+     "Apteka Dbam o Zdrowie",
+     "Kalwaryjska 94, 30-504 Kraków",
+     2662,
+     47
+    ]
+   ],
+   "razem": 3
+  }
+ ],
+ "obiekty": [
+  {
+   "nazwa": "Dr. Max",
+   "adres": "Karmelicka 23, 31-131 Kraków",
+   "odleglosc_prosta_m": 678,
+   "pieszo_min_szac": 12,
+   "lat": 50.065864,
+   "lon": 19.930463
+  },
+  {
+   "nazwa": "DOZ Apteka dbam o zdrowie Galla",
+   "adres": "Kronikarza Galla 26, 30-053 Kraków",
+   "odleglosc_prosta_m": 2020,
+   "pieszo_min_szac": 36,
+   "lat": 50.071744,
+   "lon": 19.913713
+  },
+  {
+   "nazwa": "Apteka Dbam o Zdrowie",
+   "adres": "Kalwaryjska 94, 30-504 Kraków",
+   "odleglosc_prosta_m": 2662,
+   "pieszo_min_szac": 47,
+   "lat": 50.037534,
+   "lon": 19.940799
+  }
+ ]
+}

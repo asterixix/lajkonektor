@@ -21,8 +21,13 @@
   ]
  },
  "podsumowanie": "Zwrócono 20 wierszy ze zbioru od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:25.288Z",
+  "migawka_katalogu": "2026-10-19"
+ },
  "zrodlo": "OD-SrodowiskoParkiMiejskie / parki-miejskie-powierzchnia",
  "zbior": "od:OD-SrodowiskoParkiMiejskie/parki-miejskie-powierzchnia",
+ "kompletne": true,
  "wiersze_zwrocone": 20,
  "wiersze": [
   {

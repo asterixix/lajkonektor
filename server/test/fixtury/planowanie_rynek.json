@@ -1,0 +1,386 @@
+{
+ "_widok": "zlozony",
+ "_zapytanie": {
+  "miejsce": {
+   "tekst": "Rynek Główny"
+  }
+ },
+ "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.613Z"
+ },
+ "tytul": "Co obowiązuje w tym miejscu: Rynek Główny, Stare Miasto, Kraków",
+ "podtytul": "Dzielnica I Stare Miasto",
+ "zrodlo": "MSIP Kraków: BP_MPZP, BP_Projekt_planu_ogolnego, BP_STUDIUM_K1, PI_Rewitalizacja_od_2022, BP_UCHWALA_KRAJOBRAZOWA, Zabytki, Pobieranie/Dzialki",
+ "bloki": [
+  {
+   "typ": "metryki",
+   "pozycje": [
+    {
+     "etykieta": "Miejscowy plan",
+     "wartosc": "obowiązuje",
+     "opis": "STARE MIASTO"
+    },
+    {
+     "etykieta": "Strefa planu ogólnego",
+     "wartosc": "SU",
+     "opis": "STREFA USŁUGOWA"
+    },
+    {
+     "etykieta": "Intensywność / wysokość",
+     "wartosc": "5,4 / 26 m"
+    },
+    {
+     "etykieta": "Zabudowa maks. / bio. czynna min.",
+     "wartosc": "90% / 30%"
+    }
+   ]
+  },
+  {
+   "typ": "mapa",
+   "tytul": "Rynek Główny, Stare Miasto, Kraków",
+   "punkty": [
+    {
+     "lat": 50.0614956,
+     "lon": 19.9371133,
+     "etykieta": "Tu"
+    }
+   ],
+   "kontury": [
+    {
+     "etykieta": "działka",
+     "pierscien": [
+      [
+       19.936791,
+       50.061353
+      ],
+      [
+       19.937482,
+       50.062206
+      ],
+      [
+       19.937926,
+       50.062058
+      ],
+      [
+       19.937196,
+       50.061173
+      ],
+      [
+       19.936791,
+       50.061353
+      ]
+     ],
+     "pierscienie": [
+      [
+       [
+        19.936791,
+        50.061353
+       ],
+       [
+        19.937482,
+        50.062206
+       ],
+       [
+        19.937926,
+        50.062058
+       ],
+       [
+        19.937196,
+        50.061173
+       ],
+       [
+        19.936791,
+        50.061353
+       ]
+      ]
+     ],
+     "kolor": "#AFCDE9"
+    }
+   ]
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Projekt planu ogólnego Krakowa: strefa planistyczna",
+   "kolumny": [
+    "Parametr",
+    "Wartość"
+   ],
+   "wiersze": [
+    [
+     "Strefa",
+     "SU: STREFA USŁUGOWA"
+    ],
+    [
+     "Odmiana",
+     null
+    ],
+    [
+     "Przeznaczenie podstawowe",
+     "teren usług; teren komunikacji; teren zieleni urządzonej; teren ogrodów działkowych; teren infrastruktury technicznej"
+    ],
+    [
+     "Przeznaczenie dopuszczalne",
+     "teren zieleni naturalnej; teren lasu; teren wód"
+    ],
+    [
+     "Maks. nadziemna intensywność zabudowy",
+     5.4
+    ],
+    [
+     "Maks. wysokość zabudowy (m)",
+     26
+    ],
+    [
+     "Maks. udział powierzchni zabudowy (%)",
+     90
+    ],
+    [
+     "Min. udział powierzchni biologicznie czynnej (%)",
+     30
+    ]
+   ],
+   "razem": 8
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Obowiązujące miejscowe plany zagospodarowania",
+   "kolumny": [
+    "Plan",
+    "Oznaczenie",
+    "Przeznaczenie",
+    "Opis",
+    "Skala"
+   ],
+   "wiersze": [
+    [
+     "STARE MIASTO",
+     "KP.1",
+     "KP",
+     "Tereny placów miejskich",
+     "Miejscowy plan (skala do 1:1000)"
+    ],
+    [
+     "STARE MIASTO",
+     "KP.1",
+     "KP",
+     "Tereny placów miejskich",
+     "Miejscowy plan (skala 1:1000–1:2000)"
+    ],
+    [
+     "STARE MIASTO",
+     "KP.1",
+     "KP",
+     "Tereny placów miejskich",
+     "Miejscowy plan (skala od 1:2000)"
+    ]
+   ],
+   "razem": 3
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Działka ewidencyjna",
+   "kolumny": [
+    "Pole",
+    "Wartość"
+   ],
+   "wiersze": [
+    [
+     "id",
+     70963834
+    ],
+    [
+     "id_dzialki",
+     "126105_9.0001.311"
+    ],
+    [
+     "numer_dzialki",
+     "311"
+    ],
+    [
+     "numer_obrebu",
+     "0001"
+    ],
+    [
+     "numer_jednostki",
+     "126105_9"
+    ],
+    [
+     "nazwa_obrebu",
+     "S-1"
+    ],
+    [
+     "nazwa_jednostki",
+     "Śródmieście"
+    ],
+    [
+     "pow_graf",
+     3828
+    ]
+   ],
+   "razem": 8
+  },
+  {
+   "typ": "tabela",
+   "tytul": "Obszary specjalne i ograniczenia w tym miejscu",
+   "kolumny": [
+    "Warstwa",
+    "Wynik"
+   ],
+   "wiersze": [
+    [
+     "Studium: kierunki zagospodarowania (K1)",
+     "tak: GDB$G_BP_K1_PRZEZ_OB_2_BP_K.952fd16d-6b5d-5498-e055-000000000001, UM, 1"
+    ],
+    [
+     "Obszar zabudowy śródmiejskiej",
+     "tak: 1OZS, OZS"
+    ],
+    [
+     "Obszar uzupełnienia zabudowy",
+     "nie"
+    ],
+    [
+     "Obszar standardów dostępności infrastruktury",
+     "nie"
+    ],
+    [
+     "Podobszar rewitalizacji (od 2022)",
+     "nie"
+    ],
+    [
+     "Uchwała krajobrazowa: strefa",
+     "tak: Strefa III Podobszar 1, GDB$G_STREFY_UCHW_KRAJ_0506.a756366e-3964-79fb-e055-000000000001, Tak"
+    ],
+    [
+     "Obszar UNESCO",
+     "tak: Granica obszaru UNESCO, Obiekt utworzony przez KD po akceptacji KZ"
+    ],
+    [
+     "Strefa buforowa UNESCO",
+     "tak: Granica strefy buforowej UNESCO"
+    ],
+    [
+     "Park kulturowy",
+     "tak: Park Kulturowy Stare Miasto, UchwaKa Nr CXV/1547/10 Rady Miasta Krakowa z dnia 3 listopada 2010 r. w sprawie utworzenia parku kulturowego pod nazw, https://www.bip.krakow.pl/?dok_id=167&sub_dok_id=167&sub=uchwala&query=id%3D18477%26typ%3Du/"
+    ]
+   ],
+   "razem": 12
+  },
+  {
+   "typ": "tekst",
+   "wariant": "uwaga",
+   "tekst": "Dane informacyjne z MSIP, w tym projekt planu ogólnego (nie jest jeszcze uchwalony). Nie zastępują wypisu i wyrysu z planu ani decyzji o warunkach zabudowy; parametry strefy mogą się zmienić do uchwalenia."
+  }
+ ],
+ "plan": {
+  "miejscowy_plan": [
+   {
+    "nazwa_mpzp": "STARE MIASTO",
+    "oznaczenie": "KP.1",
+    "rodzaj_ozn": "KP",
+    "opis_oznac": "Tereny placów miejskich",
+    "data_ob": 1308268800000,
+    "www": "http://www.bip.krakow.pl/?bip_id=1&dok_id=45241&sub_dok_id=45241",
+    "skala": "Miejscowy plan (skala do 1:1000)"
+   },
+   {
+    "nazwa_mpzp": "STARE MIASTO",
+    "oznaczenie": "KP.1",
+    "rodzaj_ozn": "KP",
+    "opis_oznac": "Tereny placów miejskich",
+    "data_ob": 1308268800000,
+    "www": "http://www.bip.krakow.pl/?bip_id=1&dok_id=45241&sub_dok_id=45241",
+    "skala": "Miejscowy plan (skala 1:1000–1:2000)"
+   },
+   {
+    "nazwa_mpzp": "STARE MIASTO",
+    "oznaczenie": "KP.1",
+    "rodzaj_ozn": "KP",
+    "opis_oznac": "Tereny placów miejskich",
+    "data_ob": 1308268800000,
+    "www": "http://www.bip.krakow.pl/?bip_id=1&dok_id=45241&sub_dok_id=45241",
+    "skala": "Miejscowy plan (skala od 1:2000)"
+   }
+  ],
+  "strefa_planu_ogolnego": {
+   "oznaczenie": "658SU",
+   "symbol": "SU",
+   "nazwa": "STREFA USŁUGOWA",
+   "profil_p": "teren usług,teren komunikacji,teren zieleni urządzonej,teren ogrodów działkowych,teren infrastruktury technicznej,",
+   "profil_d": "teren zieleni naturalnej,teren lasu,teren wód,",
+   "max_niz": 5.4,
+   "max_wz": 26,
+   "max_upz": 90,
+   "min_upbc": 30
+  },
+  "obszar_standardow": null,
+  "dzialka": {
+   "id": 70963834,
+   "id_dzialki": "126105_9.0001.311",
+   "numer_dzialki": "311",
+   "numer_obrebu": "0001",
+   "numer_jednostki": "126105_9",
+   "nazwa_obrebu": "S-1",
+   "nazwa_jednostki": "Śródmieście",
+   "pow_graf": 3828
+  },
+  "obszary": [
+   {
+    "warstwa": "Studium: kierunki zagospodarowania (K1)",
+    "dane": {
+     "isdp_fid": "GDB$G_BP_K1_PRZEZ_OB_2_BP_K.952fd16d-6b5d-5498-e055-000000000001",
+     "ozn": "UM",
+     "pow": 388451.86,
+     "nr_ju": "1"
+    }
+   },
+   {
+    "warstwa": "Obszar zabudowy śródmiejskiej",
+    "dane": {
+     "oznaczenie": "1OZS",
+     "symbol": "OZS"
+    }
+   },
+   {
+    "warstwa": "Uchwała krajobrazowa: strefa",
+    "dane": {
+     "strefa": "Strefa III Podobszar 1",
+     "fid_1": "GDB$G_STREFY_UCHW_KRAJ_0506.a756366e-3964-79fb-e055-000000000001",
+     "baner": "Tak",
+     "baner2": "Tak",
+     "billboard": "Nie",
+     "panel": "Tak",
+     "okraglak": "Tak",
+     "reklama5m": "Nie",
+     "reklama": "Nie",
+     "informacje": "https://www.bip.krakow.pl/zalaczniki/dokumenty/n/342462/karta"
+    }
+   },
+   {
+    "warstwa": "Obszar UNESCO",
+    "dane": {
+     "name": "Granica obszaru UNESCO",
+     "descriptio": "Obiekt utworzony przez KD po akceptacji KZ"
+    }
+   },
+   {
+    "warstwa": "Strefa buforowa UNESCO",
+    "dane": {
+     "nazwa": "Granica strefy buforowej UNESCO"
+    }
+   },
+   {
+    "warstwa": "Park kulturowy",
+    "dane": {
+     "nazwa": "Park Kulturowy Stare Miasto",
+     "uchwala": "UchwaKa Nr CXV/1547/10 Rady Miasta Krakowa z dnia 3 listopada 2010 r. w sprawie utworzenia parku kulturowego pod nazw",
+     "uchwala_ww": "https://www.bip.krakow.pl/?dok_id=167&sub_dok_id=167&sub=uchwala&query=id%3D18477%26typ%3Du/",
+     "park_www": "http://www.parkikulturowe.krakow.pl",
+     "fid_": 0
+    }
+   }
+  ],
+  "niedostepne": []
+ }
+}

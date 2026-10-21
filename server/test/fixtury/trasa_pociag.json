@@ -9,7 +9,10 @@
   },
   "max_dojscie_m": 800
  },
- "podsumowanie": "Najlepsza opcja (bezposrednia): ok. 61 min. Dojście 4 min do przystanku Dworzec Główny Zachód 07, linia 304 (Dworzec Główny Zachód 07 → Wieliczka Kopalnia Soli 01, 39 min), dojście 8 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 2.",
+ "podsumowanie": "Najlepsza opcja (z przesiadką): ok. 140 min. Dojście 2 min do przystanku Dworzec Główny Wschód 01, linia 902 (Dworzec Główny Wschód 01 → Teatr Słowackiego 01, 3 min), potem linia 904 (Teatr Słowackiego 02 → Wieliczka Cmentarz 01, 43 min), dojście 7 min do celu. To szacunek, nie gwarancja. Opcji łącznie: 4.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:40.131Z"
+ },
  "zrodlo": "ZTP Kraków: GTFS statyczny pobierany na żywo + GTFS-RT TripUpdates i ServiceAlerts; pociągi: rozkłady PKP PLK (mkuran.pl); dojście: OSM",
  "uwaga": "Szacunek, nie gwarancja: autobusy i tramwaje liczone z częstotliwości kursów (pierwsza noga na żywo), pociągi z dokładnych godzin rozkładu PKP PLK (bez opóźnień), transfery do 200 m, maks. jedna przesiadka.",
  "z": {
@@ -21,78 +24,226 @@
  "do": {
   "opis": "Wieliczka Mediateka, Juliusza Słowackiego, Osiedle Boża Wola",
   "zrodlo": "OpenStreetMap (Nominatim)",
-  "lat": 49.9841741,
-  "lon": 20.0647418
+  "lat": 49.9843526,
+  "lon": 20.0633964
  },
- "odleglosc_prosta_m": 12526,
- "opcji": 2,
+ "odleglosc_prosta_m": 12447,
+ "opcji": 4,
  "promien_dojscia_m": 800,
  "komunikaty_o_utrudnieniach": [],
  "opcje": [
   {
-   "rodzaj": "bezposrednia",
-   "czas_min": 61,
+   "rodzaj": "z przesiadką",
+   "czas_min": 140,
+   "dojscie_start": {
+    "przystanek": "Dworzec Główny Wschód 01",
+    "m": 135,
+    "min": 2,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "przesiadka": {
+    "przystanek": "Teatr Słowackiego 01",
+    "dojscie_min": 2
+   },
+   "dojscie_cel": {
+    "przystanek": "Wieliczka Cmentarz 01",
+    "m": 501,
+    "min": 7,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 80,
+   "czekanie_pierwsza_noga_min": 50,
+   "zrodlo_czasu": "pierwsza noga z GTFS-RT (na żywo), reszta szacunek z rozkładu",
+   "najblizsze_odjazdy_na_zywo": [
+    {
+     "odjazd": "01:08",
+     "za_min": 52,
+     "opoznienie_s": null
+    }
+   ],
+   "nogi": [
+    {
+     "linia": "902",
+     "kierunek": "Kraków Airport",
+     "wsiadanie": "Dworzec Główny Wschód 01",
+     "wysiadanie": "Teatr Słowackiego 01",
+     "przystankow": 2,
+     "jazda_min": 3,
+     "wsiadanie_pkt": {
+      "lat": 50.06848,
+      "lon": 19.94943
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.06464,
+      "lon": 19.94566
+     }
+    },
+    {
+     "linia": "904",
+     "kierunek": "Wieliczka Cmentarz",
+     "wsiadanie": "Teatr Słowackiego 02",
+     "wysiadanie": "Wieliczka Cmentarz 01",
+     "przystankow": 27,
+     "jazda_min": 43,
+     "wsiadanie_pkt": {
+      "lat": 50.06485,
+      "lon": 19.94418
+     },
+     "wysiadanie_pkt": {
+      "lat": 49.98727,
+      "lon": 20.06426
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "z przesiadką",
+   "czas_min": 126,
    "dojscie_start": {
     "przystanek": "Dworzec Główny Zachód 07",
     "m": 281,
     "min": 4,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
+   "przesiadka": {
+    "przystanek": "Politechnika 01",
+    "dojscie_min": 2
+   },
    "dojscie_cel": {
-    "przystanek": "Wieliczka Kopalnia Soli 01",
-    "m": 591,
-    "min": 8,
+    "przystanek": "Wieliczka Cmentarz 01",
+    "m": 501,
+    "min": 7,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 10,
-   "czekanie_pierwsza_noga_min": 10,
+   "czekanie_min": 60,
+   "czekanie_pierwsza_noga_min": 30,
    "zrodlo_czasu": "szacunek z rozkładu (częstotliwość kursów)",
    "nogi": [
     {
-     "linia": "304",
-     "kierunek": "Wieliczka Kampus",
+     "linia": "608",
+     "kierunek": "Os. Na Stoku",
      "wsiadanie": "Dworzec Główny Zachód 07",
-     "wysiadanie": "Wieliczka Kopalnia Soli 01",
-     "przystankow": 15,
-     "jazda_min": 39,
+     "wysiadanie": "Politechnika 01",
+     "przystankow": 1,
+     "jazda_min": 1,
      "wsiadanie_pkt": {
       "lat": 50.06778,
       "lon": 19.94527
      },
      "wysiadanie_pkt": {
-      "lat": 49.9842,
-      "lon": 20.05706
+      "lat": 50.07109,
+      "lon": 19.94511
+     }
+    },
+    {
+     "linia": "904",
+     "kierunek": "Wieliczka Cmentarz",
+     "wsiadanie": "Politechnika 06",
+     "wysiadanie": "Wieliczka Cmentarz 01",
+     "przystankow": 28,
+     "jazda_min": 49,
+     "wsiadanie_pkt": {
+      "lat": 50.07128,
+      "lon": 19.9441
+     },
+     "wysiadanie_pkt": {
+      "lat": 49.98727,
+      "lon": 20.06426
+     }
+    }
+   ]
+  },
+  {
+   "rodzaj": "z przesiadką",
+   "czas_min": 137,
+   "dojscie_start": {
+    "przystanek": "Dworzec Główny Zachód 07",
+    "m": 281,
+    "min": 4,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "przesiadka": {
+    "przystanek": "Politechnika 01",
+    "dojscie_min": 2
+   },
+   "dojscie_cel": {
+    "przystanek": "Wieliczka Cmentarz 01",
+    "m": 501,
+    "min": 7,
+    "zrodlo": "OSM (OSRM, pieszo)"
+   },
+   "czekanie_min": 71,
+   "czekanie_pierwsza_noga_min": 41,
+   "zrodlo_czasu": "pierwsza noga z GTFS-RT (na żywo), reszta szacunek z rozkładu",
+   "najblizsze_odjazdy_na_zywo": [
+    {
+     "odjazd": "01:01",
+     "za_min": 45,
+     "opoznienie_s": null
+    }
+   ],
+   "nogi": [
+    {
+     "linia": "610",
+     "kierunek": "Prądnik Czerwony P+R",
+     "wsiadanie": "Dworzec Główny Zachód 07",
+     "wysiadanie": "Politechnika 01",
+     "przystankow": 1,
+     "jazda_min": 1,
+     "wsiadanie_pkt": {
+      "lat": 50.06778,
+      "lon": 19.94527
+     },
+     "wysiadanie_pkt": {
+      "lat": 50.07109,
+      "lon": 19.94511
+     }
+    },
+    {
+     "linia": "904",
+     "kierunek": "Wieliczka Cmentarz",
+     "wsiadanie": "Politechnika 06",
+     "wysiadanie": "Wieliczka Cmentarz 01",
+     "przystankow": 28,
+     "jazda_min": 49,
+     "wsiadanie_pkt": {
+      "lat": 50.07128,
+      "lon": 19.9441
+     },
+     "wysiadanie_pkt": {
+      "lat": 49.98727,
+      "lon": 20.06426
      }
     }
    ]
   },
   {
    "rodzaj": "bezposrednia",
-   "czas_min": 75,
+   "czas_min": 320,
    "dojscie_start": {
-    "przystanek": "Kraków Główny 1 t. 9",
+    "przystanek": "Kraków Główny 1 t. 11",
     "m": 220,
     "min": 3,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
    "dojscie_cel": {
     "przystanek": "Wieliczka Bogucice 1 t. 1",
-    "m": 2986,
-    "min": 40,
+    "m": 2887,
+    "min": 39,
     "zrodlo": "OSM (OSRM, pieszo)"
    },
-   "czekanie_min": 10,
-   "czekanie_pierwsza_noga_min": 10,
+   "czekanie_min": 256,
+   "czekanie_pierwsza_noga_min": 256,
    "zrodlo_czasu": "rozkład pociągu (dokładny odjazd)",
    "nogi": [
     {
      "linia": "SKA1",
      "kierunek": "Wieliczka Rynek-Kopalnia",
-     "wsiadanie": "Kraków Główny 1 t. 9",
+     "wsiadanie": "Kraków Główny 1 t. 11",
      "wysiadanie": "Wieliczka Bogucice 1 t. 1",
      "przystankow": 7,
      "jazda_min": 22,
-     "odjazd_wg_rozkladu": "22:34",
+     "odjazd_wg_rozkladu": "04:34",
      "wsiadanie_pkt": {
       "lat": 50.06861,
       "lon": 19.9478

@@ -5,27 +5,21 @@
   "promien_m": 400,
   "limit": 8
  },
- "podsumowanie": "Najbliższe odjazdy (na żywo): linia K63 → Kraków Nowa Huta o 22:23 (za 2 min); linia SKA3 → Tarnów o 22:29 (za 8 min); linia SKA1 → Kraków Lotnisko o 22:33 (za 12 min); linia K5 → Sucha Beskidzka o 22:34 (za 13 min); linia SKA1 → Wieliczka Rynek-Kopalnia o 22:34 (za 13 min).",
+ "podsumowanie": "Najbliższe odjazdy (na żywo): linia SKA1 → Kraków Lotnisko o 00:46 (za 31 min); linia SKA1 → Kraków Lotnisko o 03:26 (za 191 min); linia IC → Giżycko o 03:52 (za 217 min); linia K52P → Bielsko-Biała Główna o 03:58 (za 223 min); linia K63 → Kraków Nowa Huta o 04:00 (za 225 min).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:50.094Z"
+ },
  "zrodlo": "ZTP Kraków, GTFS-RT TripUpdates i ServiceAlerts (na żywo)",
- "przystankow": 11,
+ "przystankow": 10,
  "bledy": [],
  "czas_feedu": {},
  "odjazdy": [
   {
-   "linia": "K63",
-   "kierunek": "Kraków Nowa Huta",
-   "przystanek": "Kraków Główny 5 t. 10",
-   "odjazd": "22:23",
-   "za_min": 2,
-   "opoznienie_s": null,
-   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
-  },
-  {
-   "linia": "SKA3",
-   "kierunek": "Tarnów",
-   "przystanek": "Kraków Główny 1 t. 9",
-   "odjazd": "22:29",
-   "za_min": 8,
+   "linia": "SKA1",
+   "kierunek": "Kraków Lotnisko",
+   "przystanek": "Kraków Główny 3 t. 2",
+   "odjazd": "00:46",
+   "za_min": 31,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   },
@@ -33,53 +27,62 @@
    "linia": "SKA1",
    "kierunek": "Kraków Lotnisko",
    "przystanek": "Kraków Główny 3 t. 2",
-   "odjazd": "22:33",
-   "za_min": 12,
+   "odjazd": "03:26",
+   "za_min": 191,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   },
   {
-   "linia": "K5",
-   "kierunek": "Sucha Beskidzka",
-   "przystanek": "Kraków Główny 2 t. 3",
-   "odjazd": "22:34",
-   "za_min": 13,
+   "linia": "IC",
+   "kierunek": "Giżycko",
+   "przystanek": "Kraków Główny 5 t. 10",
+   "odjazd": "03:52",
+   "za_min": 217,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   },
   {
-   "linia": "SKA1",
-   "kierunek": "Wieliczka Rynek-Kopalnia",
+   "linia": "K52P",
+   "kierunek": "Bielsko-Biała Główna",
    "przystanek": "Kraków Główny 1 t. 9",
-   "odjazd": "22:34",
-   "za_min": 13,
+   "odjazd": "03:58",
+   "za_min": 223,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   },
   {
-   "linia": "SKA3",
+   "linia": "K63",
+   "kierunek": "Kraków Nowa Huta",
+   "przystanek": "Kraków Główny 5 t. 12",
+   "odjazd": "04:00",
+   "za_min": 225,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "IC",
+   "kierunek": "Berlin-Lichtenberg",
+   "przystanek": "Kraków Główny 3 t. 1",
+   "odjazd": "04:10",
+   "za_min": 235,
+   "opoznienie_s": null,
+   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
+  },
+  {
+   "linia": "SKA2",
    "kierunek": "Oświęcim",
-   "przystanek": "Kraków Główny 2 t. 3",
-   "odjazd": "22:45",
-   "za_min": 24,
+   "przystanek": "Kraków Główny 1 t. 9",
+   "odjazd": "04:10",
+   "za_min": 235,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   },
   {
    "linia": "SKA2",
    "kierunek": "Sędziszów",
-   "przystanek": "Kraków Główny 5 t. 12",
-   "odjazd": "22:50",
-   "za_min": 29,
-   "opoznienie_s": null,
-   "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
-  },
-  {
-   "linia": "SKA2",
-   "kierunek": "Oświęcim",
-   "przystanek": "Kraków Główny 1 t. 11",
-   "odjazd": "22:50",
-   "za_min": 29,
+   "przystanek": "Kraków Główny 4 t. 6",
+   "odjazd": "04:10",
+   "za_min": 235,
    "opoznienie_s": null,
    "zrodlo": "rozkład PKP PLK (bez danych na żywo)"
   }

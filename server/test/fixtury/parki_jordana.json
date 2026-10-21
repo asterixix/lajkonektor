@@ -5,6 +5,9 @@
   "tylko_z_geometria": false
  },
  "podsumowanie": "Parków: 1. Pokrycie konturów OSM: 46 z 78 parków (44.9% powierzchni).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:24.428Z"
+ },
  "zrodlo": "Tabela: Otwarte Dane Miasta Krakowa (parki miejskie). Geometria: © współtwórcy OpenStreetMap, ODbL.",
  "migawka": "2026-10-19",
  "uwaga": "Geometria pochodzi z OSM i dotyczy tylko części parków z tabeli OD. Pole 'zgodnosc' mówi, czy dopasowanie potwierdza powierzchnia. Parki bez geometrii nie wchodzą do analiz przestrzennych.",

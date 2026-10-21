@@ -10,6 +10,9 @@
   "limit": 6
  },
  "podsumowanie": "Plik xlsx: 1457 wierszy, 63 kolumn; zwrócono 6.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:26.145Z"
+ },
  "zrodlo": "api.dane.gov.pl/media/resources/20261019/DDKW_Ceny_ofertowe_mieszkan_2026_10_18_b03813da.xlsx",
  "format": "xlsx",
  "rozmiar_kb": 185,

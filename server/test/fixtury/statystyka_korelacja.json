@@ -1,0 +1,169 @@
+{
+ "_widok": "zlozony",
+ "_zapytanie": {
+  "operacja": "korelacja",
+  "z": {
+   "narzedzie": "dane_zapytaj",
+   "argumenty": {
+    "id": "msip:Rejestr_cen/Rc_Lokale_m_Rp_Mapa/12",
+    "limit": 20
+   }
+  },
+  "kolumna_x": "med_wart_m2",
+  "kolumna_y": "lkl_count",
+  "kolumna_etykiet": "nazwa_dz"
+ },
+ "podsumowanie": "",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.156Z"
+ },
+ "tytul": "Korelacja: med_wart_m2 i lkl_count",
+ "zrodlo": "obliczenia serwera Lajkonektor na przekazanych danych",
+ "bloki": [
+  {
+   "typ": "metryki",
+   "pozycje": [
+    {
+     "etykieta": "Pearson r",
+     "wartosc": "-0,056",
+     "opis": "p ≈ 0,825"
+    },
+    {
+     "etykieta": "Spearman ρ",
+     "wartosc": "-0,008",
+     "opis": "p ≈ 0,974"
+    },
+    {
+     "etykieta": "Związek",
+     "wartosc": "bardzo słaba lub brak, ujemna"
+    },
+    {
+     "etykieta": "R²",
+     "wartosc": "0,003"
+    },
+    {
+     "etykieta": "Par",
+     "wartosc": 18
+    }
+   ]
+  },
+  {
+   "typ": "tekst",
+   "wariant": "informacja",
+   "tekst": "Prosta regresji: lkl_count ≈ 337,445 + -0,006 · med_wart_m2. Wartość p jest przybliżona i zakłada niezależność obserwacji (dzielnice sąsiadują ze sobą, więc ją zawyża). Korelacja nie dowodzi przyczynowości."
+  },
+  {
+   "typ": "wykres",
+   "rodzaj": "punktowy",
+   "tytul": "lkl_count względem med_wart_m2",
+   "punkty": [
+    {
+     "x": 21712.33,
+     "y": 71,
+     "etykieta": "Dzielnica I Stare Miasto"
+    },
+    {
+     "x": 20054.295,
+     "y": 94,
+     "etykieta": "Dzielnica II Grzegórzki"
+    },
+    {
+     "x": 16827.05,
+     "y": 141,
+     "etykieta": "Dzielnica III Prądnik Czerwony"
+    },
+    {
+     "x": 14515.08,
+     "y": 895,
+     "etykieta": "Dzielnica IV Prądnik Biały"
+    },
+    {
+     "x": 18521.405,
+     "y": 64,
+     "etykieta": "Dzielnica V Krowodrza"
+    },
+    {
+     "x": 16234.93,
+     "y": 422,
+     "etykieta": "Dzielnica VI Bronowice"
+    },
+    {
+     "x": 18430.99,
+     "y": 31,
+     "etykieta": "Dzielnica VII Zwierzyniec"
+    },
+    {
+     "x": 14900,
+     "y": 299,
+     "etykieta": "Dzielnica VIII Dębniki"
+    },
+    {
+     "x": 17793.68,
+     "y": 27,
+     "etykieta": "Dzielnica IX Łagiewniki-Borek Fałęcki"
+    },
+    {
+     "x": 11401.61,
+     "y": 41,
+     "etykieta": "Dzielnica X Swoszowice"
+    },
+    {
+     "x": 16015.925,
+     "y": 232,
+     "etykieta": "Dzielnica XI Podgórze Duchackie"
+    },
+    {
+     "x": 13738.55,
+     "y": 117,
+     "etykieta": "Dzielnica XII Bieżanów-Prokocim"
+    },
+    {
+     "x": 16441.69,
+     "y": 1177,
+     "etykieta": "Dzielnica XIII Podgórze"
+    },
+    {
+     "x": 13199.76,
+     "y": 467,
+     "etykieta": "Dzielnica XIV Czyżyny"
+    },
+    {
+     "x": 13154.48,
+     "y": 213,
+     "etykieta": "Dzielnica XV Mistrzejowice"
+    },
+    {
+     "x": 15358.695,
+     "y": 42,
+     "etykieta": "Dzielnica XVI Bieńczyce"
+    },
+    {
+     "x": 9821.34,
+     "y": 27,
+     "etykieta": "Dzielnica XVII Wzgórza Krzesławickie"
+    },
+    {
+     "x": 13585.71,
+     "y": 19,
+     "etykieta": "Dzielnica XVIII Nowa Huta"
+    }
+   ],
+   "regresja": {
+    "a": -0.006016904944459373,
+    "b": 337.44485388774376
+   }
+  }
+ ],
+ "korelacja": {
+  "n": 18,
+  "pearson": -0.056100881302289886,
+  "p_pearson": 0.8250131915564748,
+  "spearman": -0.008260197280440994,
+  "p_spearman": 0.974049849570552,
+  "sila": "bardzo słaba lub brak",
+  "kierunek": "ujemna",
+  "nachylenie": -0.006016904944459373,
+  "wyraz_wolny": 337.44485388774376,
+  "r2": 0.003147308882893619
+ }
+}

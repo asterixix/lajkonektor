@@ -1,29 +1,24 @@
 {
  "_widok": "komunikaty",
  "_zapytanie": {},
- "podsumowanie": "Aktywne komunikaty ZTP: 2.",
+ "podsumowanie": "Aktywne komunikaty ZTP: 1.",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:55.748Z"
+ },
  "zrodlo": "ZTP Kraków, GTFS-RT ServiceAlerts (na żywo)",
- "liczba": 2,
+ "liczba": 1,
  "komunikaty": [
   {
    "feed": "T",
    "tytul": "Ogólny tekst specjalny",
-   "opis": "TEST_1 EBBLO_1 TEST_1 EBBLO_1_",
-   "linie": [],
+   "opis": "Usterka torowiska przy Teatrze Słowackiego. Linia 12 kierowana objazdem w kierunku os. Piastów od Poczty Głównej przez Pl.Wszystkich Świętych  i Basztową.",
+   "linie": [
+    "12"
+   ],
    "przystanki": [],
    "od": null,
    "do": null,
-   "testowy": true
-  },
-  {
-   "feed": "T",
-   "tytul": "Ogólny tekst specjalny",
-   "opis": "TEST_2 EBBLO_2 TEST_2 EBBLO_2_",
-   "linie": [],
-   "przystanki": [],
-   "od": null,
-   "do": null,
-   "testowy": true
+   "testowy": false
   }
  ]
 }

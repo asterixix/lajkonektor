@@ -5,6 +5,10 @@
   "limit": 4
  },
  "podsumowanie": "Znaleziono 0 zbiorów. Najlepszy: brak. Kin nie ma w katalogu. Instytucje kultury: muzea, teatry, biblioteki, galerie (Kultura/Miejskie_Instytucje_Kultury).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:39.649Z",
+  "migawka_katalogu": "2026-10-19"
+ },
  "liczba": 0,
  "wyniki": [],
  "brak_w_katalogu": "Kin nie ma w katalogu. Instytucje kultury: muzea, teatry, biblioteki, galerie (Kultura/Miejskie_Instytucje_Kultury).",

@@ -6,7 +6,7 @@ const lista = document.getElementById("lista") as HTMLSelectElement;
 const szer = document.getElementById("szer") as HTMLSelectElement;
 const scena = document.getElementById("scena")!;
 const log = document.getElementById("log")!;
-const FIXTURY = ["odjazdy", "odjazdy_puste", "trasa", "przystanki", "parki_jordana", "parki_wszystkie", "tabela_parki", "plik_xlsx", "szereg", "prognoza", "katalog", "opis_zbioru", "bdl_lista", "dane_gov", "adres", "komunikaty", "status", "blad_522", "mapa_msip", "widok_zlozony", "katalog_brak", "trasa_pociag", "trasa_wies", "odjazdy_pociagi"];
+const FIXTURY = ["odjazdy", "odjazdy_puste", "trasa", "przystanki", "parki_jordana", "parki_wszystkie", "tabela_parki", "plik_xlsx", "szereg", "prognoza", "katalog", "opis_zbioru", "bdl_lista", "dane_gov", "adres", "komunikaty", "status", "blad_522", "mapa_msip", "widok_zlozony", "katalog_brak", "trasa_pociag", "trasa_wies", "odjazdy_pociagi", "wskaznik_dzielnic", "profil_dzielnicy", "dostepnosc_standardy", "dostepnosc_apteki", "dostepnosc_punkt", "obiekty_apteki", "statystyka_korelacja", "planowanie_telimeny", "planowanie_rynek"];
 const stanyDodatkowe = ["ladowanie"];
 for (const f of [...FIXTURY, ...stanyDodatkowe]) lista.add(new Option(f, f));
 

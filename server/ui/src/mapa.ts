@@ -3,7 +3,7 @@
 import { esc } from "./pomoc.ts";
 
 export type Ring = [number, number][]; // [lon, lat]
-export interface Poligon { id?: string; rings: Ring[]; klasa?: string; etykieta?: { tekst: string; glowna?: boolean; priorytet?: number } }
+export interface Poligon { id?: string; rings: Ring[]; klasa?: string; kolor?: string; etykieta?: { tekst: string; glowna?: boolean; priorytet?: number } }
 export interface LiniaMapy { pts: Ring; klasa: "pieszo" | "jazda" }
 export interface PunktMapy { lat: number; lon: number; klasa?: "start" | "cel" | "przystanek" | "obiekt"; etykieta?: string }
 
@@ -15,6 +15,8 @@ export interface OpcjeMapy {
   przypis?: string;
   opis: string; // alt dla czytników ekranu
   skala?: boolean;
+  /** Legenda mapy koropletowej: kolor i opis klasy. */
+  legenda?: { kolor: string; tekst: string }[];
   min_wys?: number;
   maks_zoom?: number;
 }
@@ -79,7 +81,7 @@ export function mapa(o: OpcjeMapy): string {
   }
 
   const sciezka = (rings: Ring[]) => rings.map((r) => "M" + r.map((p) => `${px(p[0])},${py(p[1])}`).join("L") + "Z").join("");
-  const poligony = (o.poligony ?? []).map((p) => `<path class="park ${esc(p.klasa ?? "")}" data-id="${esc(p.id ?? "")}" fill-rule="evenodd" d="${sciezka(p.rings)}"><title>${esc(p.etykieta?.tekst ?? "")}</title></path>`).join("");
+  const poligony = (o.poligony ?? []).map((p) => `<path class="park ${esc(p.klasa ?? "")}" data-id="${esc(p.id ?? "")}" fill-rule="evenodd"${p.kolor ? ` style="fill:${esc(p.kolor)};fill-opacity:.8"` : ""} d="${sciezka(p.rings)}"><title>${esc(p.etykieta?.tekst ?? "")}</title></path>`).join("");
   const linie = (o.linie ?? []).map((l) => {
     const pts = l.pts.map((p) => `${px(p[0])},${py(p[1])}`).join(" ");
     return `<polyline class="obrys-${l.klasa}" points="${pts}"/><polyline class="trasa-${l.klasa}" points="${pts}"/>`;
@@ -111,5 +113,5 @@ export function mapa(o: OpcjeMapy): string {
     skala = `<g class="skala" transform="translate(${+(10 * u).toFixed(1)},${+(VH - 10 * u).toFixed(1)}) scale(${+u.toFixed(3)})"><rect x="-4" y="-22" width="${+(w + 16 + String(dl).length * 8 + 22).toFixed(1)}" height="28" fill="#fff" fill-opacity=".9"/><line x1="4" y1="-4" x2="${+(4 + w).toFixed(1)}" y2="-4"/><line x1="4" y1="-9" x2="4" y2="0"/><line x1="${+(4 + w).toFixed(1)}" y1="-9" x2="${+(4 + w).toFixed(1)}" y2="0"/><text x="${+(12 + w).toFixed(1)}" y="0">${dl >= 1000 ? dl / 1000 + " km" : dl + " m"}</text></g>`;
   }
   const osm = kafelki ? `<g class="osm" transform="translate(${VW},${VH}) scale(${+u.toFixed(3)})"><rect x="-176" y="-18" width="176" height="18" fill="#fff" fill-opacity=".85"/><text x="-170" y="-5">© współtwórcy OpenStreetMap</text></g>` : "";
-  return `<div class="mapa"><svg viewBox="0 0 ${VW} ${VH}" role="img" aria-label="${esc(o.opis)}"><rect width="${VW}" height="${VH}" fill="#e9e6df"/>${kafelki}${poligony}${linie}${kropki}${etykiety}${skala}${osm}</svg>${o.przypis ? `<div class="przypis">${esc(o.przypis)}</div>` : ""}</div>`;
+  return `<div class="mapa"><svg viewBox="0 0 ${VW} ${VH}" role="img" aria-label="${esc(o.opis)}"><rect width="${VW}" height="${VH}" fill="#e9e6df"/>${kafelki}${poligony}${linie}${kropki}${etykiety}${skala}${osm}</svg>${o.legenda?.length ? `<div class="legenda">${o.legenda.map((l) => `<span><i style="background:${esc(l.kolor)}"></i>${esc(l.tekst)}</span>`).join("")}</div>` : ""}${o.przypis ? `<div class="przypis">${esc(o.przypis)}</div>` : ""}</div>`;
 }

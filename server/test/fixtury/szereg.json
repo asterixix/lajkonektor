@@ -20,6 +20,9 @@
   ]
  },
  "podsumowanie": "Szereg GUS (Powiat m. Kraków): 2023: 1,9%, 2024: 2%, 2025: 2,5% (ostatnie wartości).",
+ "_dowod": {
+  "pobrano": "2026-10-21T22:15:26.710Z"
+ },
  "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
  "jednostka": "Powiat m. Kraków",
  "jednostka_id": "011212161000",
