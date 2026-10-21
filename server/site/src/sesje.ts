@@ -13,7 +13,7 @@ export interface Sesja {
 }
 
 export const SESJE: Sesja[] = [
-  { id: "katalog", pytanie: TRESC.odtwarzacz.pytania[0], narzedzie: "katalog_szukaj", argumenty: { temat: "przedszkola", limit: 6 }, wynik: katalog as Record<string, any> },
-  { id: "trasa", pytanie: TRESC.odtwarzacz.pytania[1], narzedzie: "trasa", argumenty: { z: { ulica: "Łojasiewicza", numer: "4" }, do: { ulica: "Basztowa", numer: "20" }, max_dojscie_m: 800 }, wynik: trasa as Record<string, any> },
-  { id: "prognoza", pytanie: TRESC.odtwarzacz.pytania[2], narzedzie: "prognoza", argumenty: { serie: prognozaDane._zapytanie.serie, horyzont: 3, metoda: "auto", etykieta: prognozaDane._zapytanie.etykieta }, wynik: prognozaDane as Record<string, any> },
+  { id: "katalog", pytanie: TRESC.sesje.pytania[0], narzedzie: "katalog_szukaj", argumenty: { temat: "przedszkola", limit: 6 }, wynik: katalog as Record<string, any> },
+  { id: "trasa", pytanie: TRESC.sesje.pytania[1], narzedzie: "trasa", argumenty: { z: { ulica: "Łojasiewicza", numer: "4" }, do: { ulica: "Basztowa", numer: "20" }, max_dojscie_m: 800 }, wynik: trasa as Record<string, any> },
+  { id: "prognoza", pytanie: TRESC.sesje.pytania[2], narzedzie: "prognoza", argumenty: { serie: prognozaDane._zapytanie.serie, horyzont: 3, metoda: "auto", etykieta: prognozaDane._zapytanie.etykieta }, wynik: prognozaDane as Record<string, any> },
 ];

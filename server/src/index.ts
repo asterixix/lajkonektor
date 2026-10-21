@@ -4,6 +4,7 @@ import { statusZrodel } from "./status.ts";
 import { wczytajSiec } from "./transport.ts";
 import { kafelek } from "./kafelki.ts";
 import { obsluzWywolanie } from "./api.ts";
+import { mcpPrzezHandler, obsluzCzat, type EnvCzat } from "./czat.ts";
 import { WERSJA } from "./wersja.ts";
 
 // Publiczny serwer tylko do odczytu, więc CORS otwarty (klienci przeglądarkowi, MCP Inspector).
@@ -21,7 +22,7 @@ function withCors(res: Response): Response {
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: EnvCzat = {}, ctx?: { waitUntil(p: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
     const { pathname } = url;
     if (request.method === "OPTIONS" && pathname !== "/api/wywolaj") return new Response(null, { status: 204, headers: CORS });
@@ -30,6 +31,10 @@ export default {
     if (pathname === "/api/wywolaj") {
       const serwer = createServer((request as any).cf, url.origin) as any;
       return obsluzWywolanie(request, { wywolaj: serwer.wywolaj, ip: request.headers.get("cf-connecting-ip") ?? "" });
+    }
+    if (pathname === "/api/czat") {
+      const handler = createMcpHandler(() => createServer((request as any).cf, url.origin));
+      return obsluzCzat(request, { env, ip: request.headers.get("cf-connecting-ip") ?? "", mcp: mcpPrzezHandler(handler), waitUntil: (p) => ctx?.waitUntil(p) });
     }
     if (pathname.startsWith("/kafelki/")) return kafelek(pathname, request.headers.get("cf-connecting-ip") ?? "");
     if (pathname === "/diag") return Response.json(await statusZrodel((request as any).cf), { headers: CORS });

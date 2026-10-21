@@ -20,3 +20,24 @@ export async function limitMinutowy(
     return false; // Awaria cache nie może wyłączać usługi — limitu po prostu nie ma.
   }
 }
+
+// Licznik dzienny (doba UTC) w caches.default, np. globalny budżet czatu. Ta sama zasada: przybliżony, a awaria cache go wyłącza.
+export async function limitDzienny(
+  prefiks: string,
+  klucz: string,
+  max: number,
+  cache: Cache | undefined = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default,
+): Promise<boolean> {
+  if (!cache || !klucz) return false;
+  try {
+    const dzien = Math.floor(Date.now() / 86_400_000);
+    const url = `https://lajkonektor.cache/${prefiks}/dzien/v1/${dzien}/${encodeURIComponent(klucz)}`;
+    const trafienie = await cache.match(url);
+    const n = Number(await trafienie?.text());
+    if (Number.isFinite(n) && n >= max) return true;
+    await cache.put(url, new Response(String((Number.isFinite(n) ? n : 0) + 1), { headers: { "cache-control": "public, max-age=90000" } }));
+    return false;
+  } catch {
+    return false;
+  }
+}

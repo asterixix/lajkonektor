@@ -1,0 +1,7 @@
+# Skopiuj do .dev.vars (plik jest w .gitignore) i wpisz własny klucz z panelu Eden AI.
+# Na produkcji: npx wrangler secret put EDEN_AI_API_KEY
+EDEN_AI_API_KEY=
+# Opcjonalnie:
+# CZAT_MODEL=vertex/claude-haiku-5-5@eu
+# CZAT_MODEL_ZAPASOWY=anthropic/claude-haiku-5-5
+# CZAT_LIMIT_DZIENNY=1500

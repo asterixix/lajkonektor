@@ -1,39 +1,43 @@
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import { useCallback, useState } from "react";
 import { Naglowek } from "./komponenty/Naglowek.tsx";
 import { Hero } from "./komponenty/Hero.tsx";
+import { PasekLiczb } from "./komponenty/PasekLiczb.tsx";
+import { JakDziala } from "./komponenty/JakDziala.tsx";
+import { Mieszkancy } from "./komponenty/Mieszkancy.tsx";
+import { Dlaczego } from "./komponenty/Dlaczego.tsx";
 import { TabelaNarzedzi } from "./komponenty/TabelaNarzedzi.tsx";
-import { CzegoNieWiemy } from "./komponenty/CzegoNieWiemy.tsx";
+import { Ograniczenia } from "./komponenty/Ograniczenia.tsx";
 import { DlaMiasta } from "./komponenty/DlaMiasta.tsx";
 import { Podlaczenie } from "./komponenty/Podlaczenie.tsx";
+import { Przyszlosc } from "./komponenty/Przyszlosc.tsx";
 import { Stopka } from "./komponenty/Stopka.tsx";
-import { SESJE } from "./sesje.ts";
-
-// Wejście sekcji: tylko opacity i transform, raz, bez ruchu przy prefers-reduced-motion.
-function Wejscie({ children }: { children: ReactNode }) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+import type { TrybDemo } from "./komponenty/Demo.tsx";
+import type { Pytanie } from "./komponenty/Czat.tsx";
 
 export function App() {
+  // Kafle „Zapytaj AI" wysyłają pytanie do czatu w hero i przewijają do niego.
+  const [tryb, setTryb] = useState<TrybDemo>("czat");
+  const [pytanie, setPytanie] = useState<Pytanie | null>(null);
+  const zapytaj = useCallback((tekst: string) => {
+    setTryb("czat");
+    setPytanie((p) => ({ tekst, n: (p?.n ?? 0) + 1 }));
+    document.getElementById("demo")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }, []);
+
   return (
     <>
       <Naglowek />
       <main id="tresc">
-        <Hero sesje={SESJE} />
-        <Wejscie><TabelaNarzedzi /></Wejscie>
-        <Wejscie><CzegoNieWiemy /></Wejscie>
-        <Wejscie><DlaMiasta /></Wejscie>
-        <Wejscie><Podlaczenie /></Wejscie>
+        <Hero tryb={tryb} onTryb={setTryb} pytanie={pytanie} />
+        <PasekLiczb />
+        <JakDziala />
+        <Mieszkancy onZapytaj={zapytaj} />
+        <Dlaczego />
+        <TabelaNarzedzi />
+        <Ograniczenia />
+        <DlaMiasta />
+        <Podlaczenie />
+        <Przyszlosc />
       </main>
       <Stopka />
     </>
