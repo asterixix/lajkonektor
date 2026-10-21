@@ -5,7 +5,7 @@ export async function limitMinutowy(
   prefiks: string,
   ip: string,
   max: number,
-  cache: Cache | undefined = (globalThis as { caches?: { default: Cache } }).caches?.default,
+  cache: Cache | undefined = (globalThis as unknown as { caches?: { default: Cache } }).caches?.default,
 ): Promise<boolean> {
   if (!cache || !ip) return false;
   try {
