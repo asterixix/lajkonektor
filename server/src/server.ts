@@ -80,10 +80,18 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
   const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) => {
     rejestr.set(nazwa, { schema: cfg.inputSchema, handler });
     return registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
-      const r = await handler(args);
-      if (!r.structuredContent) return r;
-      const dane = { podsumowanie: podsumuj(nazwa, r.structuredContent), ...r.structuredContent };
-      return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
+      try {
+        const r = await handler(args);
+        // Błąd wraca modelowi jako isError; ten wpis zostawia ślad po stronie serwera,
+        // żeby odróżnić „źródło padło" od „mój błąd" (wrangler tail).
+        if (r?.isError) console.error(JSON.stringify({ narzedzie: nazwa, blad: String(r.content?.[0]?.text ?? "(bez komunikatu)").replace(/^Błąd:\s*/, "") }));
+        if (!r.structuredContent) return r;
+        const dane = { podsumowanie: podsumuj(nazwa, r.structuredContent), ...r.structuredContent };
+        return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
+      } catch (e) {
+        console.error(JSON.stringify({ narzedzie: nazwa, blad: e instanceof Error ? e.message : String(e) }));
+        throw e;
+      }
     });
   };
   const wywolaj = async (nazwa: string, argumenty: unknown) => {
