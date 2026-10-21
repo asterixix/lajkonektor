@@ -21,7 +21,7 @@ export async function wywolajApi(
   } catch {
     throw new BladApi("Nie udało się połączyć z serwerem. Sprawdź łącze i spróbuj ponownie.", 0);
   }
-  const j = await odp.json().catch(() => ({}));
+  const j = (await odp.json().catch(() => ({}))) as { blad?: string };
   if (!odp.ok) throw new BladApi(j.blad ?? "Serwer zwrócił błąd.", odp.status);
   return j;
 }

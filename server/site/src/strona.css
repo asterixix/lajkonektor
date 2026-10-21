@@ -1,2 +1,79 @@
-/* Stub do zadania 1 planu. Style strony powstają w zadaniu 14. */
-body { margin: 0; }
+@font-face { font-family: "Lato"; src: url("/fonts/lato-latin-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Lato"; src: url("/fonts/lato-latin-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Lato"; src: url("/fonts/lato-latin-900.woff2") format("woff2"); font-weight: 900; font-display: swap; }
+
+:root {
+  --lk-niebieski: #0063AF;
+  --lk-niebieski-ciemny: #00488E;
+  --lk-zolty: #FFCC00;
+  --lk-atrament: #071F32;
+  --lk-szary-tlo: #F5F5F5;
+  --lk-szary-linia: #BFBFBF;
+  --lk-szary-ramka: #767676;
+  --lk-szary-tekst: #505050;
+  --lk-czerwony: #AF1828;
+  --lk-zielony: #2E7D32;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body { margin: 0; font-family: Lato, system-ui, sans-serif; color: var(--lk-atrament); background: #fff; line-height: 1.5; }
+.pomin { position: absolute; left: -999px; }
+.pomin:focus { left: 8px; top: 8px; background: #fff; padding: 8px; z-index: 10; }
+:focus-visible { outline: 3px solid var(--lk-niebieski); outline-offset: 2px; }
+
+.naglowek { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; height: 72px; padding: 0 24px; background: #fff; border-bottom: 1px solid var(--lk-szary-linia); }
+.naglowek nav { display: flex; gap: 20px; }
+.naglowek a { color: var(--lk-atrament); min-height: 40px; display: inline-flex; align-items: center; }
+.naglowek-marka { display: flex; align-items: center; gap: 8px; font-weight: 900; }
+
+main { display: block; }
+section { padding: 48px 24px; max-width: 1200px; margin: 0 auto; }
+h1 { font-weight: 900; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.1; margin: 0 0 16px; }
+h2 { font-weight: 900; font-size: 1.75rem; margin: 0 0 12px; }
+h3 { font-weight: 700; font-size: 1.25rem; margin: 4px 0 8px; }
+
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; min-height: 100dvh; padding: 56px 24px; }
+.hero-tekst p { font-size: 1.125rem; max-width: 42ch; }
+.przycisk { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border: 2px solid var(--lk-atrament); background: #fff; color: var(--lk-atrament); font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }
+.przycisk:active { transform: translateY(1px); }
+.przycisk-glowny { background: var(--lk-zolty); border-color: var(--lk-zolty); color: var(--lk-atrament); }
+
+.odtwarzacz-pytania { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.odtwarzacz-pytania button, .pole-zapytania button { min-height: 44px; padding: 0 12px; border: 2px solid var(--lk-atrament); background: #fff; font: inherit; cursor: pointer; }
+.odtwarzacz-pytania button[aria-pressed="true"] { background: var(--lk-niebieski); border-color: var(--lk-niebieski); color: #fff; }
+.pole-zapytania label { display: block; font-weight: 700; margin-bottom: 6px; }
+.pole-zapytania-wiersz { display: flex; gap: 8px; }
+.pole-zapytania input { flex: 1; min-height: 44px; padding: 0 12px; border: 2px solid var(--lk-szary-ramka); font: inherit; }
+.pole-zapytania [role="alert"] { color: var(--lk-czerwony); font-weight: 700; }
+
+.tabela-kontener { overflow-x: auto; border-top: 3px solid var(--lk-niebieski); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--lk-szary-linia); vertical-align: top; }
+
+.czego-nie-wiemy { background: var(--lk-szary-tlo); max-width: none; }
+.czego-nie-wiemy > * { max-width: 1200px; margin-left: auto; margin-right: auto; }
+.mapa-parkow { width: 100%; height: auto; max-height: 420px; }
+.mapa-parkow path { fill: var(--lk-niebieski); fill-opacity: 0.35; stroke: var(--lk-niebieski-ciemny); stroke-width: 0.6; }
+
+.dla-miasta { display: grid; gap: 16px; }
+.dla-miasta article, .dla-miasta blockquote { border-top: 3px solid var(--lk-niebieski); padding-top: 12px; margin: 0; }
+.dm-etykieta { font-size: 0.875rem; font-weight: 700; color: var(--lk-niebieski); margin: 0; }
+.dm-liczby span { font-size: 2rem; font-weight: 900; margin-right: 4px; }
+.dm-para { display: grid; grid-template-columns: 2fr 3fr; gap: 16px; }
+.dm-lista { background: var(--lk-szary-tlo); padding: 16px; }
+.dm-fakt { font-size: 1.125rem; border-left: 4px solid var(--lk-niebieski); padding-left: 16px; }
+.dm-zamkniecie { background: var(--lk-atrament); color: #fff; padding: 24px; }
+.dm-zamkniecie .dm-etykieta { color: var(--lk-zolty); }
+
+.podlaczenie ol { padding-left: 20px; }
+.podlaczenie-adres { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 16px 0; }
+.podlaczenie-adres code { background: var(--lk-szary-tlo); padding: 10px 12px; }
+
+.stopka { background: var(--lk-atrament); color: #fff; padding: 32px 24px; }
+.stopka a { color: #fff; }
+
+@media (max-width: 767px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; padding: 32px 16px; }
+  .dm-para { grid-template-columns: 1fr; }
+  .naglowek nav { gap: 12px; font-size: 0.9rem; }
+}
