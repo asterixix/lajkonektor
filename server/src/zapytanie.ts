@@ -99,10 +99,10 @@ async function odQuery(p: Pozycja, q: Zapytanie) {
     } while (after);
     if (ucieto) uwagi.push(`Agregacja na pierwszych ${rows.length} wierszach (limit bezpieczeństwa); wynik niepełny.`);
     const wynik = sortuj(agreguj(rows, q.grupuj_po ?? [], q.agreguj), q.sortuj);
-    return { wiersze: wynik.slice(0, limit), ile_zrodlo: rows.length, nastepny_kursor: null as string | null, uwagi };
+    return { wiersze: wynik.slice(0, limit), ile_zrodlo: rows.length, nastepny_kursor: null as string | null, uwagi, kompletne: !ucieto && wynik.length <= limit };
   }
   const pg = await odPage(p.url, q, limit, q.kursor);
-  return { wiersze: pg.rows, ile_zrodlo: null, nastepny_kursor: pg.next, uwagi };
+  return { wiersze: pg.rows, ile_zrodlo: null, nastepny_kursor: pg.next, uwagi, kompletne: !pg.next };
 }
 
 // --- warstwy MSIP (ArcGIS REST)
@@ -164,7 +164,7 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
   const params: Record<string, string> = { where: q.filtr ?? "1=1", ...(q.geometria ? await zasieg(q.geometria, uwagi) : {}) };
   if (q.tylko_liczba) {
     const r = await arcgisQuery(p.url, { ...params, returnCountOnly: "true" });
-    return { wiersze: [{ liczba: r.count }], ile_zrodlo: r.count, nastepny_kursor: null as string | null, uwagi };
+    return { wiersze: [{ liczba: r.count }], ile_zrodlo: r.count, nastepny_kursor: null as string | null, uwagi, kompletne: true };
   }
   if (q.agreguj?.length) {
     params.outStatistics = JSON.stringify(q.agreguj.map((a) => ({ statisticType: a.fn, onStatisticField: a.pole, outStatisticFieldName: a.nazwa ?? `${a.fn}_${a.pole}` })));
@@ -172,7 +172,7 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
     if (q.sortuj) params.orderByFields = q.sortuj;
     const r = await arcgisQuery(p.url, params);
     const wiersze = (r.features ?? []).map((f: any) => f.attributes);
-    return { wiersze: wiersze.slice(0, limit), ile_zrodlo: wiersze.length, nastepny_kursor: null, uwagi };
+    return { wiersze: wiersze.slice(0, limit), ile_zrodlo: wiersze.length, nastepny_kursor: null, uwagi, kompletne: wiersze.length <= limit && !r.exceededTransferLimit };
   }
   params.outFields = q.pola?.length ? q.pola.join(",") : "*";
   const geom = q.zwroc_geometrie || q.kontury;
@@ -183,10 +183,12 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
   if (q.offset) params.resultOffset = String(q.offset);
   // Część warstw nie obsługuje stronicowania albo przy resultRecordCount zwraca 0 obiektów z exceededTransferLimit:
   // wtedy pytamy bez stronicowania i przycinamy po pobraniu.
+  let ucieteLokalnie = false;
   const bezStronicowania = async () => {
     delete params.resultRecordCount;
     delete params.resultOffset;
     const wynik = await arcgisQuery(p.url, params);
+    ucieteLokalnie = (wynik.features ?? []).length > (q.offset ?? 0) + limit;
     wynik.features = (wynik.features ?? []).slice(q.offset ?? 0, (q.offset ?? 0) + limit);
     uwagi.push("Warstwa nie obsługuje stronicowania po stronie serwera: limit i offset zastosowano po pobraniu.");
     return wynik;
@@ -207,7 +209,7 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
     return g ? { ...a, _geometria: g } : a;
   });
   if (r.exceededTransferLimit && wiersze.length) uwagi.push(`Są kolejne wiersze: ponów z offset=${(q.offset ?? 0) + wiersze.length}.`);
-  return { wiersze, ile_zrodlo: null, nastepny_kursor: null as string | null, uwagi };
+  return { wiersze, ile_zrodlo: null, nastepny_kursor: null as string | null, uwagi, kompletne: !r.exceededTransferLimit && !ucieteLokalnie };
 }
 
 export async function daneZapytaj(q: Zapytanie) {
@@ -218,9 +220,13 @@ export async function daneZapytaj(q: Zapytanie) {
   const uwagi = [...r.uwagi];
   while (wiersze.length > 1 && JSON.stringify(wiersze).length > MAX_ZNAKOW) wiersze = wiersze.slice(0, Math.ceil(wiersze.length / 2));
   if (wiersze.length < r.wiersze.length) uwagi.push(`Odpowiedź przycięta do ${wiersze.length} wierszy ze względu na rozmiar; zawęź pola lub filtr albo użyj agregacji.`);
+  // Pusty wynik najczęściej znaczy zły filtr albo kod słownika, nie brak zjawiska: model nie ma z niego wnioskować, że czegoś nie ma.
+  if (!wiersze.length && !q.tylko_liczba) uwagi.push("Zero wierszy nie dowodzi braku danych: sprawdź filtr, nazwy pól i kody słowników w zbior_opis, zanim uznasz, że takich obiektów nie ma.");
   return {
     zrodlo: p.tytul,
     zbior: p.id,
+    // false = wiersze to tylko część wyniku (limit, stronicowanie, przycięcie): sum i liczności nie wolno podawać jako pełnych.
+    kompletne: r.kompletne && wiersze.length === r.wiersze.length,
     wiersze_zwrocone: wiersze.length,
     ...(r.nastepny_kursor ? { nastepny_kursor: r.nastepny_kursor } : {}),
     ...(uwagi.length ? { uwagi } : {}),

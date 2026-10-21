@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { RESOURCE_MIME_TYPE, registerAppResource, registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { addressToPoint } from "./adres.ts";
-import { brakiTematu, pozycje, szukaj } from "./katalog.ts";
+import { brakiTematu, migawkaKatalogu, pozycje, szukaj } from "./katalog.ts";
 import { konturyParkow, parkGeometry } from "./parki.ts";
 import { KARTA_HTML } from "./ui/karta.generated.ts";
 import { podsumuj } from "./podsumowanie.ts";
@@ -37,6 +37,9 @@ export const WIDOK: Record<string, string> = {
   bdl_szukaj: "bdl_lista", bdl_dane: "szereg", dane_gov: "dane_gov", przystanki_w_poblizu: "przystanki", odjazdy: "odjazdy",
   trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik", widok: "zlozony",
 };
+
+// Narzędzia opierające się na migawce katalogu (zbiory dodane po jej dacie mogą nie być widoczne).
+const ZE_KATALOGU = new Set(["katalog_szukaj", "zbior_opis", "dane_zapytaj"]);
 
 // Kontury i przebiegi do rysowania map są potrzebne karcie (structuredContent), a nie modelowi: w tekście wyniku ich nie powtarzamy.
 const bezKonturow = (k: string, v: unknown) => (k === "kontury" || k === "linie_geom" ? undefined : v);
@@ -79,7 +82,8 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
   const rejestr = new Map<string, { schema: z.ZodType; handler: (args: any) => Promise<any> }>();
   // Wynik narzędzia dostaje widok, zapytanie i podsumowanie. Tę samą ścieżkę używa MCP i /api/wywolaj.
   const otocz = (nazwa: string, args: unknown, sc: Record<string, unknown>) => {
-    const dane = { podsumowanie: podsumuj(nazwa, sc), ...sc };
+    // _dowod: skąd i kiedy; w tekście dla modelu, więc da się na nim oprzeć odpowiedź o datę i pochodzenie liczb.
+    const dane = { podsumowanie: podsumuj(nazwa, sc), _dowod: { pobrano: new Date().toISOString(), ...(ZE_KATALOGU.has(nazwa) ? { migawka_katalogu: migawkaKatalogu } : {}) }, ...sc };
     return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
   };
   const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) => {
