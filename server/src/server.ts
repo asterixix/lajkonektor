@@ -42,13 +42,18 @@ export const WIDOK: Record<string, string> = {
 const bezKonturow = (k: string, v: unknown) => (k === "kontury" || k === "linie_geom" ? undefined : v);
 
 const INSTRUKCJE = `Lajkonektor: otwarte dane Krakowa (Otwarte Dane i MSIP Urzędu Miasta, GUS BDL, dane.gov.pl, rozkłady i pozycje pojazdów ZTP na żywo, OpenStreetMap). Tylko odczyt.
-Jak pracować:
-1. Nie znasz zbioru: katalog_szukaj(temat) → zbior_opis(id) → dane_zapytaj(id, filtr, agreguj, geometria). Sumy i średnie liczy serwer (agreguj), nie licz w pamięci. Obejmuje m.in. parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję, wybory. Czego nie ma (odpady i PSZOK, kina, targowiska, wypadki drogowe), katalog_szukaj mówi w polu brak_w_katalogu: wtedy powiedz to użytkownikowi, nie podsuwaj innych danych.
-2. Adres lub miejsce: adres_na_punkt; filtr przestrzenny w dane_zapytaj: {punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}.
-3. Komunikacja: przystanki_w_poblizu, odjazdy (na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne), utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity: dokładne godziny z rozkładu, bez opóźnień); miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Gdy źródło zwraca błąd 522, użyj status_zrodel.
-4. Szeregi GUS: bdl_szukaj → bdl_dane; projekcja: prognoza. Gdy użytkownik prosi o prognozę lub trend, wywołaj prognoza nawet dla krótkiej serii (od 3 punktów) i przekaż jej przedział oraz ostrzeżenia, zamiast odmawiać z góry. Pliki CSV/XLSX/GeoJSON: plik_odczyt.
-5. Każde narzędzie pokazuje kartę w klientach z MCP Apps (z mapą OSM, tabelą, wykresem). Gdy odpowiedź wymaga własnego układu (porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami), złóż kartę narzędziem widok; dane wskazuj przez pole z, zamiast przepisywać liczby.
-6. Podawaj źródło i datę danych oraz pokrycie (np. geometria jest tylko dla części parków). Nie zgaduj liczb, których narzędzia nie zwróciły.`;
+
+Zbiory danych: katalog_szukaj szuka po temacie i zwraca id; zbior_opis opisuje pola i słowniki; dane_zapytaj filtruje, sortuje, grupuje i agreguje (sum/count/avg/min/max) — także filtr przestrzenny dla warstw MSIP ({punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}). Pokrycie obejmuje parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję i wybory. Tematów bez danych (odpady i PSZOK, kina, targowiska, wypadki drogowe) katalog_szukaj nie znajdzie i zwraca je w polu brak_w_katalogu.
+
+Adresy i miejsca: adres_na_punkt geokoduje adres lub nazwę miejsca i podaje dzielnicę.
+
+Komunikacja: przystanki_w_poblizu, odjazdy (GTFS-RT na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne; dojście piesze po sieci OSM, jedna przesiadka) oraz utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity — dokładne godziny z rozkładu PKP PLK, bez opóźnień). Miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Czasy trasy są szacunkami (oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu). Gdy źródło zwraca błąd 522, status_zrodel pokazuje colo, kraj i dostępność każdego źródła.
+
+Szeregi GUS: bdl_szukaj znajduje wskaźnik, bdl_dane zwraca szereg; prognoza robi deterministyczną projekcję z przedziałami 80% i 95% (trend liniowy, wzrost wykładniczy, Holt) i wymaga co najmniej 3 punktów. Pliki CSV/XLSX/GeoJSON z adresów *.gov.pl i *.krakow.pl czyta plik_odczyt (limit 8 MB) z profilem kolumn i agregacją po stronie serwera.
+
+Karty: każde narzędzie zwraca kartę w klientach z MCP Apps (mapa OSM, tabela, wykres) i pełny wynik tekstowy z polskim podsumowaniem w pozostałych. widok składa własną kartę z bloków (tekst, metryki, tabela, wykres, mapa, lista, oś czasu), gdy odpowiedź łączy dane z kilku źródeł.
+
+Nie podawaj liczb, których narzędzia nie zwróciły. Podawaj źródło, datę danych i pokrycie (np. geometria jest tylko dla części parków).`;
 
 const geometria = z
   .union([
@@ -96,7 +101,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Szukaj danych o Krakowie",
       description:
-        `Szukaj w katalogu ${pozycje.length} zbiorów danych miasta Krakowa (tabele Otwartych Danych UMK i warstwy mapowe MSIP: plany miejscowe, demografia, hałas, transport, edukacja, zdrowie, zieleń i inne) po temacie lub nazwie pola. Zwraca id do użycia w zbior_opis i dane_zapytaj. ZACZNIJ OD TEGO NARZĘDZIA, gdy pytanie dotyczy danych o mieście.`,
+        `Szukaj w katalogu ${pozycje.length} zbiorów danych miasta Krakowa (tabele Otwartych Danych UMK i warstwy mapowe MSIP: plany miejscowe, demografia, hałas, transport, edukacja, zdrowie, zieleń i inne) po temacie lub nazwie pola. Zwraca id do użycia w zbior_opis i dane_zapytaj. Największe pokrycie ma dla pytań o dane miasta Krakowa.`,
       inputSchema: z.object({
         temat: z.string().min(2).describe("Słowa kluczowe po polsku, np. 'parki', 'cudzoziemcy', 'bezrobocie', 'miejscowy plan', 'hałas', 'przystanki'"),
         zrodlo: z.enum(["od", "msip"]).optional().describe("od = tabele Otwartych Danych, msip = warstwy mapowe"),
@@ -131,7 +136,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Zapytaj zbiór danych",
       description:
-        "Uniwersalne zapytanie do zbioru z katalogu: filtr, wybór pól, sortowanie, agregacje (sum/count/avg/min/max z grupowaniem), stronicowanie oraz filtr przestrzenny dla warstw MSIP (punkt z promieniem, ramka, albo bufor wokół obiektów innej warstwy). Liczby liczy serwer, nie model. Współrzędne WGS84.",
+        "Uniwersalne zapytanie do zbioru z katalogu: filtr, wybór pól, sortowanie, agregacje (sum/count/avg/min/max z grupowaniem), stronicowanie oraz filtr przestrzenny dla warstw MSIP (punkt z promieniem, ramka, albo bufor wokół obiektów innej warstwy). Agregacje liczy serwer, więc wynik jest powtarzalny. Współrzędne WGS84.",
       inputSchema: z.object({
         id: z.string().describe("id zbioru z katalog_szukaj"),
         pola: z.array(z.string()).optional().describe("Kolumny do zwrócenia (domyślnie wszystkie)"),
@@ -433,7 +438,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Złóż własną kartę z danych",
       description:
-        "Składa jedną kartę z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Użyj, gdy odpowiedź wymaga własnego układu: porównania, zestawienia z kilku źródeł, mapy z kilkoma warstwami, podsumowania dla urzędnika lub badacza. NIE powtarzaj nim wyniku pojedynczego narzędzia (ma już własną kartę). Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam; wtedy nie przepisujesz liczb. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Podaj zrodlo (zbiory, daty, pokrycie).",
+        "Składa jedną kartę z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Nadaje się na własny układ odpowiedzi: porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami, podsumowanie dla urzędnika lub badacza. Każde pojedyncze narzędzie renderuje własną kartę, więc to narzędzie dodaje wartość przy składaniu wyników z wielu źródeł. Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam — wtedy liczby nie są przepisywane. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Blok zrodlo opisuje zbiory, daty i pokrycie.",
       inputSchema: widokSchema,
       annotations: { ...readOnly, openWorldHint: false },
     },
