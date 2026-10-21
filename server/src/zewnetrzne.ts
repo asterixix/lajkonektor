@@ -14,17 +14,25 @@ const bdlUrl = (path: string, extra: Record<string, string | string[]> = {}) => 
   return `${BDL}${path}?${p}`;
 };
 
+// Nazwa tematu BDL nosi okres danych („…(dane miesięczne)”), więc bez niej zmienne o tym samym n1 są nierozróżnialne.
+async function tematyBdl(ids: (string | undefined)[]): Promise<Map<string, string>> {
+  return new Map(await Promise.all([...new Set(ids.filter(Boolean) as string[])].map(
+    async (id) => [id, (await zCache(`bdl/temat/${id}`, 86400, () => getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({})))).name ?? ""] as [string, string])));
+}
+
 export async function bdlSzukaj(nazwa: string, limit: number) {
   const j = await zCache(`bdl/szukaj/${nazwa}`, 86400, () => getJson(bdlUrl("/variables/search", { name: nazwa, "page-size": "100" })));
   // level >= 5 = dane dostępne co najmniej na poziomie powiatu, więc także dla Krakowa.
-  const zmienne = (j.results ?? []).filter((v: any) => v.level >= 5).slice(0, limit).map((v: any) => ({
-    id: v.id, temat: v.subjectId,
+  const znalezione = (j.results ?? []).filter((v: any) => v.level >= 5).slice(0, limit);
+  const tematy = await tematyBdl(znalezione.map((v: any) => v.subjectId));
+  const zmienne = znalezione.map((v: any) => ({
+    id: v.id, temat: tematy.get(v.subjectId) || undefined,
     nazwa: [v.n1, v.n2, v.n3, v.n4].filter(Boolean).join(" | "),
     jednostka_miary: v.measureUnitName,
   }));
   return {
     zrodlo: "GUS, Bank Danych Lokalnych (BDL)",
-    uwaga: "Wiele zmiennych ma tę samą nazwę dla różnych okresów (np. kwartałów); sprawdź pole 'nazwa' i użyj bdl_dane z kilkoma id.",
+    uwaga: "Temat mowi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
     razem_w_bdl: j.totalRecords, zwrocono: zmienne.length, zmienne,
   };
 }
@@ -36,9 +44,8 @@ export async function bdlDane(opts: { zmienne: number[]; jednostka: string; lata
     ...opts.zmienne.map((id) => zCache(`bdl/zmienna/${id}`, 86400, () => getJson(bdlUrl(`/variables/${id}`)).catch(() => ({ id })))),
   ]);
   const opis = new Map<number, any>(info.map((v: any) => [v.id, v]));
-  // n1 bywa samym „ogółem”; temat (np. „Stopa bezrobocia rejestrowanego”) mówi, co faktycznie jest mierzone.
-  const tematy = new Map<string, string>(await Promise.all([...new Set(info.map((v: any) => v.subjectId).filter(Boolean))].map(
-    async (id: string) => [id, (await zCache(`bdl/temat/${id}`, 86400, () => getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({})))).name ?? ""] as [string, string])));
+  // n1 bywa samym „ogółem”; temat (np. „Stopa bezrobocia rejestrowanego (dane miesięczne)”) mówi, co faktycznie jest mierzone.
+  const tematy = await tematyBdl(info.map((v: any) => v.subjectId));
   const wiersze = (dane.results ?? []).flatMap((r: any) => {
     const v = opis.get(r.id) ?? {};
     const nazwa = [v.n1, v.n2, v.n3, v.n4].filter(Boolean).join(" | ");

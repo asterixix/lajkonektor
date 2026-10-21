@@ -122,6 +122,12 @@ test("parki_geometria: pokrycie jawne, Błonia mają środek w Krakowie", () => 
 });
 
 // --- zewnętrzne
+naZywo("BDL: bdl_szukaj podaje nazwe tematu z okresem (miesieczne/roczne)", {}, async () => {
+  const s = await bdlSzukaj("stopa bezrobocia rejestrowanego", 12);
+  assert.ok(s.zmienne.length > 0);
+  for (const v of s.zmienne) assert.match(String(v.temat), /dane (miesięczne|roczne|kwartalne|dzienne)/i, `zmienna ${v.id}: ${v.nazwa}`);
+});
+
 naZywo("BDL: szukaj stopy bezrobocia i pobierz szereg dla Krakowa", {}, async () => {
   const s = await bdlSzukaj("stopa bezrobocia", 5);
   assert.ok(s.zmienne.length > 0 && s.zmienne.every((v: any) => v.nazwa));
