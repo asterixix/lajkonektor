@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { RESOURCE_MIME_TYPE, registerAppResource, registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { addressToPoint } from "./adres.ts";
-import { brakiTematu, migawkaKatalogu, pozycje, szukaj } from "./katalog.ts";
+import { brakiTematu, migawkaKatalogu, pozycje, szukajZOcena } from "./katalog.ts";
 import { konturyParkow, parkGeometry } from "./parki.ts";
 import { KARTA_HTML } from "./ui/karta.generated.ts";
 import { podsumuj } from "./podsumowanie.ts";
@@ -46,6 +46,8 @@ const bezKonturow = (k: string, v: unknown) => (k === "kontury" || k === "linie_
 
 const INSTRUKCJE = `Lajkonektor: otwarte dane Krakowa (Otwarte Dane i MSIP Urzędu Miasta, GUS BDL, dane.gov.pl, rozkłady i pozycje pojazdów ZTP na żywo, OpenStreetMap). Tylko odczyt.
 
+Zakres: źródło faktów o Krakowie, które zmieniają się w czasie albo wymagają dokładnej liczby, adresu, godziny lub przebiegu: liczby mieszkańców, placówki, ceny, plany miejscowe, hałas, odjazdy i utrudnienia, trasy, wskaźniki GUS. Wiedza modelu o tych sprawach bywa nieaktualna, a dane z narzędzi mają datę pobrania w polu _dowod.
+
 Zbiory danych: katalog_szukaj szuka po temacie i zwraca id; zbior_opis opisuje pola i słowniki; dane_zapytaj filtruje, sortuje, grupuje i agreguje (sum/count/avg/min/max) — także filtr przestrzenny dla warstw MSIP ({punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}). Pokrycie obejmuje parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję i wybory. Tematów bez danych (odpady i PSZOK, kina, targowiska, wypadki drogowe) katalog_szukaj nie znajdzie i zwraca je w polu brak_w_katalogu.
 
 Adresy i miejsca: adres_na_punkt geokoduje adres i podaje dzielnicę; nazwę miejsca przyjmują trasa i przystanki_w_poblizu przez pole {tekst}.
@@ -56,7 +58,9 @@ Szeregi GUS: bdl_szukaj znajduje wskaźnik, bdl_dane zwraca szereg; prognoza rob
 
 Karty: każde narzędzie zwraca kartę w klientach z MCP Apps (mapa OSM, tabela, wykres) i pełny wynik tekstowy z polskim podsumowaniem w pozostałych. widok składa własną kartę z bloków (tekst, metryki, tabela, wykres, mapa, lista, oś czasu), gdy odpowiedź łączy dane z kilku źródeł.
 
-Nie podawaj liczb, których narzędzia nie zwróciły. Podawaj źródło, datę danych i pokrycie (np. geometria jest tylko dla części parków).`;
+Nie podawaj liczb, których narzędzia nie zwróciły. Podawaj źródło, datę danych (_dowod.pobrano, odswiezono) i pokrycie (np. geometria jest tylko dla części parków).
+
+Granice wyniku: kompletne=false znaczy, że wiersze są tylko częścią wyniku (sum i liczności nie podawaj jako pełnych). Zero wierszy albo brak_pelnego_dopasowania nie dowodzi, że zjawiska nie ma: to znak, by sprawdzić filtr lub słownik w zbior_opis. Gdy dane przeczą założeniu pytania, wynik mówi o założeniu, nie o oczekiwaniu rozmówcy; przy sprzeciwie warto ponownie sprawdzić dane, a nie zmieniać liczby.`;
 
 const geometria = z
   .union([
@@ -127,12 +131,19 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     },
     ({ temat, zrodlo, limit }) =>
       run(async () => {
-        const wyniki = szukaj(temat, { zrodlo, limit }).map((p) => ({
-          id: p.id, zrodlo: p.zrodlo, tytul: p.tytul, geometria: p.geometria ?? undefined,
+        const { wyniki: znalezione, pelne } = szukajZOcena(temat, { zrodlo, limit });
+        const wyniki = znalezione.map((p) => ({
+          id: p.id, zrodlo: p.zrodlo, tytul: p.tytul, geometria: p.geometria ?? undefined, dopasowanie: pelne.has(p.id) ? "pelne" : "czesciowe",
           pola: p.pola.slice(0, 14).map((f) => f.split(":")[0]), ...(p.pola.length > 14 ? { pol_razem: p.pola.length } : {}),
         }));
         const brak = brakiTematu(temat);
-        return { liczba: wyniki.length, wyniki, ...(brak ? { brak_w_katalogu: brak } : {}), podpowiedz: wyniki.length ? "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj." : "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'." };
+        const slabe = wyniki.length > 0 && !pelne.size;
+        return {
+          liczba: wyniki.length, wyniki, ...(brak ? { brak_w_katalogu: brak } : {}), ...(slabe ? { brak_pelnego_dopasowania: true } : {}),
+          podpowiedz: !wyniki.length ? "Brak wyników: spróbuj innych słów lub bez filtra 'zrodlo'."
+            : slabe ? "Żaden zbiór nie zawiera wszystkich słów tematu: wyniki są tylko podobne i mogą dotyczyć czegoś innego. Sprawdź je w zbior_opis; jeśli nie pasują, danych w katalogu nie ma."
+            : "Użyj zbior_opis(id), by zobaczyć pola i słowniki, potem dane_zapytaj.",
+        };
       }),
   );
 
@@ -140,7 +151,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     "zbior_opis",
     {
       title: "Opis zbioru danych",
-      description: "Pełny opis zbioru z katalogu: pola i typy, aliasy, słowniki kodów, liczba rekordów, próbka danych i wskazówki do zapytań.",
+      description: "Pełny opis zbioru danych miasta Krakowa z katalogu: pola i typy, aliasy, słowniki kodów (z liczbą kodów, gdy lista jest ucięta), liczba rekordów, data odświeżenia, próbka danych i wskazówki do zapytań.",
       inputSchema: z.object({ id: z.string().describe("id z katalog_szukaj, np. 'msip:Planowanie/BP_MPZP/3'") }),
       annotations: readOnly,
     },
@@ -152,7 +163,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Zapytaj zbiór danych",
       description:
-        "Uniwersalne zapytanie do zbioru z katalogu: filtr, wybór pól, sortowanie, agregacje (sum/count/avg/min/max z grupowaniem), stronicowanie oraz filtr przestrzenny dla warstw MSIP (punkt z promieniem, ramka, albo bufor wokół obiektów innej warstwy). Agregacje liczy serwer, więc wynik jest powtarzalny. Współrzędne WGS84.",
+        "Zapytanie do zbioru danych miasta Krakowa z katalogu (np. ile żłobków jest w dzielnicy, jakie plany miejscowe obejmują działkę, ile osób mieszka w zasięgu parków): filtr, wybór pól, sortowanie, agregacje (sum/count/avg/min/max z grupowaniem), stronicowanie oraz filtr przestrzenny dla warstw MSIP (punkt z promieniem, ramka, albo bufor wokół obiektów innej warstwy). Agregacje liczy serwer, więc wynik jest powtarzalny. Wynik ma pole kompletne (false = tylko część wyniku). Współrzędne WGS84.",
       inputSchema: z.object({
         id: z.string().describe("id zbioru z katalog_szukaj"),
         pola: z.array(z.string()).optional().describe("Kolumny do zwrócenia (domyślnie wszystkie)"),
@@ -209,7 +220,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     "status_zrodel",
     {
       title: "Status źródeł danych",
-      description: "Sprawdza z serwera Lajkonektora, czy źródła (Otwarte Dane UMK, MSIP, GUS BDL, ZTP) odpowiadają, i podaje lokalizację serwera. Użyj, gdy inne narzędzia zwracają błąd HTTP 5xx lub timeout.",
+      description: "Sprawdza z serwera Lajkonektora, czy źródła danych o Krakowie (Otwarte Dane UMK, MSIP, GUS BDL, ZTP) odpowiadają, i podaje lokalizację serwera. Użyj, gdy inne narzędzia zwracają błąd HTTP 5xx lub timeout.",
       inputSchema: z.object({}),
       annotations: readOnly,
     },
@@ -410,7 +421,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Prognoza szeregu czasowego",
       description:
-        "Deterministyczna projekcja szeregu (np. z bdl_dane lub dane_zapytaj) z przedziałami 80% i 95% oraz opisem metody. Metody: trend liniowy, wzrost wykładniczy, Holt; w trybie auto wybór po błędzie backtestu. To projekcja trendu, nie przewidywanie. Wymaga ≥3 punktów (zalecane ≥6). Liczy serwer, więc wynik jest powtarzalny.",
+        "Deterministyczna projekcja szeregu czasowego, np. liczby mieszkańców Krakowa czy stopy bezrobocia (z bdl_dane lub dane_zapytaj) z przedziałami 80% i 95% oraz opisem metody. Metody: trend liniowy, wzrost wykładniczy, Holt; w trybie auto wybór po błędzie backtestu. To projekcja trendu, nie przewidywanie. Wymaga ≥3 punktów (zalecane ≥6). Liczy serwer, więc wynik jest powtarzalny.",
       inputSchema: z.object({
         serie: z.array(z.object({ x: z.number().describe("Okres, np. rok"), y: z.number().describe("Wartość") })).min(3).max(200),
         horyzont: z.number().int().min(1).max(20).default(5).describe("Liczba kroków do przodu"),
@@ -430,7 +441,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Odczyt pliku z otwartych danych",
       description:
-        "Pobiera i czyta plik CSV, XLSX lub GeoJSON/JSON z adresu https instytucji publicznych (*.gov.pl, *.krakow.pl, np. link z dane_gov albo eksport MSIP f=geojson) i zwraca tabelę z profilem kolumn (typ, braki, min/max/suma/średnia), opcjonalnie z filtrem pól, sortowaniem i agregacją po stronie serwera. Limit pliku 8 MB.",
+        "Pobiera i czyta plik CSV, XLSX lub GeoJSON/JSON z otwartych danych o Krakowie z adresu https instytucji publicznych (*.gov.pl, *.krakow.pl, np. link z dane_gov albo eksport MSIP f=geojson) i zwraca tabelę z profilem kolumn (typ, braki, min/max/suma/średnia), opcjonalnie z filtrem pól, sortowaniem i agregacją po stronie serwera. Limit pliku 8 MB.",
       inputSchema: z.object({
         url: z.string().url().describe("https://api.dane.gov.pl/resources/.../file albo inny link do pliku"),
         format: z.enum(["csv", "xlsx", "geojson", "json"]).optional().describe("Domyślnie wykrywany automatycznie"),
@@ -454,7 +465,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Złóż własną kartę z danych",
       description:
-        "Składa jedną kartę z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Nadaje się na własny układ odpowiedzi: porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami, podsumowanie dla urzędnika lub badacza. Każde pojedyncze narzędzie renderuje własną kartę, więc to narzędzie dodaje wartość przy składaniu wyników z wielu źródeł. Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam — wtedy liczby nie są przepisywane. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Blok zrodlo opisuje zbiory, daty i pokrycie.",
+        "Składa jedną kartę o Krakowie z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Nadaje się na własny układ odpowiedzi: porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami, podsumowanie dla urzędnika lub badacza. Każde pojedyncze narzędzie renderuje własną kartę, więc to narzędzie dodaje wartość przy składaniu wyników z wielu źródeł. Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam — wtedy liczby nie są przepisywane. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Blok zrodlo opisuje zbiory, daty i pokrycie.",
       inputSchema: widokSchema,
       annotations: { ...readOnly, openWorldHint: false },
     },

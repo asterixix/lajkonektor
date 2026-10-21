@@ -40,7 +40,7 @@ export function podsumuj(nazwa: string, d: any): string {
       case "widok":
         return `Karta „${d.tytul}”: ${(d.bloki ?? []).map((b: any) => b.typ + (b.razem ? ` (${b.razem} wierszy)` : "")).join(", ")}. Źródło: ${d.zrodlo}.`;
       case "katalog_szukaj":
-        return `Znaleziono ${d.liczba} zbiorów. Najlepszy: ${d.wyniki?.[0]?.id ?? "brak"}.${d.brak_w_katalogu ? " " + d.brak_w_katalogu : ""}`;
+        return `Znaleziono ${d.liczba} zbiorów. Najlepszy: ${d.wyniki?.[0]?.id ?? "brak"}.${d.brak_pelnego_dopasowania ? " Brak pełnego dopasowania: to tylko zbiory podobne." : ""}${d.brak_w_katalogu ? " " + d.brak_w_katalogu : ""}`;
       case "adres_na_punkt":
         return d.liczba ? `Adres: ${d.kandydaci[0].ulica} ${d.kandydaci[0].numer}, ${d.kandydaci[0].kod_pocztowy}, ${d.kandydaci[0].dzielnica}; współrzędne ${d.kandydaci[0].lat?.toFixed(5)}, ${d.kandydaci[0].lon?.toFixed(5)}.` : "Nie znaleziono adresu.";
       default:

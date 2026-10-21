@@ -1,7 +1,8 @@
 // Wyszukiwanie w katalogu (offline): potoczne tematy mieszkańców trafiają w urzędowe nazwy zbiorów, braków nie udajemy.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { brakiTematu, szukaj } from "../src/katalog.ts";
+import { brakiTematu, szukaj, szukajZOcena } from "../src/katalog.ts";
+import { createServer } from "../src/server.ts";
 
 const pierwsze = (temat: string, n = 3) => szukaj(temat, { limit: n }).map((p) => p.id);
 const zawiera = (temat: string, fragment: string, n = 3) => assert.ok(pierwsze(temat, n).some((id) => id.includes(fragment)), `${temat} → ${pierwsze(temat, n).join(", ")}`);
@@ -53,4 +54,20 @@ test("katalog: nazwa krótka nie łapie dłuższej (parki ≠ parking), a końc�
 test("katalog: tematy, których nie ma w danych miasta, są nazwane wprost", () => {
   for (const t of ["wywóz odpadów", "PSZOK", "kina w Krakowie", "wypadki drogowe", "targowiska", "rowery miejskie Wavelo", "dzielnicowy mojej ulicy"]) assert.ok(brakiTematu(t), t);
   for (const t of ["parki", "teatry", "ceny mieszkań", "żłobki", "komisariaty"]) assert.equal(brakiTematu(t), undefined, t);
+});
+
+test("katalog: dopasowanie pełne tylko, gdy zbiór ma wszystkie słowa tematu; inaczej wynik jest oznaczony jako częściowy", async () => {
+  assert.ok(szukajZOcena("parki").pelne.size > 0);
+  const slabe = szukajZOcena("parki xyzzyq");
+  assert.ok(slabe.wyniki.length > 0 && slabe.pelne.size === 0, "słowo spoza katalogu nie może dać pełnego dopasowania");
+
+  const s = createServer() as any;
+  const dobre = await s.wywolaj("katalog_szukaj", { temat: "parki" });
+  assert.equal(dobre.wyniki[0].dopasowanie, "pelne");
+  assert.equal(dobre.brak_pelnego_dopasowania, undefined);
+  const zle = await s.wywolaj("katalog_szukaj", { temat: "parki xyzzyq" });
+  assert.equal(zle.brak_pelnego_dopasowania, true);
+  assert.ok(zle.wyniki.every((w: any) => w.dopasowanie === "czesciowe"));
+  assert.match(zle.podpowiedz, /danych w katalogu nie ma/);
+  assert.match(zle.podsumowanie, /Brak pełnego dopasowania/);
 });

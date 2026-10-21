@@ -95,7 +95,15 @@ const rodziny: [(a: Pozycja[], p: Pozycja, i: number, wszystkie: Pozycja[]) => P
 
 const PRZYIMKI = new Set(["na", "w", "z", "o", "do", "dla", "po", "od", "za", "ze", "we", "ich", "oraz", "jak", "jest", "czy", "gdzie", "ile", "mam", "moje"]);
 
-export function szukaj(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: number } = {}) {
+// Wynik z oceną: `pelne` = id zbiorów (całych rodzin lat), w których występują wszystkie słowa tematu.
+// Bez pełnego trafienia ranking pokazuje tylko podobne zbiory, które mogą dotyczyć czegoś innego.
+export function szukajZOcena(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: number } = {}) {
+  const pelneRodziny = new Set<string>();
+  const wyniki = szukaj(temat, opts, pelneRodziny);
+  return { wyniki, pelne: new Set(wyniki.filter((p) => pelneRodziny.has(rodzina(p.id))).map((p) => p.id)) };
+}
+
+export function szukaj(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: number } = {}, pelneRodziny?: Set<string>) {
   // Przybliżony stemming polskiej fleksji: pierwsze 7 liter ("bezrobocie" ~ "bezrobotni"; 6 liter mylilo "przedszkola" z "przedstawienia").
   const stem = (t: string) => t.slice(0, 7);
   const slowa = (s: string) => [...new Set(norm(s).split(" ").filter((t) => t.length >= 2 && !PRZYIMKI.has(t)).map(stem))];
@@ -116,6 +124,7 @@ export function szukaj(temat: string, opts: { zrodlo?: "od" | "msip"; limit?: nu
       const wszystkie = hity.every((h) => h > 0);
       const s = hity.reduce((a, b) => a + b, 0) + 0.3 * dodatkowe.reduce((a, t) => a + punkty(x, t), 0);
       const kara = bezCudzoziemcow && x.tytul.some((w) => w.startsWith("cudzoziem")) ? 0.25 : 1;
+      if (wszystkie) pelneRodziny?.add(rodzina(x.p.id));
       return { p: x.p, score: (wszystkie ? s + 5 : s * 0.4) * kara };
     })
     .filter((x) => x.score > 0)

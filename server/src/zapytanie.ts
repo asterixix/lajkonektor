@@ -245,7 +245,11 @@ export async function zbiorOpis(id: string) {
   const live = await zCache(`opis/${p.id}/meta`, 3600, () => getJson(`${p.url}?f=json`));
   const slowniki = (live.fields ?? [])
     .filter((f: any) => f.domain?.codedValues?.length)
-    .map((f: any) => ({ pole: f.name, kody: f.domain.codedValues.slice(0, 30).map((c: any) => `${c.code}=${c.name}`) }));
+    .map((f: any) => ({
+      pole: f.name, kody: f.domain.codedValues.slice(0, 30).map((c: any) => `${c.code}=${c.name}`),
+      // Ucięty słownik: bez tej liczby model zgadywałby brakujące kody.
+      ...(f.domain.codedValues.length > 30 ? { kodow_razem: f.domain.codedValues.length } : {}),
+    }));
   const liczba = (await arcgisQuery(p.url, { where: "1=1", returnCountOnly: "true" })).count;
   return {
     ...base, geometria: p.geometria, liczba_obiektow: liczba, maxRecordCount: p.maxRecordCount,
