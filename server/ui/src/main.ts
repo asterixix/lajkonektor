@@ -5,9 +5,10 @@ import { konfiguracja } from "./mapa.ts";
 import { WIDOKI } from "./widoki/rejestr.ts";
 import { ladowanie, blad, ogolny } from "./widoki/stany.ts";
 import { stan, type Ctx, type Widok } from "./widoki/typy.ts";
+import { WERSJA } from "../../src/wersja.ts";
 
 const korzen = document.getElementById("app")!;
-const app = new App({ name: "Lajkonektor", version: "0.3.0" });
+const app = new App({ name: "Lajkonektor", version: WERSJA });
 
 let biezace: { dane: any; widok: string } | null = null;
 const historia: any[] = []; // widoki sprzed przejścia z karty (np. z listy katalogu do opisu zbioru)

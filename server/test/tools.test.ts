@@ -99,7 +99,9 @@ naZywo("złączenie przestrzenne: obiekty innej warstwy MSIP jako obszar (ZP w M
   assert.ok((r.wiersze[0] as any).suma > 0);
 });
 
-naZywo("błędy: nieznany zbiór i filtr przestrzenny dla OD", {}, async () => {
+// Oba odrzucenia dzieją się przed jakimkolwiek fetch (pozycja() i straż przestrzenna),
+// więc to regression test walidacji wejścia — musi chodzić offline.
+test("błędy: nieznany zbiór i filtr przestrzenny dla OD", async () => {
   await assert.rejects(daneZapytaj({ id: "msip:nie/ma/1" }), /Nieznany zbiór/);
   await assert.rejects(daneZapytaj({ id: PARKI_OD, geometria: { punkt: BLONIA } }), /tylko dla warstw MSIP/);
 });

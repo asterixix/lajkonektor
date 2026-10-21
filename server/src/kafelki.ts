@@ -14,14 +14,18 @@ export const LIMIT_KAFELKOW = 240;
 // a ten działa tylko na własnej domenie (workers.dev jej nie ma).
 async function limitKafelkow(ip: string): Promise<boolean> {
   if (typeof caches === "undefined" || !ip) return false;
-  const cache = (caches as unknown as { default: Cache }).default;
-  const minuta = Math.floor(Date.now() / 60000);
-  const url = `https://lajkonektor.cache/kafelki/v1/${minuta}/${ip}`;
-  const trafienie = await cache.match(url);
-  const n = trafienie ? Number(await trafienie.text()) : 0;
-  if (n >= LIMIT_KAFELKOW) return true;
-  await cache.put(url, new Response(String(n + 1), { headers: { "cache-control": "public, max-age=120" } }));
-  return false;
+  try {
+    const cache = (caches as unknown as { default: Cache }).default;
+    const minuta = Math.floor(Date.now() / 60000);
+    const url = `https://lajkonektor.cache/kafelki/v1/${minuta}/${encodeURIComponent(ip)}`;
+    const trafienie = await cache.match(url);
+    const n = Number(await trafienie?.text());
+    if (Number.isFinite(n) && n >= LIMIT_KAFELKOW) return true;
+    await cache.put(url, new Response(String((Number.isFinite(n) ? n : 0) + 1), { headers: { "cache-control": "public, max-age=120" } }));
+    return false;
+  } catch {
+    return false; // Awaria cache nie może wyłączać kafelków — limitu po prostu nie ma.
+  }
 }
 
 const tx = (lon: number, z: number) => Math.floor(((lon + 180) / 360) * 2 ** z);

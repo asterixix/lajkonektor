@@ -21,7 +21,7 @@ async function z_ponowieniem(url: string, init: RequestInit): Promise<Response> 
 
 export async function getBytes(url: string): Promise<Uint8Array> {
   const res = await z_ponowieniem(url, { headers: { "user-agent": UA } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status} dla ${url.split("?")[0]}`); // bez query: plik_odczyt przyjmuje adresy użytkownika
   return new Uint8Array(await res.arrayBuffer());
 }
 
@@ -59,7 +59,9 @@ export async function zCache<T>(klucz: string, ttl_s: number, pobierz: () => Pro
   if (ttl_s <= 0) return pobierz();
   const cache = typeof caches !== "undefined" ? (caches as unknown as { default: Cache }).default : null;
   if (!cache) return pobierz();
-  const url = `https://lajkonektor.cache/json/v1/${ttl_s}/${klucz}`;
+  // Cały klucz jako jeden segment: encodeURIComponent zabija „..", znaki sterujące
+  // i cudze teksty, więc tekst użytkownika nie może trafić w klucz innego zbioru.
+  const url = `https://lajkonektor.cache/json/v1/${ttl_s}/${encodeURIComponent(klucz)}`;
   const hit = await cache.match(url);
   if (hit) return (await hit.json()) as T;
   const dane = await pobierz();

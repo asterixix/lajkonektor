@@ -202,7 +202,8 @@ naZywo("na żywo: GeoJSON z MSIP (dzielnice Krakowa), pola wielokątów", { time
   assert.ok(pole && pole.suma > 20_000 && pole.suma < 40_000, `suma pól dzielnic ${pole?.suma} ha (Kraków ~32 700 ha)`);
 });
 
-naZywo("na żywo: nieznany host jest odrzucony przed pobraniem", {}, async () => {
+// Odrzucenie dzieje się w sprawdzUrl(), przed pobraniem — offline.
+test("nieznany host jest odrzucony przed pobraniem", async () => {
   await assert.rejects(plikOdczyt({ url: "https://example.com/dane.csv" }), /nie jest dozwolony/);
 });
 

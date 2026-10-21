@@ -21,7 +21,7 @@ async function rpc(method: string, params: unknown = {}): Promise<any> {
 // Rozkazy skierowane do modelu: opis ma mówić, co narzędzie robi, nie co model ma zrobić.
 const ROZKAZ = /zacznij od|najpierw wywołaj|użyj [a-z_]+ zamiast|nie powtarzaj nim|nie odmawiaj|wywołaj [a-z_]+ nawet/i;
 
-test("opisy: każde narzędzie ma opis i żaden nie rozkazuje modelu, które narzędzie wywołać", async () => {
+test("opisy: każde narzędzie ma opis i żaden nie każe modelu zacząć od konkretnego narzędzia ani go zmieniać", async () => {
   const { tools } = await rpc("tools/list");
   assert.ok(tools.length >= 16, `17 narzędzi, jest ${tools.length}`);
   for (const t of tools) {

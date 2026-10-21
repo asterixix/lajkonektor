@@ -45,7 +45,7 @@ const INSTRUKCJE = `Lajkonektor: otwarte dane Krakowa (Otwarte Dane i MSIP Urzę
 
 Zbiory danych: katalog_szukaj szuka po temacie i zwraca id; zbior_opis opisuje pola i słowniki; dane_zapytaj filtruje, sortuje, grupuje i agreguje (sum/count/avg/min/max) — także filtr przestrzenny dla warstw MSIP ({punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}). Pokrycie obejmuje parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję i wybory. Tematów bez danych (odpady i PSZOK, kina, targowiska, wypadki drogowe) katalog_szukaj nie znajdzie i zwraca je w polu brak_w_katalogu.
 
-Adresy i miejsca: adres_na_punkt geokoduje adres lub nazwę miejsca i podaje dzielnicę.
+Adresy i miejsca: adres_na_punkt geokoduje adres i podaje dzielnicę; nazwę miejsca przyjmują trasa i przystanki_w_poblizu przez pole {tekst}.
 
 Komunikacja: przystanki_w_poblizu, odjazdy (GTFS-RT na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne; dojście piesze po sieci OSM, jedna przesiadka) oraz utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity — dokładne godziny z rozkładu PKP PLK, bez opóźnień). Miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Czasy trasy są szacunkami (oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu). Gdy źródło zwraca błąd 522, status_zrodel pokazuje colo, kraj i dostępność każdego źródła.
 

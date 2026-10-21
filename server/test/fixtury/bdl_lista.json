@@ -12,31 +12,31 @@
  "zmienne": [
   {
    "id": 450231,
-   "temat": "P3414",
+   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
    "nazwa": "ogółem | ogółem | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   },
   {
    "id": 450230,
-   "temat": "P3414",
+   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
    "nazwa": "ogółem | ogółem | stopa bezrobocia | wskaźnik precyzji",
    "jednostka_miary": "%"
   },
   {
    "id": 450285,
-   "temat": "P3414",
+   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
    "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   },
   {
    "id": 450284,
-   "temat": "P3414",
+   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
    "nazwa": "ogółem | mężczyźni | stopa bezrobocia | wskaźnik precyzji",
    "jednostka_miary": "%"
   },
   {
    "id": 450339,
-   "temat": "P3414",
+   "temat": "Stopa bezrobocia rejestrowanego (dane miesi?czne)",
    "nazwa": "ogółem | kobiety | stopa bezrobocia | wartość liczbowa",
    "jednostka_miary": "%"
   }

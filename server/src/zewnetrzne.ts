@@ -15,9 +15,10 @@ const bdlUrl = (path: string, extra: Record<string, string | string[]> = {}) => 
 };
 
 // Nazwa tematu BDL nosi okres danych („…(dane miesięczne)”), więc bez niej zmienne o tym samym n1 są nierozróżnialne.
+// `.catch()` stoi PO zCache: inaczej pusty wynik błędu zostałby zapisany w cache na 24 h.
 async function tematyBdl(ids: (string | undefined)[]): Promise<Map<string, string>> {
   return new Map(await Promise.all([...new Set(ids.filter(Boolean) as string[])].map(
-    async (id) => [id, (await zCache(`bdl/temat/${id}`, 86400, () => getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({})))).name ?? ""] as [string, string])));
+    async (id) => [id, (await zCache(`bdl/temat/${id}`, 86400, () => getJson(bdlUrl(`/subjects/${id}`))).catch(() => ({}))).name ?? ""] as [string, string])));
 }
 
 export async function bdlSzukaj(nazwa: string, limit: number) {
@@ -32,7 +33,7 @@ export async function bdlSzukaj(nazwa: string, limit: number) {
   }));
   return {
     zrodlo: "GUS, Bank Danych Lokalnych (BDL)",
-    uwaga: "Temat mowi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
+    uwaga: "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
     razem_w_bdl: j.totalRecords, zwrocono: zmienne.length, zmienne,
   };
 }
@@ -41,7 +42,7 @@ export async function bdlDane(opts: { zmienne: number[]; jednostka: string; lata
   const unit = JEDNOSTKI[opts.jednostka] ?? opts.jednostka;
   const [dane, ...info] = await Promise.all([
     getJson(bdlUrl(`/data/by-unit/${unit}`, { "var-id": opts.zmienne.map(String), ...(opts.lata?.length ? { year: opts.lata.map(String) } : {}) })),
-    ...opts.zmienne.map((id) => zCache(`bdl/zmienna/${id}`, 86400, () => getJson(bdlUrl(`/variables/${id}`)).catch(() => ({ id })))),
+    ...opts.zmienne.map((id) => zCache(`bdl/zmienna/${id}`, 86400, () => getJson(bdlUrl(`/variables/${id}`))).catch(() => ({ id }))),
   ]);
   const opis = new Map<number, any>(info.map((v: any) => [v.id, v]));
   // n1 bywa samym „ogółem”; temat (np. „Stopa bezrobocia rejestrowanego (dane miesięczne)”) mówi, co faktycznie jest mierzone.
