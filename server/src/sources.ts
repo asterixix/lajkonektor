@@ -51,3 +51,18 @@ export async function arcgisQuery(layerUrl: string, params: Record<string, strin
 }
 
 export const odGet = (path: string) => getJson(`${OD_BASE}${path}`);
+
+// Metadane i wyniki wyszukiwań zmieniają się rzadko, a każde wywołanie narzędzia
+// biło w to samo API. Wzorzec i klucz jak w siec.ts. TTL <= 0 = bez cache,
+// czyli wywołania na żywo (odjazdy, trasa, status źródeł) idą tędy.
+export async function zCache<T>(klucz: string, ttl_s: number, pobierz: () => Promise<T>): Promise<T> {
+  if (ttl_s <= 0) return pobierz();
+  const cache = typeof caches !== "undefined" ? (caches as unknown as { default: Cache }).default : null;
+  if (!cache) return pobierz();
+  const url = `https://lajkonektor.cache/json/v1/${ttl_s}/${klucz}`;
+  const hit = await cache.match(url);
+  if (hit) return (await hit.json()) as T;
+  const dane = await pobierz();
+  await cache.put(url, new Response(JSON.stringify(dane), { headers: { "content-type": "application/json", "cache-control": `public, max-age=${ttl_s}` } }));
+  return dane;
+}

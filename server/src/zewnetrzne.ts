@@ -1,5 +1,5 @@
 // Źródła spoza miasta: GUS BDL (makro, demografia, rynek pracy) i dane.gov.pl (zbiory instytucji publicznych).
-import { getJson } from "./sources.ts";
+import { getJson, zCache } from "./sources.ts";
 
 const BDL = "https://bdl.stat.gov.pl/api/v1";
 const JEDNOSTKI: Record<string, string> = {
@@ -15,7 +15,7 @@ const bdlUrl = (path: string, extra: Record<string, string | string[]> = {}) => 
 };
 
 export async function bdlSzukaj(nazwa: string, limit: number) {
-  const j = await getJson(bdlUrl("/variables/search", { name: nazwa, "page-size": "100" }));
+  const j = await zCache(`bdl/szukaj/${nazwa}`, 86400, () => getJson(bdlUrl("/variables/search", { name: nazwa, "page-size": "100" })));
   // level >= 5 = dane dostępne co najmniej na poziomie powiatu, więc także dla Krakowa.
   const zmienne = (j.results ?? []).filter((v: any) => v.level >= 5).slice(0, limit).map((v: any) => ({
     id: v.id, temat: v.subjectId,
@@ -33,12 +33,12 @@ export async function bdlDane(opts: { zmienne: number[]; jednostka: string; lata
   const unit = JEDNOSTKI[opts.jednostka] ?? opts.jednostka;
   const [dane, ...info] = await Promise.all([
     getJson(bdlUrl(`/data/by-unit/${unit}`, { "var-id": opts.zmienne.map(String), ...(opts.lata?.length ? { year: opts.lata.map(String) } : {}) })),
-    ...opts.zmienne.map((id) => getJson(bdlUrl(`/variables/${id}`)).catch(() => ({ id }))),
+    ...opts.zmienne.map((id) => zCache(`bdl/zmienna/${id}`, 86400, () => getJson(bdlUrl(`/variables/${id}`)).catch(() => ({ id })))),
   ]);
   const opis = new Map<number, any>(info.map((v: any) => [v.id, v]));
   // n1 bywa samym „ogółem”; temat (np. „Stopa bezrobocia rejestrowanego”) mówi, co faktycznie jest mierzone.
   const tematy = new Map<string, string>(await Promise.all([...new Set(info.map((v: any) => v.subjectId).filter(Boolean))].map(
-    async (id: string) => [id, (await getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({}))).name ?? ""] as [string, string])));
+    async (id: string) => [id, (await zCache(`bdl/temat/${id}`, 86400, () => getJson(bdlUrl(`/subjects/${id}`)).catch(() => ({})))).name ?? ""] as [string, string])));
   const wiersze = (dane.results ?? []).flatMap((r: any) => {
     const v = opis.get(r.id) ?? {};
     const nazwa = [v.n1, v.n2, v.n3, v.n4].filter(Boolean).join(" | ");
@@ -55,11 +55,13 @@ export async function bdlDane(opts: { zmienne: number[]; jednostka: string; lata
 const JSONAPI = { headers: { accept: "application/vnd.api+json" } };
 
 export async function daneGovSzukaj(q: string, limit: number) {
-  const res = await fetch(`https://api.dane.gov.pl/1.4/datasets?${new URLSearchParams({ q, per_page: String(limit), sort: "-modified" })}`, {
-    ...JSONAPI, signal: AbortSignal.timeout(25_000),
+  const j: any = await zCache(`dane-gov/lista/${q}/${limit}`, 900, async () => {
+    const res = await fetch(`https://api.dane.gov.pl/1.4/datasets?${new URLSearchParams({ q, per_page: String(limit), sort: "-modified" })}`, {
+      ...JSONAPI, signal: AbortSignal.timeout(25_000),
+    });
+    if (!res.ok) throw new Error(`dane.gov.pl HTTP ${res.status}`);
+    return res.json();
   });
-  if (!res.ok) throw new Error(`dane.gov.pl HTTP ${res.status}`);
-  const j: any = await res.json();
   // Opisy na dane.gov.pl to HTML (<p>, <span style>, &nbsp;), a tytuły mają podświetlenie <mark>.
   const strip = (s: unknown) => String(s ?? "").replace(/<\/?mark>/g, "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
   return {
@@ -74,9 +76,11 @@ export async function daneGovSzukaj(q: string, limit: number) {
 }
 
 export async function daneGovZasoby(datasetId: string) {
-  const res = await fetch(`https://api.dane.gov.pl/1.4/datasets/${encodeURIComponent(datasetId)}/resources?per_page=50`, { ...JSONAPI, signal: AbortSignal.timeout(25_000) });
-  if (!res.ok) throw new Error(`dane.gov.pl HTTP ${res.status}`);
-  const j: any = await res.json();
+  const j: any = await zCache(`dane-gov/zasoby/${datasetId}`, 900, async () => {
+    const res = await fetch(`https://api.dane.gov.pl/1.4/datasets/${encodeURIComponent(datasetId)}/resources?per_page=50`, { ...JSONAPI, signal: AbortSignal.timeout(25_000) });
+    if (!res.ok) throw new Error(`dane.gov.pl HTTP ${res.status}`);
+    return res.json();
+  });
   return {
     zrodlo: "dane.gov.pl (Portal Danych Otwartych)", zbior: datasetId,
     zasoby: (j.data ?? []).map((r: any) => ({ id: r.id, tytul: r.attributes?.title, format: r.attributes?.format, link: r.attributes?.download_url ?? r.attributes?.link })),

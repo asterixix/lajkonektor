@@ -2,7 +2,7 @@
 import { bbox, centroid, uprosc, zaokragl, type Ring } from "./geo.ts";
 import { znajdz, type Pozycja } from "./katalog.ts";
 import { PARKI_OSM_ID, parkiRings, pokrycieParkow } from "./parki.ts";
-import { arcgisQuery, getJson } from "./sources.ts";
+import { arcgisQuery, getJson, zCache } from "./sources.ts";
 
 export type Fn = "sum" | "count" | "avg" | "min" | "max";
 export type Geometria =
@@ -233,10 +233,10 @@ export async function zbiorOpis(id: string) {
   const p = pozycja(id);
   const base = { id: p.id, zrodlo: p.zrodlo, tytul: p.tytul, url: p.url, pola: p.pola, ...(p.opis ? { opis: p.opis } : {}) };
   if (p.zrodlo === "od") {
-    const probka = (await getJson(`${p.url}?$first=3`)).value;
+    const probka = (await zCache(`opis/${p.id}/probka`, 3600, () => getJson(`${p.url}?$first=3`))).value;
     return { ...base, wiersze: (p as any).wiersze ?? null, odswiezono: (p as any).odswiezono ?? null, probka, jak_pytac: "dane_zapytaj: filtr=OData ($filter, np. \"Rok eq 2024\"), pola, sortuj, limit, kursor; agregacje liczone po naszej stronie." };
   }
-  const live = await getJson(`${p.url}?f=json`);
+  const live = await zCache(`opis/${p.id}/meta`, 3600, () => getJson(`${p.url}?f=json`));
   const slowniki = (live.fields ?? [])
     .filter((f: any) => f.domain?.codedValues?.length)
     .map((f: any) => ({ pole: f.name, kody: f.domain.codedValues.slice(0, 30).map((c: any) => `${c.code}=${c.name}`) }));
