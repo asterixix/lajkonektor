@@ -16,6 +16,7 @@ import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
 import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
 import { czyZtp } from "./siec.ts";
+import { WERSJA } from "./wersja.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
 
@@ -61,7 +62,7 @@ const geometria = z
 
 // origin: publiczny adres serwera; karty pobierają z niego kafelki mapy (CSP hosta musi go znać).
 export function createServer(cf?: { colo?: string; country?: string }, origin?: string): McpServer {
-  const server = new McpServer({ name: "lajkonektor", version: "0.4.0" }, { instructions: INSTRUKCJE });
+  const server = new McpServer({ name: "lajkonektor", version: WERSJA }, { instructions: INSTRUKCJE });
 
   registerAppResource(server, "Karta Lajkonektora", KARTA_URI, { description: "Widoki wyników narzędzi: odjazdy, trasa, mapa parków, tabele, wykresy, prognoza." }, async () => ({
     contents: [{ uri: KARTA_URI, mimeType: RESOURCE_MIME_TYPE, text: KARTA_HTML, _meta: { ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: origin ? [origin] : [] } } } }],

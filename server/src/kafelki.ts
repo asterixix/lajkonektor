@@ -2,7 +2,8 @@
 // User-Agenta ani cache'u, a polityka OSM wymaga identyfikacji aplikacji i buforowania. Obszar i zoom są ograniczone
 // do okolic Krakowa, żeby serwer nie służył jako ogólny proxy kafelków.
 // shortcut: serwer kafelków osm.org bez umowy, tylko do lekkiego użycia; przy większym ruchu przejść na własny hosting (PMTiles na R2) albo płatnego dostawcę.
-const UA = "Lajkonektor/0.3 (+https://lajkonektor.sendyka.workers.dev)";
+import { WERSJA } from "./wersja.ts";
+const UA = `Lajkonektor/${WERSJA} (+https://lajkonektor.sendyka.workers.dev)`;
 const OBSZAR = { lonMin: 19.0, lonMax: 21.2, latMin: 49.5, latMax: 50.5 };
 export const ZOOM = { min: 9, max: 18 };
 

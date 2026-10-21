@@ -17,7 +17,8 @@ export const PKP_GTFS = "https://mkuran.pl/gtfs/polish_trains.zip";
 const ZIP_URL: Record<Feed, string> = { A: `${BAZA_ZTP}/GTFS_KRK_A.zip`, T: `${BAZA_ZTP}/GTFS_KRK_T.zip`, M: `${BAZA_ZTP}/GTFS_KRK_M.zip`, K: PKP_GTFS };
 // [zachód, południe, wschód, północ]: Małopolska z zapasem (Kraków, Tarnów, Nowy Sącz, Zakopane, Oświęcim, granica z Katowicami).
 const OBSZAR_K: [number, number, number, number] = [18.9, 49.2, 21.5, 50.5];
-const UA = "lajkonektor/0.4 (+https://lajkonektor.sendyka.workers.dev)";
+import { WERSJA } from "./wersja.ts";
+const UA = `lajkonektor/${WERSJA} (+https://lajkonektor.sendyka.workers.dev)`;
 
 export type Przystanek = [feed: Feed, id: string, nazwa: string, lat: number, lon: number, kod: string];
 export type Linia = [feed: Feed, id: string, numer: string, nazwa: string, typ: number];

@@ -8,7 +8,8 @@ import { agreguj, sortuj, type Fn } from "./zapytanie.ts";
 export const MAX_BAJTOW = 8 * 1024 * 1024;
 const MAX_WIERSZY = 50_000;
 const MAX_ZNAKOW = 60_000;
-const UA = "lajkonektor/0.2 (konkurs Open Data App Krakow)";
+import { WERSJA } from "./wersja.ts";
+const UA = `lajkonektor/${WERSJA} (konkurs Open Data App Krakow)`;
 
 // --- bezpieczeństwo
 const dozwolonyHost = (h: string) => h === "gov.pl" || h.endsWith(".gov.pl") || h === "krakow.pl" || h.endsWith(".krakow.pl");

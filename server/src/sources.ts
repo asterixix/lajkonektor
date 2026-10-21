@@ -1,5 +1,6 @@
 // Cienkie wrappery na publiczne API miasta. Bez kluczy, tylko odczyt.
-const UA = "lajkonektor/0.1 (konkurs Open Data App Krakow)";
+import { WERSJA } from "./wersja.ts";
+const UA = `lajkonektor/${WERSJA} (konkurs Open Data App Krakow)`;
 const TIMEOUT_MS = 25_000;
 
 export const OD_BASE = "https://api.um.krakow.pl";

@@ -4,7 +4,8 @@
 import type { Kand, Punkt, Siec } from "./transport.ts";
 import { dojscieMin, przystankiBlisko } from "./transport.ts";
 
-const UA = "lajkonektor/0.4 (+https://lajkonektor.sendyka.workers.dev)";
+import { WERSJA } from "./wersja.ts";
+const UA = `lajkonektor/${WERSJA} (+https://lajkonektor.sendyka.workers.dev)`;
 // Ramki (zach, pln, wsch, pld): najpierw sam Kraków, potem Małopolska (gminy aglomeracji i okolice stacji kolejowych).
 const VIEWBOX = "19.78,50.13,20.13,49.95";
 const VIEWBOX_REGION = "18.9,50.5,21.5,49.2";
