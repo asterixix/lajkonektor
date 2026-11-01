@@ -24,3 +24,4 @@ docs/10-walidacja/*
 !docs/10-walidacja/2026-10-25/
 docs/PROGRESS.md
 docs/superpowers/
+*.tmp.*
