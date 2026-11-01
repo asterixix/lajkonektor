@@ -24,8 +24,14 @@ export function dzielnicaId(wartosc: unknown): number | null {
   if (!t) return null;
   if (/^\d{1,2}$/.test(t)) return dzielnicaId(+t);
   const rzym = t.match(/^(xviii|xvii|xvi|xv|xiv|xiii|xii|xi|x|ix|viii|vii|vi|v|iv|iii|ii|i)\b/)?.[1];
-  if (rzym) return RZYMSKIE.indexOf(rzym.toUpperCase()) + 1;
   const pelne = DZIELNICE.map((d) => ({ d, n: bezOgonkow(d.nazwa) }));
+  if (rzym) {
+    const numer = RZYMSKIE.indexOf(rzym.toUpperCase()) + 1;
+    const nazwa = t.replace(/^[ivxl]+\s*/, "");
+    const wskazana = pelne.find((x) => x.n === nazwa);
+    // Nie rozstrzygamy po cichu błędów źródła typu „IV Prądnik Czerwony”.
+    return wskazana && wskazana.d.id !== numer ? null : numer;
+  }
   const dokladna = pelne.find((x) => x.n === t);
   if (dokladna) return dokladna.d.id;
   const pasujace = pelne.filter((x) => (t.length >= 4 && x.n.startsWith(t)) || t.includes(x.n));
@@ -199,17 +205,24 @@ export function korelacja(x: (number | null | undefined)[], y: (number | null | 
 const sxx = (x: number[]) => odchylenie(x);
 
 /** Test trendu Manna-Kendalla (bez założeń o rozkładzie) i nachylenie Sena. Dla szeregów czasowych o ≥ 4 punktach. */
-export function trend(x: number[]) {
+export function trend(x: number[], czas?: number[]) {
   const n = x.length;
-  if (n < 4) return { n, kierunek: "za krótki szereg", s: null as number | null, p: null as number | null, nachylenie_sena: null as number | null };
+  const os = czas ?? x.map((_, i) => i);
+  if (os.length !== n) throw new Error("Oś czasu musi mieć tę samą długość co szereg.");
+  if (os.some((v, i) => !Number.isFinite(v) || (i > 0 && v <= os[i - 1]))) throw new Error("Oś czasu musi być skończona i ściśle rosnąca.");
+  if (x.some((v) => !Number.isFinite(v))) throw new Error("Trend wymaga skończonych wartości.");
+  if (n < 4) return { n, kierunek: "za krótki szereg", s: null as number | null, p: null as number | null, nachylenie_sena: null as number | null, wariancja_s: null as number | null };
   let s = 0;
   const nach: number[] = [];
-  for (let i = 0; i < n - 1; i++) for (let j = i + 1; j < n; j++) { s += Math.sign(x[j] - x[i]); nach.push((x[j] - x[i]) / (j - i)); }
-  const wariancja = (n * (n - 1) * (2 * n + 5)) / 18; // bez poprawki na remisy
+  for (let i = 0; i < n - 1; i++) for (let j = i + 1; j < n; j++) { s += Math.sign(x[j] - x[i]); nach.push((x[j] - x[i]) / (os[j] - os[i])); }
+  const remisy = new Map<number, number>();
+  x.forEach((v) => remisy.set(v, (remisy.get(v) ?? 0) + 1));
+  const poprawka = [...remisy.values()].reduce((suma, t) => suma + t * (t - 1) * (2 * t + 5), 0);
+  const wariancja = (n * (n - 1) * (2 * n + 5) - poprawka) / 18;
   const z = s > 0 ? (s - 1) / Math.sqrt(wariancja) : s < 0 ? (s + 1) / Math.sqrt(wariancja) : 0;
-  const p = 2 * (1 - phi(Math.abs(z)));
+  const p = wariancja === 0 ? 1 : 2 * (1 - phi(Math.abs(z)));
   const sorted = nach.sort((a, b) => a - b);
-  return { n, kierunek: p < 0.05 ? (s > 0 ? "rosnący" : "malejący") : "brak istotnego trendu", s, p, nachylenie_sena: kwantyl(sorted, 0.5) };
+  return { n, kierunek: p < 0.05 ? (s > 0 ? "rosnący" : "malejący") : "brak istotnego trendu", s, p, nachylenie_sena: kwantyl(sorted, 0.5), wariancja_s: wariancja };
 }
 
 /** Zmiana między pierwszą a ostatnią wartością: bezwzględna, procentowa i średnioroczna (CAGR) dla `lata` lat. */

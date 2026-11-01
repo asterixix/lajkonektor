@@ -1,0 +1,9 @@
+{
+  "_widok": "miejsca",
+  "status": "wymaga_wyboru",
+  "zrodlo": "© OpenStreetMap contributors, ODbL; dane syntetyczne testu",
+  "kandydaci": [
+    { "lat": 50.06, "lon": 19.93, "nazwa": "Przykładowy akademik", "kategoria": "building/dormitory", "osm_id": 1, "osm_typ": "node" },
+    { "lat": 50.0601, "lon": 19.9301, "nazwa": "Przykładowy klub", "kategoria": "amenity/social_facility", "osm_id": 2, "osm_typ": "node" }
+  ]
+}

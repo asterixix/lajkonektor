@@ -22,9 +22,23 @@ async function tematyBdl(ids: (string | undefined)[]): Promise<Map<string, strin
 }
 
 export async function bdlSzukaj(nazwa: string, limit: number) {
-  const j = await zCache(`bdl/szukaj/${nazwa}`, 86400, () => getJson(bdlUrl("/variables/search", { name: nazwa, "page-size": "100" })));
+  const wyszukaj = (fraza: string) => zCache(`bdl/szukaj/${fraza}`, 86400, () => getJson(bdlUrl("/variables/search", { name: fraza, "page-size": "100" })));
+  const j = await wyszukaj(nazwa);
+  // Szerokie hasło często stawia na początku wynik ankietowy BAEL z jednym rokiem.
+  // Dla Krakowa dołóż rozłączne pojęciowo, lokalne wskaźniki rejestrowane, żeby model
+  // mógł sprawdzić właściwy szereg bez zgadywania kolejnej frazy wyszukiwania.
+  const bezrobocie = /stopa\s+bezroboc/i.test(nazwa) && !/rejestrowan|bael/i.test(nazwa);
+  // Stan ludności ma w BDL zmienną nazwaną samym „ogółem” (temat P2137), więc „ludność ogółem” nic nie znajduje,
+  // a „ludność” daje wodociągi i kanalizację. Dla pytań o liczbę ludności dokładamy sumy tego tematu, zaczynając od całości.
+  const ludnosc = /ludno|mieszka[nń]c/i.test(nazwa) && !/wodoci|kanaliz|gaz|oczyszcz|aktywn|bael|bezrob|pracuj/i.test(nazwa);
+  const dodatkowe = bezrobocie ? await wyszukaj("stopa bezrobocia rejestrowanego").catch(() => ({ results: [] }))
+    : ludnosc ? await zCache("bdl/temat-zmienne/P2137", 86400, () => getJson(bdlUrl("/variables", { "subject-id": "P2137", "page-size": "100" })))
+      .then((r: any) => ({ results: (r.results ?? []).filter((v: any) => v.n2 === "ogółem").sort((a: any, b: any) => Number(b.n1 === "ogółem") - Number(a.n1 === "ogółem")) })).catch(() => ({ results: [] }))
+    : { results: [] };
   // level >= 5 = dane dostępne co najmniej na poziomie powiatu, więc także dla Krakowa.
-  const znalezione = (j.results ?? []).filter((v: any) => v.level >= 5).slice(0, limit);
+  const unikalne = new Map<number, any>();
+  for (const v of [...(dodatkowe.results ?? []), ...(j.results ?? [])]) if (v.level >= 5 && !unikalne.has(v.id)) unikalne.set(v.id, v);
+  const znalezione = [...unikalne.values()].slice(0, limit);
   const tematy = await tematyBdl(znalezione.map((v: any) => v.subjectId));
   const zmienne = znalezione.map((v: any) => ({
     id: v.id, temat: tematy.get(v.subjectId) || undefined,
@@ -33,7 +47,11 @@ export async function bdlSzukaj(nazwa: string, limit: number) {
   }));
   return {
     zrodlo: "GUS, Bank Danych Lokalnych (BDL)",
-    uwaga: "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
+    uwaga: bezrobocie
+      ? "Wyniki obejmują też dokładne dopasowanie „stopa bezrobocia rejestrowanego”. Sprawdź temat i nazwę: stopa BAEL, stopa rejestrowana i liczba bezrobotnych na ofertę pracy to różne miary. Osobne zmienne miesięczne pozwalają porównać ten sam miesiąc w kolejnych latach."
+      : ludnosc
+      ? "Na początku wyników są sumy z tematu stanu ludności wg grup wieku i płci (GUS, stan na 31 XII): „ogółem | ogółem” to cała ludność, kolejne to grupy wieku. Pozostałe trafienia sprawdź po temacie, bo „ludność korzystająca z…” to inne miary."
+      : "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
     razem_w_bdl: j.totalRecords, zwrocono: zmienne.length, zmienne,
   };
 }

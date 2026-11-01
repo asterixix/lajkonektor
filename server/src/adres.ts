@@ -35,12 +35,15 @@ export async function addressToPoint(opts: { ulica: string; numer: string; kod_p
     lon: f.geometry?.x,
   }));
   return {
+    status: kandydaci.length ? "poprawna" : "pusta",
+    wymaga_wyboru: false,
+    kompletne: !r.exceededTransferLimit,
     zrodlo: "MSIP Kraków, Pobieranie/Adresy (punkty adresowe)",
     uwaga:
       kandydaci.length === 0
         ? "Nie znaleziono adresu. Numer musi być dokładny (np. 11A, 4/2); sprawdź pisownię ulicy."
         : kandydaci.length > 1
-          ? "Kilka dopasowań (np. ta sama ulica w różnych dzielnicach): wybierz po kodzie pocztowym lub dzielnicy."
+          ? `Kilka dopasowań; przyjęto pierwsze: ${kandydaci[0].ulica} ${kandydaci[0].numer}, ${kandydaci[0].kod_pocztowy} (${kandydaci[0].dzielnica}). Podaj w odpowiedzi, który adres przyjęto.`
           : "Współrzędne WGS84 punktu adresowego; użyj lat/lon w innych narzędziach.",
     liczba: kandydaci.length,
     kandydaci,

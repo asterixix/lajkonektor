@@ -9,7 +9,9 @@ export interface NarzedzieWiersz {
 // Wszystkie narzędzia serwera, pogrupowane tematycznie. Osiem głównych idzie do tabeli, reszta pod rozwijanym przyciskiem.
 // Świeżość opisuje, jak często zmieniają się dane.
 export const NARZEDZIA: NarzedzieWiersz[] = [
-  { grupa: "Dane", nazwa: "katalog_szukaj", opis: "Znajduje zbiór po temacie, także gdy nie znasz jego nazwy.", swiezosc: "katalog co dobę", glowne: true },
+  { grupa: "Dane", nazwa: "analiza", opis: "Sprawdza plan badania i wykonuje go po zatwierdzeniu, zwracając raport z danymi i metodą.", swiezosc: "zgodnie ze źródłami", glowne: false },
+  { grupa: "Dane", nazwa: "dane_eksportuj", opis: "Na prośbę pakuje odczytane i przeliczone tabele do ZIP z CSV, JSON i opisem pochodzenia.", swiezosc: "ponowny odczyt źródeł", glowne: false },
+  { grupa: "Dane", nazwa: "katalog_szukaj", opis: "Znajduje zbiór po temacie, także gdy nie znasz jego nazwy.", swiezosc: "data migawki w wyniku", glowne: true },
   { grupa: "Dane", nazwa: "dane_zapytaj", opis: "Liczy, filtruje i grupuje wartości ze zbioru, także dla punktu na mapie.", swiezosc: "zgodnie ze zbiorem", glowne: true },
   { grupa: "Dane", nazwa: "zbior_opis", opis: "Pokazuje kolumny, słowniki, licencję i datę aktualizacji zbioru.", swiezosc: "metadane zbioru", glowne: true },
   { grupa: "Dane", nazwa: "dane_gov", opis: "Przeszukuje dane.gov.pl, także dla zbiorów spoza Krakowa.", swiezosc: "zgodnie z portalem", glowne: true },
@@ -24,5 +26,14 @@ export const NARZEDZIA: NarzedzieWiersz[] = [
   { grupa: "Dane", nazwa: "widok", opis: "Składa jedną kartę z kilku wyników, żeby model mógł je pokazać razem.", swiezosc: "liczone przy zapytaniu", glowne: false },
   { grupa: "Dane", nazwa: "status_zrodel", opis: "Sprawdza, które źródła danych odpowiadają.", swiezosc: "przy zapytaniu", glowne: false },
   { grupa: "Transport", nazwa: "przystanki_w_poblizu", opis: "Znajduje przystanki w promieniu spaceru z czasem dojścia.", swiezosc: "rozkład co 30 minut", glowne: false },
+  { grupa: "Miejsca", nazwa: "planowanie_w_punkcie", opis: "Mówi, co obowiązuje w danym miejscu: plan miejscowy, strefa i ograniczenia zabudowy.", swiezosc: "dane planistyczne MSIP", glowne: false },
+  { grupa: "Miejsca", nazwa: "obiekty_w_poblizu", opis: "Znajduje najbliższe apteki, szkoły, żłobki, biblioteki i inne obiekty miasta.", swiezosc: "migawka katalogu", glowne: false },
+  { grupa: "Miejsca", nazwa: "dostepnosc", opis: "Sprawdza, ilu mieszkańców ma usługę w zasięgu i czy adres spełnia standardy planu ogólnego.", swiezosc: "migawka danych", glowne: false },
+  { grupa: "Dane", nazwa: "wskaznik_dzielnic", opis: "Porównuje 18 dzielnic wskaźnikiem z rankingiem, medianą i mapą.", swiezosc: "migawka danych", glowne: false },
+  { grupa: "Dane", nazwa: "statystyka", opis: "Liczy średnie, korelacje, trendy i nierówności na liczbach z danych.", swiezosc: "liczone przy zapytaniu", glowne: false },
   { grupa: "Miejsca", nazwa: "adres_na_punkt", opis: "Zamienia adres w punkt na mapie i podaje dzielnicę.", swiezosc: "punkty adresowe MSIP", glowne: false },
+  { grupa: "Miejsca", nazwa: "miejsce_szukaj", opis: "Wyszukuje miejsce i wymaga wyboru przy wielu trafieniach.", swiezosc: "OSM, cache do 24 godzin", glowne: false },
+  { grupa: "Miejsca", nazwa: "osm_obiekty", opis: "Szuka kategorii obiektów OSM w promieniu do 5 km.", swiezosc: "Overpass, cache do godziny", glowne: false },
+  { grupa: "Dane", nazwa: "operacje_szukaj", opis: "Wyszukuje najwyżej trzy pełne opisy operacji.", swiezosc: "rejestr serwera", glowne: false },
+  { grupa: "Dane", nazwa: "operacja_wykonaj", opis: "Wykonuje operację po sprawdzeniu argumentów.", swiezosc: "zależnie od operacji", glowne: false },
 ];

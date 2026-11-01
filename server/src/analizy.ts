@@ -1,11 +1,13 @@
+import { BladDomeny } from "./bledy.ts";
 // Narzędzia analityczne: wskaźniki w przekroju dzielnic (mapa, ranking, profil), dostępność usług i standardy planu ogólnego,
 // najbliższe obiekty oraz statystyka. Zwracają `bloki` zgodne z kartą „zlozony”, więc jedna karta pokazuje metryki, mapę i wykresy.
-import { arcgisQuery, zCache } from "./sources.ts";
+import { arcgisQuery, zCache, warstwaAnalityczna } from "./sources.ts";
 import { znajdz } from "./katalog.ts";
 import { centroid, metry, odlegloscDoObszaru, ringAreaHa, type Ring } from "./geo.ts";
 import { daneZapytaj } from "./zapytanie.ts";
 import * as A from "./analityka.ts";
 import { PARKI_OSM_ID, parkiRings, pokrycieParkow } from "./parki.ts";
+import { runtime } from "./runtime.ts";
 
 const PALETA = ["#E3EDF7", "#AFCDE9", "#6AA2D4", "#0063AF", "#00366B"];
 const f = (n: number | null | undefined, m = 1) => (n == null || !Number.isFinite(n) ? "–" : new Intl.NumberFormat("pl-PL", { maximumFractionDigits: m }).format(n));
@@ -17,14 +19,14 @@ const pierwszy = (a: Record<string, any>, klucze: string[]) => { for (const k of
 
 export async function obiektyWarstwy(id: string, where = "1=1"): Promise<Obiekt[]> {
   const p = znajdz(id);
-  if (!p?.url) throw new Error(`Nieznana warstwa ${id}`);
-  return zCache(`obiekty|${id}|${where}`, 3600, async () => {
-    const r = await arcgisQuery(p.url, { where, outFields: "*", returnGeometry: "true", outSR: "4326", geometryPrecision: "6", resultRecordCount: "2000" });
+  if (!p?.url) throw new BladDomeny("wejscie", `Nieznana warstwa ${id}`);
+  const wynik = await zCache(`obiekty-v2|${id}|${where}`, 3600, async () => {
+    const r = await warstwaAnalityczna(p.url, { where, outFields: "*", returnGeometry: "true", outSR: "4326", geometryPrecision: "6" });
     const out: Obiekt[] = [];
     for (const ft of r.features ?? []) {
       const g = ft.geometry; if (!g) continue;
       const c = g.rings ? centroid(g.rings as Ring[]) : g.x != null ? { lat: g.y, lon: g.x } : null;
-      if (!c) continue;
+      if (!c || !Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
       const a = ft.attributes ?? {};
       out.push({
         nazwa: pierwszy(a, ["nazwa", "nz_pl", "nazwa_obiektu", "name", "nazwa_jedn"]) ?? pierwszy(a, Object.keys(a)) ?? "bez nazwy",
@@ -32,8 +34,11 @@ export async function obiektyWarstwy(id: string, where = "1=1"): Promise<Obiekt[
         lat: c.lat, lon: c.lon, atrybuty: a,
       });
     }
-    return out;
+    return { obiekty: out, warstwa: { id, filtr: where, dostepna: true, kompletne: out.length === r.features.length, pominiete_bez_geometrii: r.features.length - out.length, ...r._migawka } };
   });
+  const warstwa = { ...wynik.warstwa, wiek_s: Math.max(0, Math.floor((Date.now() - Date.parse(wynik.warstwa.pobrano)) / 1000)) };
+  runtime.getStore()?.warstwy?.push(warstwa);
+  return wynik.obiekty;
 }
 
 /** Rodzaje obiektów dostępne w narzędziach `obiekty_w_poblizu` i `dostepnosc` (warstwy MSIP; promień domyślny w metrach). */
@@ -61,7 +66,7 @@ export const NAZWY_RODZAJOW = Object.keys(RODZAJE) as [string, ...string[]];
 
 export async function obiektyRodzaju(rodzaj: string): Promise<Obiekt[]> {
   const r = RODZAJE[rodzaj];
-  if (!r) throw new Error(`Nieznany rodzaj '${rodzaj}'. Dostępne: ${NAZWY_RODZAJOW.join(", ")}`);
+  if (!r) throw new BladDomeny("wejscie", `Nieznany rodzaj '${rodzaj}'. Dostępne: ${NAZWY_RODZAJOW.join(", ")}`);
   return (await Promise.all(r.warstwy.map(([id, where]) => obiektyWarstwy(id, where)))).flat();
 }
 
@@ -132,11 +137,11 @@ export interface ArgsWskaznik { licznik?: string; mianownik?: string; dzielnica?
 
 export async function wskaznikDzielnic(a: ArgsWskaznik) {
   const dz = a.dzielnica ? A.dzielnicaId(a.dzielnica) : null;
-  if (a.dzielnica && !dz) throw new Error(`Nie rozpoznano dzielnicy '${a.dzielnica}'. Użyj numeru 1–18 lub nazwy, np. 'VIII Dębniki'.`);
+  if (a.dzielnica && !dz) throw new BladDomeny("wejscie", `Nie rozpoznano dzielnicy '${a.dzielnica}'. Użyj numeru 1–18 lub nazwy, np. 'VIII Dębniki'.`);
   if (!a.licznik) return profilDzielnicy(dz);
-  const L = WSKAZNIKI[a.licznik]; if (!L) throw new Error(`Nieznany wskaźnik '${a.licznik}'. Dostępne: ${NAZWY_WSKAZNIKOW.join(", ")}`);
+  const L = WSKAZNIKI[a.licznik]; if (!L) throw new BladDomeny("wejscie", `Nieznany wskaźnik '${a.licznik}'. Dostępne: ${NAZWY_WSKAZNIKOW.join(", ")}`);
   const M = a.mianownik ? WSKAZNIKI[a.mianownik] : undefined;
-  if (a.mianownik && !M) throw new Error(`Nieznany mianownik '${a.mianownik}'. Dostępne: ${NAZWY_WSKAZNIKOW.join(", ")}`);
+  if (a.mianownik && !M) throw new BladDomeny("wejscie", `Nieznany mianownik '${a.mianownik}'. Dostępne: ${NAZWY_WSKAZNIKOW.join(", ")}`);
   const [lm, mm] = await Promise.all([L.licz(), M?.licz()]);
   // ha na mieszkańca to m² na mieszkańca; liczności placówek na 10 tys. mieszkańców, a względem grup wieku na 1000 osób
   const mnoznik = !M || NIE_SUMOWAC.has(a.licznik) ? 1 : a.licznik === "parki_ha" ? 10_000 : a.mianownik === "ludnosc" ? 10_000 : 1000;
@@ -202,7 +207,9 @@ async function profilDzielnicy(dz: number | null) {
 export interface ArgsDostepnosc { miejsce?: { lat: number; lon: number; etykieta?: string }; usluga?: string; promien_m?: number }
 
 export async function dostepnosc(a: ArgsDostepnosc) {
-  return a.miejsce ? dostepnoscPunktu(a.miejsce) : a.usluga && a.usluga !== "standardy" ? dostepnoscUslugi(a.usluga, a.promien_m) : dostepnoscStandardow();
+  // Wskazana usługa ma pierwszeństwo: z miejscem to najbliższe obiekty tej usługi, bez miejsca zasięg w całym mieście.
+  if (a.usluga && a.usluga !== "standardy") return a.miejsce ? najblizszeObiekty(a.miejsce, a.usluga, a.promien_m) : dostepnoscUslugi(a.usluga, a.promien_m);
+  return a.miejsce ? dostepnoscPunktu(a.miejsce) : dostepnoscStandardow();
 }
 
 const STD_OPIS = "Standardy z projektu planu ogólnego Krakowa (art. 13f ustawy o planowaniu): odległość dojścia od działki do szkoły podstawowej i do zieleni publicznej ≥ 3 ha oraz ≥ 15 ha, osobno dla obszarów intensywnych i ekstensywnych.";
@@ -243,7 +250,7 @@ async function dostepnoscStandardow() {
 }
 
 async function dostepnoscUslugi(usluga: string, promien?: number) {
-  const r = RODZAJE[usluga]; if (!r) throw new Error(`Nieznana usługa '${usluga}'. Dostępne: standardy, ${NAZWY_RODZAJOW.join(", ")}`);
+  const r = RODZAJE[usluga]; if (!r) throw new BladDomeny("wejscie", `Nieznana usługa '${usluga}'. Dostępne: standardy, ${NAZWY_RODZAJOW.join(", ")}`);
   const p = promien ?? r.promien_m;
   const obiekty = await obiektyRodzaju(usluga);
   const w = A.pokrycie(obiekty, p);
@@ -286,7 +293,7 @@ async function dostepnoscPunktu(m: { lat: number; lon: number; etykieta?: string
 // ───────────── najbliższe obiekty
 
 export async function najblizszeObiekty(m: { lat: number; lon: number; etykieta?: string }, rodzaj: string, promien?: number, limit = 8) {
-  const r = RODZAJE[rodzaj]; if (!r) throw new Error(`Nieznany rodzaj '${rodzaj}'. Dostępne: ${NAZWY_RODZAJOW.join(", ")}`);
+  const r = RODZAJE[rodzaj]; if (!r) throw new BladDomeny("wejscie", `Nieznany rodzaj '${rodzaj}'. Dostępne: ${NAZWY_RODZAJOW.join(", ")}`);
   const p = promien ?? r.promien_m;
   const wszystkie = (await obiektyRodzaju(rodzaj)).map((o) => ({ o, d: metry(m.lat, m.lon, o.lat, o.lon) })).sort((x, y) => x.d - y.d);
   const wPromieniu = wszystkie.filter((x) => x.d <= p), wybrane = (wPromieniu.length ? wPromieniu : wszystkie.slice(0, 3)).slice(0, limit);
@@ -303,11 +310,13 @@ export async function najblizszeObiekty(m: { lat: number; lon: number; etykieta?
 
 // ───────────── statystyka
 
-export interface ArgsStatystyka { operacja: "opis" | "korelacja" | "trend" | "wzrost" | "nierownosc" | "klasy" | "odstajace"; x: (number | null)[]; y?: (number | null)[]; etykiety?: (string | number)[]; nazwa_x?: string; nazwa_y?: string; klasy?: number; metoda?: "kwantyle" | "rowne" | "jenks"; lata?: number }
+export interface ArgsStatystyka { operacja: "opis" | "korelacja" | "trend" | "wzrost" | "nierownosc" | "klasy" | "odstajace"; x: (number | null)[]; y?: (number | null)[]; etykiety?: (string | number)[]; czas?: number[]; nazwa_x?: string; nazwa_y?: string; klasy?: number; metoda?: "kwantyle" | "rowne" | "jenks"; lata?: number }
 
 export function statystyka(a: ArgsStatystyka) {
   const x = a.x.filter((v): v is number => typeof v === "number" && Number.isFinite(v));
-  if (x.length < 2) throw new Error("Potrzeba co najmniej 2 liczb w `x`.");
+  const indeksy = a.x.flatMap((v, i) => typeof v === "number" && Number.isFinite(v) ? [i] : []);
+  if (a.czas && a.czas.length !== a.x.length) throw new BladDomeny("wejscie", "Oś czasu musi mieć tę samą długość co x.");
+  if (x.length < 2) throw new BladDomeny("wejscie", "Potrzeba co najmniej 2 liczb w `x`.");
   const nx = a.nazwa_x ?? "x", ny = a.nazwa_y ?? "y";
   const bloki: any[] = [];
   let wynik: Record<string, unknown> = {}, tytul = "";
@@ -322,17 +331,19 @@ export function statystyka(a: ArgsStatystyka) {
       break;
     }
     case "korelacja": {
-      if (!a.y) throw new Error("Korelacja wymaga `y` tej samej długości co `x`.");
+      if (!a.y || a.y.length !== a.x.length) throw new BladDomeny("wejscie", "Korelacja wymaga `y` tej samej długości co `x`.");
       const k = A.korelacja(a.x, a.y); wynik = { korelacja: k }; tytul = `Korelacja: ${nx} i ${ny}`;
       bloki.push({ typ: "metryki", pozycje: [{ etykieta: "Pearson r", wartosc: f(k.pearson, 3), opis: `p ≈ ${f(k.p_pearson, 4)}` }, { etykieta: "Spearman ρ", wartosc: f(k.spearman, 3), opis: `p ≈ ${f(k.p_spearman, 4)}` }, { etykieta: "Związek", wartosc: `${k.sila}, ${k.kierunek}` }, { etykieta: "R²", wartosc: f(k.r2, 3) }, { etykieta: "Par", wartosc: k.n }] },
-        { typ: "tekst", wariant: "informacja", tekst: `Prosta regresji: ${ny} ≈ ${f(k.wyraz_wolny, 3)} + ${f(k.nachylenie, 3)} · ${nx}. Wartość p jest przybliżona i zakłada niezależność obserwacji (dzielnice sąsiadują ze sobą, więc ją zawyża). Korelacja nie dowodzi przyczynowości.` },
+        { typ: "tekst", wariant: "informacja", tekst: `Prosta regresji: ${ny} ≈ ${f(k.wyraz_wolny, 3)} + ${f(k.nachylenie, 3)} · ${nx}. Wartość p jest przybliżona i zakłada niezależność obserwacji. Sąsiedztwo dzielnic może naruszać to założenie; istotność wymaga osobnej oceny zależności przestrzennej. Korelacja nie dowodzi przyczynowości.` },
         { typ: "wykres", rodzaj: "punktowy", tytul: `${ny} względem ${nx}`, punkty: a.x.map((v, i) => ({ x: v, y: a.y![i], etykieta: a.etykiety?.[i] })).filter((p) => p.x != null && p.y != null), regresja: { a: k.nachylenie, b: k.wyraz_wolny } });
       break;
     }
     case "trend": {
-      const t = A.trend(x); wynik = { trend: t }; tytul = `Trend: ${nx}`;
-      const xs = a.etykiety?.length === a.x.length ? a.etykiety : x.map((_, i) => i + 1);
+      const czas = a.czas ?? a.x.map((_, i) => i + 1);
+      const t = A.trend(x, indeksy.map((i) => czas[i])); wynik = { trend: t }; tytul = `Trend: ${nx}`;
+      const xs = indeksy.map((i) => a.etykiety?.[i] ?? czas[i]);
       bloki.push({ typ: "metryki", pozycje: [{ etykieta: "Trend (Mann-Kendall)", wartosc: t.kierunek, opis: `p ≈ ${f(t.p, 4)}` }, { etykieta: "Nachylenie Sena", wartosc: f(t.nachylenie_sena, 3), opis: "zmiana na okres" }, { etykieta: "Obserwacji", wartosc: t.n }] }, { typ: "wykres", rodzaj: "linia", tytul: nx, punkty: x.map((v, i) => ({ x: xs[i], y: v })) });
+      bloki.push({ typ: "tekst", wariant: "informacja", tekst: "Test Manna-Kendalla uwzględnia remisy i zakłada niezależność obserwacji; autokorelacja i sezonowość wymagają osobnej analizy. Nachylenie podano na jednostkę wskazanej osi czasu, a bez niej na krok obserwacji." });
       break;
     }
     case "wzrost": {
@@ -351,7 +362,7 @@ export function statystyka(a: ArgsStatystyka) {
       break;
     }
     case "odstajace": {
-      const o = A.odstajace(x); wynik = { odstajace: o.map((p) => ({ ...p, etykieta: a.etykiety?.[p.i] })) }; tytul = `Wartości odstające: ${nx}`;
+      const o = A.odstajace(x).map((p) => ({ ...p, i: indeksy[p.i] })); wynik = { odstajace: o.map((p) => ({ ...p, etykieta: a.etykiety?.[p.i] })) }; tytul = `Wartości odstające: ${nx}`;
       bloki.push({ typ: "tekst", tekst: o.length ? `Odstające: ${o.map((p) => `${a.etykiety?.[p.i] ?? `#${p.i + 1}`} = ${f(p.wartosc, 2)} (z = ${f(p.z, 1)}, ${p.regula})`).join("; ")}` : "Brak wartości odstających według reguły z-score (|z| > 3) i IQR." });
       break;
     }

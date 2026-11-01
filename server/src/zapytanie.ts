@@ -1,3 +1,6 @@
+import { BladDomeny } from "./bledy.ts";
+import { runtime } from "./runtime.ts";
+import { zMigawka } from "./migawki.ts";
 // Uniwersalne zapytanie do dowolnej pozycji katalogu (tabela OD albo warstwa MSIP), z agregacją i filtrem przestrzennym.
 import { bbox, centroid, uprosc, zaokragl, type Ring } from "./geo.ts";
 import { znajdz, type Pozycja } from "./katalog.ts";
@@ -28,12 +31,11 @@ export interface Zapytanie {
 }
 
 const MAX_LIMIT = 1000;
-const MAX_ZNAKOW = 60_000; // odpowiedź trafia do kontekstu modelu, więc ją przycinamy
 const MAX_WIERSZY_OD_AGREGACJA = 20_000;
 
 function pozycja(id: string): Pozycja {
   const p = znajdz(id);
-  if (!p) throw new Error(`Nieznany zbiór '${id}'. Znajdź id narzędziem katalog_szukaj.`);
+  if (!p) throw new BladDomeny("wejscie", `Nieznany zbiór '${id}'. Znajdź id narzędziem katalog_szukaj.`);
   return p;
 }
 
@@ -111,13 +113,13 @@ async function geometriaZ(z: { id: string; where?: string }) {
     return { geometry: JSON.stringify({ rings: parkiRings(), spatialReference: { wkid: 4326 } }), type: "esriGeometryPolygon", n: parkiRings().length, uwaga: `Parki z OSM (pokrycie częściowe: ${pokrycieParkow().z} z ${pokrycieParkow().razem} parków).` };
   }
   const src = pozycja(z.id);
-  if (src.zrodlo !== "msip") throw new Error("Obszar 'z' może pochodzić tylko z warstwy MSIP lub z 'lokalne:parki_osm'.");
+  if (src.zrodlo !== "msip") throw new BladDomeny("wejscie", "Obszar 'z' może pochodzić tylko z warstwy MSIP lub z 'lokalne:parki_osm'.");
   const r = await arcgisQuery(src.url, {
     where: z.where ?? "1=1", outFields: "objectid", returnGeometry: "true", outSR: "4326", geometryPrecision: "6",
     maxAllowableOffset: "0.00005", resultRecordCount: "2000",
   });
   const f: any[] = r.features ?? [];
-  if (!f.length) throw new Error(`Filtr obszaru 'z' (${z.id}) nie zwrócił żadnych obiektów.`);
+  if (!f.length) throw new BladDomeny("wejscie", `Filtr obszaru 'z' (${z.id}) nie zwrócił żadnych obiektów.`);
   const type: string = r.geometryType;
   const sr = { wkid: 4326 };
   const geometry =
@@ -212,14 +214,12 @@ async function msipQuery(p: Pozycja, q: Zapytanie) {
   return { wiersze, ile_zrodlo: null, nastepny_kursor: null as string | null, uwagi, kompletne: !r.exceededTransferLimit && !ucieteLokalnie };
 }
 
-export async function daneZapytaj(q: Zapytanie) {
+async function daneZapytajZrodlo(q: Zapytanie) {
   const p = pozycja(q.id);
-  if (p.zrodlo === "od" && q.geometria) throw new Error("Filtr przestrzenny działa tylko dla warstw MSIP (zrodlo=msip).");
+  if (p.zrodlo === "od" && q.geometria) throw new BladDomeny("wejscie", "Filtr przestrzenny działa tylko dla warstw MSIP (zrodlo=msip).");
   const r = p.zrodlo === "od" ? await odQuery(p, q) : await msipQuery(p, q);
   let wiersze = r.wiersze;
   const uwagi = [...r.uwagi];
-  while (wiersze.length > 1 && JSON.stringify(wiersze).length > MAX_ZNAKOW) wiersze = wiersze.slice(0, Math.ceil(wiersze.length / 2));
-  if (wiersze.length < r.wiersze.length) uwagi.push(`Odpowiedź przycięta do ${wiersze.length} wierszy ze względu na rozmiar; zawęź pola lub filtr albo użyj agregacji.`);
   // Pusty wynik najczęściej znaczy zły filtr albo kod słownika, nie brak zjawiska: model nie ma z niego wnioskować, że czegoś nie ma.
   if (!wiersze.length && !q.tylko_liczba) uwagi.push("Zero wierszy nie dowodzi braku danych: sprawdź filtr, nazwy pól i kody słowników w zbior_opis, zanim uznasz, że takich obiektów nie ma.");
   return {
@@ -232,6 +232,13 @@ export async function daneZapytaj(q: Zapytanie) {
     ...(uwagi.length ? { uwagi } : {}),
     wiersze,
   };
+}
+
+export async function daneZapytaj(q: Zapytanie) {
+  const rt = runtime.getStore();
+  const r = await zMigawka(rt?.migawki, `zapytanie:${JSON.stringify(q)}`, () => daneZapytajZrodlo(q));
+  rt?.sygnal?.throwIfAborted();
+  return r;
 }
 
 // Opis zbioru: pola z katalogu + żywe metadane (aliasy i słowniki kodów dla MSIP, próbka dla OD).

@@ -4,7 +4,13 @@ const f = (n: unknown, m = 1) => (typeof n === "number" ? new Intl.NumberFormat(
 
 export function podsumuj(nazwa: string, d: any): string {
   try {
+    // Wybór miejsca poprzedza wynik każdego narzędzia; bez tego np. trasa zgłaszała brak połączenia.
+    if (d?.status === "wymaga_wyboru") return "Miejsce jest niejednoznaczne. Wybierz jedną z lokalizacji, zanim narzędzie poda wynik.";
     switch (nazwa) {
+      case "dane_eksportuj":
+        return `Dane „${d.tytul}”: ${d.pakiet_danych?.tabele?.length ?? 0} tabel. Ponowiono odczyt źródeł. ZIP zawiera CSV, JSON i opis pochodzenia; plik pobierzesz z karty.`;
+      case "analiza":
+        return d.tryb === "sprawdz" ? `Plan „${d.tytul}” sprawdzony. Przed wykonaniem przedstaw go człowiekowi i poczekaj na zatwierdzenie; id: ${d.id_planu}.` : `Raport „${d.tytul}”: ${d.raport?.tabele?.length ?? 0} tabel, ${d.raport?.zrodla?.length ?? 0} źródeł. Sprawdź metody i ograniczenia przed przyjęciem wniosków. Pełny raport i pakiet danych są w karcie.`;
       case "odjazdy": {
         const o: any[] = d.odjazdy ?? [];
         return o.length ? `Najbliższe odjazdy (na żywo): ${o.slice(0, 5).map((x) => `linia ${x.linia} ${x.kierunek ? "→ " + x.kierunek : ""} o ${x.odjazd} (za ${x.za_min} min${x.opoznienie_s ? `, opóźnienie ${Math.round(x.opoznienie_s / 60)} min` : ""})`).join("; ")}.` : "Brak odjazdów w feedzie GTFS-RT (kursy niewyjechane mogą jeszcze nie być widoczne).";

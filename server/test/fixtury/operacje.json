@@ -1,0 +1,6 @@
+{
+  "_widok": "operacje",
+  "status": "poprawna",
+  "zrodlo": "Rejestr operacji Lajkonektora; przykład syntetyczny",
+  "operacje": [{ "nazwa": "prognoza", "tytul": "Projekcja szeregu", "opis": "Deterministyczna projekcja na podstawie danych.", "inputSchema": { "type": "object" }, "outputSchema": { "type": "object" } }]
+}

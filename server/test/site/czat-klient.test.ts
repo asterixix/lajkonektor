@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { czytajZdarzenia, domknij, historiaDoApi, nowaWiadomosc, wyslijCzat, zastosuj, type Zdarzenie } from "../../site/src/czatKlient.ts";
+import { czytajZdarzenia, domknij, historiaDoApi, nowaWiadomosc, skrotArgumentow, wyslijCzat, zastosuj, type Zdarzenie } from "../../site/src/czatKlient.ts";
 
 const strumien = (kawalki: string[], status = 200) =>
   new Response(new ReadableStream({ start(c) { for (const k of kawalki) c.enqueue(new TextEncoder().encode(k)); c.close(); } }), { status });
@@ -48,6 +48,13 @@ test("historia do modelu: tylko treść rozmowy, bez trwających i pustych wiado
   assert.deepEqual(historiaDoApi([u, a, pusta, trwa]), [{ rola: "uzytkownik", tresc: "Pytanie" }, { rola: "asystent", tresc: "Odpowiedź" }]);
 });
 
+test("historia do modelu: plan analizy czekający na zatwierdzenie wraca z id i JSON planu", () => {
+  const plan = { tytul: "T", zrodla: [] };
+  const a = { ...nowaWiadomosc("asystent", "Plan gotowy."), laduje: false, karty: [{ id: "1", nazwa: "operacja_wykonaj", argumenty: {}, stan: "ok" as const, dane: { tryb: "sprawdz", id_planu: "abc", plan } }] };
+  const [, h] = historiaDoApi([nowaWiadomosc("uzytkownik", "Raport"), a]);
+  assert.equal(h.tresc, `Plan gotowy.\n\n[Plan do zatwierdzenia, id_planu abc]\n${JSON.stringify(plan)}`);
+});
+
 test("wysyłka: błąd HTTP wraca jako opis z kodem, sieć jako komunikat po polsku, a zdarzenia są przekazywane", async () => {
   const zdarz: string[] = [];
   const ok = await wyslijCzat([{ rola: "uzytkownik", tresc: "x" }], (z) => zdarz.push(z.t), undefined, (async () => strumien(['{"t":"tekst","tresc":"a"}\n{"t":"koniec"}\n'])) as unknown as typeof fetch);
@@ -58,4 +65,12 @@ test("wysyłka: błąd HTTP wraca jako opis z kodem, sieć jako komunikat po pol
   const siec = await wyslijCzat([], () => {}, undefined, (async () => { throw new TypeError("fail"); }) as unknown as typeof fetch);
   assert.equal(siec.kod, "siec");
   await assert.rejects(wyslijCzat([], () => {}, undefined, (async () => { throw Object.assign(new Error("a"), { name: "AbortError" }); }) as unknown as typeof fetch), /a/);
+});
+
+test("skrót argumentów: tablice i obiekty są zwinięte, a długie teksty ucięte", () => {
+  assert.equal(skrotArgumentow({ serie: Array.from({ length: 11 }, () => ({ x: 1, y: 2 })), horyzont: 3, metoda: "auto" }), 'serie: [11], horyzont: 3, metoda: "auto"');
+  assert.equal(skrotArgumentow({ z: { tekst: "AGH" } }), "z: {…}");
+  assert.match(skrotArgumentow({ temat: "a".repeat(80) }), /"a{27}…"/);
+  assert.ok(skrotArgumentow(Object.fromEntries(Array.from({ length: 30 }, (_, i) => [`k${i}`, i]))).length <= 90);
+  assert.equal(skrotArgumentow(null), "");
 });

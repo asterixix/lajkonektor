@@ -84,7 +84,7 @@ Kolejność: nagłówek → hero z działającym demo → **Rozkład narzędzi**
 - **Rozkład narzędzi:** belka #0063AF, wiersze: numer, nazwa narzędzia, co robi, skąd i jak świeże. 8 z 15 narzędzi.
 - **Czego nie wiemy:** „Na mapie jest 46 z 78 parków." Powód: 23 nie znaleziono po nazwie, 8 bez domkniętego obrysu, 1 z konturem należącym do innego parku (Planty Bieńczyckie); 44,9% powierzchni. Atrybucja OSM (ODbL) pod mapą.
 - **Podłączenie:** trzy kroki w numerowanych plakietkach, adres `https://lajkonektor.sendyka.workers.dev/mcp` z przyciskiem kopiowania (etykieta zmienia się na „Skopiowano" tylko po udanym zapisie do schowka).
-- Hasło z `PROGRESS.md` „Podłącz Kraków" nie weszło do H1; pasuje na przycisk lub podtytuł, jeśli zespół woli.
+- Hasło „Podłącz Kraków" nie weszło do H1; pasuje na przycisk lub podtytuł, jeśli zespół woli.
 
 ## Zasady, które da się sprawdzić
 
@@ -107,4 +107,4 @@ Kolejność: nagłówek → hero z działającym demo → **Rozkład narzędzi**
 
 - **Błąd danych:** „Planty Bieńczyckie" i „Planty Krakowskie" mają ten sam kontur OSM (21,45 ha). Do naprawy w `server/scripts/build-parki-osm.mjs`.
 - **Niesprawdzone:** renderowanie MCP Apps w Claude Pro; czcionki z Google Fonts w piaskownicy iframe MCP Apps (może blokować zewnętrzne zasoby: wtedy Lato trzeba osadzić albo zostawić `system-ui`); obrazy i mapy trzeba osadzić inline; przycisk kopiowania w iframe; układ na telefonie (zaprojektowany, nie obejrzany); tryb ciemny (nie zaprojektowany).
-- **Do decyzji:** wektor logo; właściciel domeny lajkonektor.pl i znak UPRP/EUIPO (z `PROGRESS.md`).
+- **Do decyzji:** wektor logo; właściciel domeny lajkonektor.pl i znak UPRP/EUIPO.

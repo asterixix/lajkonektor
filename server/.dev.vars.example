@@ -3,5 +3,11 @@
 EDEN_AI_API_KEY=
 # Opcjonalnie:
 # CZAT_MODEL=vertex/claude-haiku-5-5@eu
-# CZAT_MODEL_ZAPASOWY=anthropic/claude-haiku-5-5
-# CZAT_LIMIT_DZIENNY=1500
+# CZAT_LIMIT_DZIENNY=50
+# CZAT_LIMIT_USD=9
+# Tylko lokalnie (wrangler dev nie obsługuje jurysdykcji Durable Object):
+# BUDZET_LOKALNIE=1
+# Tryb lokalny wymaga także EDEN_AI_URL wskazującego lokalną atrapę, nie płatnego dostawcę.
+# CZAT_POLITYKA jest obowiązkowym JSON-em. Brak potwierdzeń pozostawia czat zablokowany.
+# Pola, dowody i ważność: docs/09-wdrozenie/budzet-europa.md.
+# Nie kopiuj polityk testowych do produkcji.

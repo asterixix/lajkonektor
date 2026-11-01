@@ -23,7 +23,7 @@ const ROZKAZ = /zacznij od|najpierw wywołaj|użyj [a-z_]+ zamiast|nie powtarzaj
 
 test("opisy: każde narzędzie ma opis i żaden nie każe modelu zacząć od konkretnego narzędzia ani go zmieniać", async () => {
   const { tools } = await rpc("tools/list");
-  assert.ok(tools.length >= 16, `17 narzędzi, jest ${tools.length}`);
+  assert.ok(tools.length === 7, `17 narzędzi, jest ${tools.length}`);
   for (const t of tools) {
     assert.ok(typeof t.description === "string" && t.description.length > 20, `${t.name}: opis jest wymagany`);
     assert.doesNotMatch(t.description, ROZKAZ, `${t.name}: opis rozkazuje modelu, zamiast opisywać narzędzie`);

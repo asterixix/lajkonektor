@@ -52,7 +52,7 @@ test("_dowod: każdy wynik ma czas pobrania w tekście dla modelu, a migawkę ka
   const h = createMcpHandler(() => createServer());
   const res = await h.fetch(new Request("https://lajkonektor.test/mcp", {
     method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "prognoza", arguments: { serie, horyzont: 1 } } }),
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "operacja_wykonaj", arguments: { operacja: "prognoza", argumenty: { serie, horyzont: 1 } } } }),
   }));
   const t = await res.text();
   const tekst = JSON.parse(JSON.parse((t.match(/data: (\{.*\})/) ?? [, t])[1]!).result.content[0].text);

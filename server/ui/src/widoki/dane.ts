@@ -4,6 +4,16 @@ import { kafel, esc, liczba, nr, zrodlo } from "../pomoc.ts";
 import { mapa, type LiniaMapy, type Poligon, type PunktMapy, type Ring } from "../mapa.ts";
 import { wykres } from "../wykres.ts";
 import { stan, type Ctx, type Widok } from "./typy.ts";
+import { adresPodgladu, type WidokPodgladu } from "../../../shared/podglad.ts";
+import { bezpiecznyURL } from "../../../shared/eksport-raportu.ts";
+
+// Podgląd i eksport zbioru na osobnej podstronie, gdy znamy adres serwera (z _kafelki); bez niego przejście zostaje w karcie.
+function otworzPodglad(d: any, c: Ctx, id: string, widok: WidokPodgladu): boolean {
+  const adres = bezpiecznyURL(typeof d._kafelki === "string" ? d._kafelki : undefined);
+  if (!adres) return false;
+  c.otworz(adresPodgladu(new URL(adres).origin, { id, widok }));
+  return true;
+}
 
 const jestLiczba = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 const tekstKomorki = (v: unknown): string =>
@@ -225,10 +235,11 @@ export const katalog: Widok = {
     const brak = d.brak_w_katalogu ? `<div class="ostrzezenia"><span class="etykieta">BRAK</span>${esc(d.brak_w_katalogu)}</div>` : "";
     return kafel({ id: "katalog_szukaj", tytul: "Zbiory danych o Krakowie", znacznik: { tekst: `${w.length} wyników`, rodzaj: "obrys" }, tresc: brak + tresc, zrodlo: zrodlo("katalog 1 203 zbiorów: Otwarte Dane UMK i warstwy MSIP.", "Przyciski pobierają dane na żywo z tego zbioru.") });
   },
-  podlacz(root, _d, c) {
+  podlacz(root, d, c) {
     root.querySelectorAll<HTMLButtonElement>("[data-akcja]").forEach((b) => {
       b.onclick = async () => {
         const etykieta = b.textContent, id = b.dataset.id!, akcja = b.dataset.akcja;
+        if (otworzPodglad(d, c, id, akcja as WidokPodgladu)) return;
         b.disabled = true; b.textContent = "Pobieram…";
         try {
           c.przejdz(await c.wywolaj(akcja === "opis" ? "zbior_opis" : "dane_zapytaj", akcja === "opis" ? { id } : akcja === "mapa" ? { id, limit: 150, kontury: true } : { id, limit: 100 }));
@@ -252,6 +263,7 @@ ${probka.length ? `<div class="profil" style="border-top:1px solid var(--lk-szar
     const b = root.querySelector<HTMLButtonElement>("[data-pokaz]");
     if (!b) return;
     b.onclick = async () => {
+      if (otworzPodglad(d, c, d.id, d.zrodlo === "msip" ? "mapa" : "dane")) return;
       const etykieta = b.textContent;
       b.disabled = true; b.textContent = "Pobieram…";
       try { c.przejdz(await c.wywolaj("dane_zapytaj", d.zrodlo === "msip" ? { id: d.id, limit: 150, kontury: true } : { id: d.id, limit: 100 })); }

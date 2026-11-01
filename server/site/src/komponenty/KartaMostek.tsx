@@ -14,7 +14,7 @@ export function KartaMostek({ dane, onZmiana }: { dane: any; onZmiana?: (d: any)
   const ctx = useMemo(() => utworzCtx({
     wywolaj: wywolajApi,
     otworz: (url) => window.open(url, "_blank", "noopener"),
-    onZmiana: (d) => { onZmiana?.(d); setWersja((v) => v + 1); },
+    onZmiana: (d) => { if (d) onZmiana?.(d); setWersja((v) => v + 1); },
   }), [onZmiana]);
 
   useEffect(() => {

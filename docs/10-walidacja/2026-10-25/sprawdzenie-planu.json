@@ -1,0 +1,784 @@
+{
+  "_widok": "zlozony",
+  "_zapytanie": {
+    "tryb": "sprawdz",
+    "plan": {
+      "tytul": "Usługi dla rodzin w Krakowie i 18 dzielnicach",
+      "pytanie": "Jak rozmieszczone są żłobki, przedszkola i kluby rodziców względem zameldowanych dzieci i jakie ograniczenia trzeba sprawdzić przed rekomendacją działań?",
+      "zrodla": [
+        {
+          "id": "ludnosc",
+          "nazwa": "Dzieci zameldowane na pobyt stały",
+          "narzedzie": "ludnosc_dzielnic",
+          "argumenty": {
+            "pola": [
+              "r_0_2",
+              "r_3_6"
+            ]
+          }
+        },
+        {
+          "id": "publiczne",
+          "nazwa": "Żłobki publiczne",
+          "narzedzie": "dane_zapytaj",
+          "argumenty": {
+            "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/0",
+            "pola": [
+              "objectid",
+              "nazwa",
+              "dzielnica",
+              "l_miejsc",
+              "data_imp"
+            ]
+          },
+          "definicja": "Żłobki publiczne; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+          "poziom": "dzielnica",
+          "dzielnica_pole": "dzielnica",
+          "dzielnica_z_geometrii": true
+        },
+        {
+          "id": "niepubliczne",
+          "nazwa": "Żłobki niepubliczne",
+          "narzedzie": "dane_zapytaj",
+          "argumenty": {
+            "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/1",
+            "pola": [
+              "objectid",
+              "nazwa",
+              "dzielnica",
+              "l_miejsc",
+              "data_imp"
+            ]
+          },
+          "definicja": "Rejestr żłobków niepublicznych; źródło nie zwraca geometrii. Dzielnica z pola opisowego, sprzeczny numer i nazwa pozostają nierozstrzygnięte.",
+          "poziom": "dzielnica",
+          "dzielnica_pole": "dzielnica",
+          "dzielnica_z_geometrii": false
+        },
+        {
+          "id": "kluby",
+          "nazwa": "Kluby rodziców z dziećmi do lat 3",
+          "narzedzie": "dane_zapytaj",
+          "argumenty": {
+            "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/2",
+            "pola": [
+              "objectid",
+              "organizacja",
+              "rodzaj"
+            ]
+          },
+          "definicja": "Kluby rodziców z dziećmi do lat 3; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+          "poziom": "dzielnica",
+          "dzielnica_z_geometrii": true
+        },
+        {
+          "id": "przedszkola",
+          "nazwa": "Placówki przedszkolne",
+          "narzedzie": "dane_zapytaj",
+          "argumenty": {
+            "id": "msip:Edukacja/EK_PLACOWKI/1",
+            "pola": [
+              "objectid",
+              "nz_pl",
+              "typ_pl",
+              "publiczn"
+            ],
+            "filtr": "typ_pl = 'Przedszkole'"
+          },
+          "definicja": "Placówki przedszkolne; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+          "poziom": "dzielnica",
+          "dzielnica_z_geometrii": true
+        },
+        {
+          "id": "urodzenia",
+          "nazwa": "Urodzenia żywe ogółem GUS",
+          "narzedzie": "bdl_dane",
+          "argumenty": {
+            "zmienne": [
+              59
+            ],
+            "jednostka": "gmina",
+            "lata": [
+              2020,
+              2021,
+              2022,
+              2023,
+              2024,
+              2025
+            ]
+          },
+          "definicja": "Urodzenia żywe ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+          "poziom": "gmina"
+        },
+        {
+          "id": "przyrost",
+          "nazwa": "Przyrost naturalny ogółem GUS",
+          "narzedzie": "bdl_dane",
+          "argumenty": {
+            "zmienne": [
+              68
+            ],
+            "jednostka": "gmina",
+            "lata": [
+              2020,
+              2021,
+              2022,
+              2023,
+              2024,
+              2025
+            ]
+          },
+          "definicja": "Przyrost naturalny ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+          "poziom": "gmina"
+        },
+        {
+          "id": "migracje",
+          "nazwa": "Saldo migracji na pobyt stały ogółem GUS",
+          "narzedzie": "bdl_dane",
+          "argumenty": {
+            "zmienne": [
+              1365234
+            ],
+            "jednostka": "gmina",
+            "lata": [
+              2020,
+              2021,
+              2022,
+              2023,
+              2024,
+              2025
+            ]
+          },
+          "definicja": "Saldo migracji na pobyt stały ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+          "poziom": "gmina"
+        }
+      ],
+      "operacje": [
+        {
+          "id": "miejsca_publiczne",
+          "typ": "agreguj",
+          "z": "publiczne",
+          "grupuj_po": [
+            "dzielnica_id"
+          ],
+          "miary": [
+            {
+              "pole": "l_miejsc",
+              "fn": "sum",
+              "nazwa": "miejsca"
+            },
+            {
+              "fn": "count",
+              "nazwa": "placowki"
+            }
+          ]
+        },
+        {
+          "id": "miejsca_niepubliczne",
+          "typ": "agreguj",
+          "z": "niepubliczne",
+          "grupuj_po": [
+            "dzielnica_id"
+          ],
+          "miary": [
+            {
+              "pole": "l_miejsc",
+              "fn": "sum",
+              "nazwa": "miejsca"
+            },
+            {
+              "fn": "count",
+              "nazwa": "placowki"
+            }
+          ]
+        },
+        {
+          "id": "kluby_dzielnice",
+          "typ": "agreguj",
+          "z": "kluby",
+          "grupuj_po": [
+            "dzielnica_id"
+          ],
+          "miary": [
+            {
+              "fn": "count",
+              "nazwa": "placowki"
+            }
+          ]
+        },
+        {
+          "id": "przedszkola_dzielnice",
+          "typ": "agreguj",
+          "z": "przedszkola",
+          "grupuj_po": [
+            "dzielnica_id"
+          ],
+          "miary": [
+            {
+              "fn": "count",
+              "nazwa": "placowki"
+            }
+          ]
+        },
+        {
+          "id": "zestawienie_publiczne",
+          "typ": "polacz",
+          "lewe": "ludnosc",
+          "prawe": "miejsca_publiczne",
+          "klucz_lewy": "id",
+          "klucz_prawy": "dzielnica_id",
+          "prefiks_prawy": "publiczne_",
+          "kardynalnosc": "1:1",
+          "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+        },
+        {
+          "id": "zestawienie_niepubliczne",
+          "typ": "polacz",
+          "lewe": "zestawienie_publiczne",
+          "prawe": "miejsca_niepubliczne",
+          "klucz_lewy": "id",
+          "klucz_prawy": "dzielnica_id",
+          "prefiks_prawy": "niepubliczne_",
+          "kardynalnosc": "1:1",
+          "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+        },
+        {
+          "id": "zestawienie_kluby",
+          "typ": "polacz",
+          "lewe": "zestawienie_niepubliczne",
+          "prawe": "kluby_dzielnice",
+          "klucz_lewy": "id",
+          "klucz_prawy": "dzielnica_id",
+          "prefiks_prawy": "kluby_",
+          "kardynalnosc": "1:1",
+          "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+        },
+        {
+          "id": "zestawienie",
+          "typ": "polacz",
+          "lewe": "zestawienie_kluby",
+          "prawe": "przedszkola_dzielnice",
+          "klucz_lewy": "id",
+          "klucz_prawy": "dzielnica_id",
+          "prefiks_prawy": "przedszkola_",
+          "kardynalnosc": "1:1",
+          "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+        },
+        {
+          "id": "wskaznik_publiczne",
+          "typ": "wskaznik",
+          "z": "zestawienie",
+          "licznik": "publiczne_miejsca",
+          "mianownik": "r_0_2",
+          "nazwa": "publiczne_miejsca_na_1000_dzieci",
+          "mnoznik": 1000,
+          "jednostka": "miejsc na 1000 zameldowanych dzieci 0–2"
+        },
+        {
+          "id": "wskaznik_niepubliczne",
+          "typ": "wskaznik",
+          "z": "wskaznik_publiczne",
+          "licznik": "niepubliczne_miejsca",
+          "mianownik": "r_0_2",
+          "nazwa": "niepubliczne_miejsca_na_1000_dzieci",
+          "mnoznik": 1000,
+          "jednostka": "miejsc na 1000 zameldowanych dzieci 0–2"
+        },
+        {
+          "id": "wskaznik_przedszkola",
+          "typ": "wskaznik",
+          "z": "wskaznik_niepubliczne",
+          "licznik": "przedszkola_placowki",
+          "mianownik": "r_3_6",
+          "nazwa": "przedszkola_na_1000_dzieci",
+          "mnoznik": 1000,
+          "jednostka": "placówek na 1000 zameldowanych dzieci 3–6"
+        },
+        {
+          "id": "scenariusz_urodzen",
+          "typ": "projekcja",
+          "z": "urodzenia",
+          "x": "rok",
+          "y": "wartosc",
+          "horyzont": 2,
+          "metoda": "auto"
+        }
+      ],
+      "ograniczenia": [
+        "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc.",
+        "Liczba miejsc nie oznacza wolnych miejsc. Kluby rodzica nie są żłobkami. Liczba przedszkoli nie oznacza pojemności.",
+        "Saldo migracji jest przepływem osób zameldowanych na pobyt stały, nie liczbą migrantów ani rodzin migranckich. Nie utożsamiaj tych kategorii.",
+        "Projekcja urodzeń to wariant trendu, nie prognoza potrzeb opieki. Nie modeluje migracji, wyborów rodziców ani polityki miasta.",
+        "Brak kosztów, kolejek i wykorzystania nie pozwala wyliczyć oszczędności ani zalecić zamknięcia placówek.",
+        "Licencje i trafność rekomendacji wymagają odrębnego przeglądu przed wykorzystaniem raportu w decyzji."
+      ]
+    }
+  },
+  "_kafelki": "http://localhost:5173/kafelki/{z}/{x}/{y}.png",
+  "_raport_url": "http://localhost:5173/?raport=1",
+  "podsumowanie": "Plan „Usługi dla rodzin w Krakowie i 18 dzielnicach” sprawdzony. Przed wykonaniem przedstaw go człowiekowi i poczekaj na zatwierdzenie; id: d06aedda87abec97b19c68a8d169a104b5103e1b4d1951cecbe2545f02b2efd2.",
+  "_dowod": {
+    "pobrano": "2026-10-25T11:13:14.454Z"
+  },
+  "tryb": "sprawdz",
+  "id_planu": "d06aedda87abec97b19c68a8d169a104b5103e1b4d1951cecbe2545f02b2efd2",
+  "plan": {
+    "tytul": "Usługi dla rodzin w Krakowie i 18 dzielnicach",
+    "pytanie": "Jak rozmieszczone są żłobki, przedszkola i kluby rodziców względem zameldowanych dzieci i jakie ograniczenia trzeba sprawdzić przed rekomendacją działań?",
+    "zrodla": [
+      {
+        "id": "ludnosc",
+        "nazwa": "Dzieci zameldowane na pobyt stały",
+        "narzedzie": "ludnosc_dzielnic",
+        "argumenty": {
+          "pola": [
+            "r_0_2",
+            "r_3_6"
+          ]
+        }
+      },
+      {
+        "id": "publiczne",
+        "nazwa": "Żłobki publiczne",
+        "narzedzie": "dane_zapytaj",
+        "argumenty": {
+          "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/0",
+          "pola": [
+            "objectid",
+            "nazwa",
+            "dzielnica",
+            "l_miejsc",
+            "data_imp"
+          ]
+        },
+        "definicja": "Żłobki publiczne; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+        "poziom": "dzielnica",
+        "dzielnica_pole": "dzielnica",
+        "dzielnica_z_geometrii": true
+      },
+      {
+        "id": "niepubliczne",
+        "nazwa": "Żłobki niepubliczne",
+        "narzedzie": "dane_zapytaj",
+        "argumenty": {
+          "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/1",
+          "pola": [
+            "objectid",
+            "nazwa",
+            "dzielnica",
+            "l_miejsc",
+            "data_imp"
+          ]
+        },
+        "definicja": "Rejestr żłobków niepublicznych; źródło nie zwraca geometrii. Dzielnica z pola opisowego, sprzeczny numer i nazwa pozostają nierozstrzygnięte.",
+        "poziom": "dzielnica",
+        "dzielnica_pole": "dzielnica",
+        "dzielnica_z_geometrii": false
+      },
+      {
+        "id": "kluby",
+        "nazwa": "Kluby rodziców z dziećmi do lat 3",
+        "narzedzie": "dane_zapytaj",
+        "argumenty": {
+          "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/2",
+          "pola": [
+            "objectid",
+            "organizacja",
+            "rodzaj"
+          ]
+        },
+        "definicja": "Kluby rodziców z dziećmi do lat 3; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+        "poziom": "dzielnica",
+        "dzielnica_z_geometrii": true
+      },
+      {
+        "id": "przedszkola",
+        "nazwa": "Placówki przedszkolne",
+        "narzedzie": "dane_zapytaj",
+        "argumenty": {
+          "id": "msip:Edukacja/EK_PLACOWKI/1",
+          "pola": [
+            "objectid",
+            "nz_pl",
+            "typ_pl",
+            "publiczn"
+          ],
+          "filtr": "typ_pl = 'Przedszkole'"
+        },
+        "definicja": "Placówki przedszkolne; lokalizacja z geometrii MSIP, nie ocena dostępności miejsc.",
+        "poziom": "dzielnica",
+        "dzielnica_z_geometrii": true
+      },
+      {
+        "id": "urodzenia",
+        "nazwa": "Urodzenia żywe ogółem GUS",
+        "narzedzie": "bdl_dane",
+        "argumenty": {
+          "zmienne": [
+            59
+          ],
+          "jednostka": "gmina",
+          "lata": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ]
+        },
+        "definicja": "Urodzenia żywe ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+        "poziom": "gmina"
+      },
+      {
+        "id": "przyrost",
+        "nazwa": "Przyrost naturalny ogółem GUS",
+        "narzedzie": "bdl_dane",
+        "argumenty": {
+          "zmienne": [
+            68
+          ],
+          "jednostka": "gmina",
+          "lata": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ]
+        },
+        "definicja": "Przyrost naturalny ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+        "poziom": "gmina"
+      },
+      {
+        "id": "migracje",
+        "nazwa": "Saldo migracji na pobyt stały ogółem GUS",
+        "narzedzie": "bdl_dane",
+        "argumenty": {
+          "zmienne": [
+            1365234
+          ],
+          "jednostka": "gmina",
+          "lata": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ]
+        },
+        "definicja": "Saldo migracji na pobyt stały ogółem GUS. Kontekst całej gminy, bez przypisywania wartości do dzielnic.",
+        "poziom": "gmina"
+      }
+    ],
+    "operacje": [
+      {
+        "id": "miejsca_publiczne",
+        "typ": "agreguj",
+        "z": "publiczne",
+        "grupuj_po": [
+          "dzielnica_id"
+        ],
+        "miary": [
+          {
+            "pole": "l_miejsc",
+            "fn": "sum",
+            "nazwa": "miejsca"
+          },
+          {
+            "fn": "count",
+            "nazwa": "placowki"
+          }
+        ]
+      },
+      {
+        "id": "miejsca_niepubliczne",
+        "typ": "agreguj",
+        "z": "niepubliczne",
+        "grupuj_po": [
+          "dzielnica_id"
+        ],
+        "miary": [
+          {
+            "pole": "l_miejsc",
+            "fn": "sum",
+            "nazwa": "miejsca"
+          },
+          {
+            "fn": "count",
+            "nazwa": "placowki"
+          }
+        ]
+      },
+      {
+        "id": "kluby_dzielnice",
+        "typ": "agreguj",
+        "z": "kluby",
+        "grupuj_po": [
+          "dzielnica_id"
+        ],
+        "miary": [
+          {
+            "fn": "count",
+            "nazwa": "placowki"
+          }
+        ]
+      },
+      {
+        "id": "przedszkola_dzielnice",
+        "typ": "agreguj",
+        "z": "przedszkola",
+        "grupuj_po": [
+          "dzielnica_id"
+        ],
+        "miary": [
+          {
+            "fn": "count",
+            "nazwa": "placowki"
+          }
+        ]
+      },
+      {
+        "id": "zestawienie_publiczne",
+        "typ": "polacz",
+        "lewe": "ludnosc",
+        "prawe": "miejsca_publiczne",
+        "klucz_lewy": "id",
+        "klucz_prawy": "dzielnica_id",
+        "prefiks_prawy": "publiczne_",
+        "kardynalnosc": "1:1",
+        "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+      },
+      {
+        "id": "zestawienie_niepubliczne",
+        "typ": "polacz",
+        "lewe": "zestawienie_publiczne",
+        "prawe": "miejsca_niepubliczne",
+        "klucz_lewy": "id",
+        "klucz_prawy": "dzielnica_id",
+        "prefiks_prawy": "niepubliczne_",
+        "kardynalnosc": "1:1",
+        "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+      },
+      {
+        "id": "zestawienie_kluby",
+        "typ": "polacz",
+        "lewe": "zestawienie_niepubliczne",
+        "prawe": "kluby_dzielnice",
+        "klucz_lewy": "id",
+        "klucz_prawy": "dzielnica_id",
+        "prefiks_prawy": "kluby_",
+        "kardynalnosc": "1:1",
+        "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+      },
+      {
+        "id": "zestawienie",
+        "typ": "polacz",
+        "lewe": "zestawienie_kluby",
+        "prawe": "przedszkola_dzielnice",
+        "klucz_lewy": "id",
+        "klucz_prawy": "dzielnica_id",
+        "prefiks_prawy": "przedszkola_",
+        "kardynalnosc": "1:1",
+        "uzasadnienie_roznic": "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc."
+      },
+      {
+        "id": "wskaznik_publiczne",
+        "typ": "wskaznik",
+        "z": "zestawienie",
+        "licznik": "publiczne_miejsca",
+        "mianownik": "r_0_2",
+        "nazwa": "publiczne_miejsca_na_1000_dzieci",
+        "mnoznik": 1000,
+        "jednostka": "miejsc na 1000 zameldowanych dzieci 0–2"
+      },
+      {
+        "id": "wskaznik_niepubliczne",
+        "typ": "wskaznik",
+        "z": "wskaznik_publiczne",
+        "licznik": "niepubliczne_miejsca",
+        "mianownik": "r_0_2",
+        "nazwa": "niepubliczne_miejsca_na_1000_dzieci",
+        "mnoznik": 1000,
+        "jednostka": "miejsc na 1000 zameldowanych dzieci 0–2"
+      },
+      {
+        "id": "wskaznik_przedszkola",
+        "typ": "wskaznik",
+        "z": "wskaznik_niepubliczne",
+        "licznik": "przedszkola_placowki",
+        "mianownik": "r_3_6",
+        "nazwa": "przedszkola_na_1000_dzieci",
+        "mnoznik": 1000,
+        "jednostka": "placówek na 1000 zameldowanych dzieci 3–6"
+      },
+      {
+        "id": "scenariusz_urodzen",
+        "typ": "projekcja",
+        "z": "urodzenia",
+        "x": "rok",
+        "y": "wartosc",
+        "horyzont": 2,
+        "metoda": "auto"
+      }
+    ],
+    "ograniczenia": [
+      "Migawka ludności opisuje zameldowanych na pobyt stały. Infrastruktura ma inną datę publikacji/importu lub nieznany stan. To porównanie orientacyjne, nie pomiar popytu ani wolnych miejsc.",
+      "Liczba miejsc nie oznacza wolnych miejsc. Kluby rodzica nie są żłobkami. Liczba przedszkoli nie oznacza pojemności.",
+      "Saldo migracji jest przepływem osób zameldowanych na pobyt stały, nie liczbą migrantów ani rodzin migranckich. Nie utożsamiaj tych kategorii.",
+      "Projekcja urodzeń to wariant trendu, nie prognoza potrzeb opieki. Nie modeluje migracji, wyborów rodziców ani polityki miasta.",
+      "Brak kosztów, kolejek i wykorzystania nie pozwala wyliczyć oszczędności ani zalecić zamknięcia placówek.",
+      "Licencje i trafność rekomendacji wymagają odrębnego przeglądu przed wykorzystaniem raportu w decyzji."
+    ]
+  },
+  "metadane": [
+    {
+      "id": "ludnosc",
+      "narzedzie": "ludnosc_dzielnic",
+      "data_stanu": "2026-09-30",
+      "uwagi": [
+        "Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."
+      ]
+    },
+    {
+      "id": "publiczne",
+      "narzedzie": "dane_zapytaj",
+      "pola": [
+        "objectid",
+        "nazwa",
+        "ulica",
+        "nr_budynku",
+        "kod_poczto",
+        "dzielnica",
+        "l_miejsc",
+        "telefon",
+        "e_mail",
+        "www",
+        "data_imp"
+      ],
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/0",
+      "data_stanu": null,
+      "uwagi": [
+        "Data pobrania metadanych nie jest datą stanu danych."
+      ]
+    },
+    {
+      "id": "niepubliczne",
+      "narzedzie": "dane_zapytaj",
+      "pola": [
+        "objectid",
+        "nazwa",
+        "ulica",
+        "nr_bud",
+        "lokal",
+        "kod_poczt",
+        "dzielnica",
+        "telefon",
+        "email",
+        "www",
+        "l_miejsc",
+        "podmiot",
+        "podm_ul",
+        "podm_nr_bud",
+        "podm_lok",
+        "podm_kod",
+        "nip",
+        "regon",
+        "nr_wpisu",
+        "data_imp"
+      ],
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/1",
+      "data_stanu": null,
+      "uwagi": [
+        "Data pobrania metadanych nie jest datą stanu danych."
+      ]
+    },
+    {
+      "id": "kluby",
+      "narzedzie": "dane_zapytaj",
+      "pola": [
+        "organizacja",
+        "ulica",
+        "adres",
+        "www",
+        "link",
+        "telefon",
+        "rodzaj",
+        "objectid"
+      ],
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/2",
+      "data_stanu": null,
+      "uwagi": [
+        "Data pobrania metadanych nie jest datą stanu danych."
+      ]
+    },
+    {
+      "id": "przedszkola",
+      "narzedzie": "dane_zapytaj",
+      "pola": [
+        "objectid",
+        "typ_pl",
+        "nz_pl",
+        "nz_ul",
+        "nr_bud",
+        "nr_lok",
+        "kod_p",
+        "nr_tel",
+        "email",
+        "www",
+        "specyf",
+        "kat_uczn",
+        "publiczn",
+        "niepelno",
+        "podm_nad",
+        "ls_rodzaj",
+        "data_akt"
+      ],
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Edukacja/EK_PLACOWKI/MapServer/1",
+      "data_stanu": null,
+      "uwagi": [
+        "Data pobrania metadanych nie jest datą stanu danych."
+      ]
+    },
+    {
+      "id": "urodzenia",
+      "narzedzie": "bdl_dane",
+      "data_stanu": null,
+      "uwagi": [
+        "Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."
+      ]
+    },
+    {
+      "id": "przyrost",
+      "narzedzie": "bdl_dane",
+      "data_stanu": null,
+      "uwagi": [
+        "Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."
+      ]
+    },
+    {
+      "id": "migracje",
+      "narzedzie": "bdl_dane",
+      "data_stanu": null,
+      "uwagi": [
+        "Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."
+      ]
+    }
+  ],
+  "wymagane_zatwierdzenie": true,
+  "tytul": "Usługi dla rodzin w Krakowie i 18 dzielnicach",
+  "podtytul": "Plan do zatwierdzenia w rozmowie",
+  "zrodlo": "Metadane źródeł; pełna analiza nie została wykonana",
+  "bloki": [
+    {
+      "typ": "tekst",
+      "tekst": "Jak rozmieszczone są żłobki, przedszkola i kluby rodziców względem zameldowanych dzieci i jakie ograniczenia trzeba sprawdzić przed rekomendacją działań?\n\nŹródła: ludnosc, publiczne, niepubliczne, kluby, przedszkola, urodzenia, przyrost, migracje. Operacje: miejsca_publiczne (agreguj), miejsca_niepubliczne (agreguj), kluby_dzielnice (agreguj), przedszkola_dzielnice (agreguj), zestawienie_publiczne (polacz), zestawienie_niepubliczne (polacz), zestawienie_kluby (polacz), zestawienie (polacz), wskaznik_publiczne (wskaznik), wskaznik_niepubliczne (wskaznik), wskaznik_przedszkola (wskaznik), scenariusz_urodzen (projekcja).\n\nZatwierdzenie planu w rozmowie jest deklaracją, nie uwierzytelnionym dowodem zgody. Interpretację modelu należy wyraźnie oddzielić od wyników obliczeń."
+    }
+  ],
+  "uwagi": [
+    "Zatwierdzenie planu w rozmowie jest deklaracją, nie uwierzytelnionym dowodem zgody. Interpretację modelu należy wyraźnie oddzielić od wyników obliczeń.",
+    "Brak daty stanu, definicji, jednostki lub poziomu ogranicza porównywalność; metadane wejściowe są deklaracją planu, nie niezależnym potwierdzeniem."
+  ]
+}

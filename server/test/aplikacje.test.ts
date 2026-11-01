@@ -1,3 +1,4 @@
+import { PUBLICZNE } from "../src/kontrakt.ts";
 // Testy MCP Apps po stronie serwera (offline): metadane narzędzi, zasób ui:// i opakowanie wyniku dla karty.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -5,31 +6,39 @@ import { createMcpHandler } from "@modelcontextprotocol/server";
 import { WIDOK, createServer } from "../src/server.ts";
 import { NAZWY_WIDOKOW } from "../ui/src/widoki/nazwy.ts";
 
-const KARTA = "ui://lajkonektor/karta.html";
+const KARTA = "ui://lajkonektor/karta-v2.html";
 const ORIGIN = "https://lajkonektor.test";
 const handler = createMcpHandler(() => createServer());
 const handlerZOrigin = createMcpHandler(() => createServer(undefined, ORIGIN));
 let id = 0;
 async function rpc(method: string, params: unknown = {}, h = handler): Promise<any> {
+  const v = params as any;
+  if (method === "tools/call" && !PUBLICZNE.includes(v.name)) params = { name: "operacja_wykonaj", arguments: { operacja: v.name, argumenty: v.arguments } };
   const r = await h.fetch(new Request("https://lajkonektor.test/mcp", {
     method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
     body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method, params }),
   }));
   const t = await r.text();
   const m = t.match(/data: (\{.*\})/);
-  return JSON.parse(m ? m[1] : t).result;
+  const wynik = JSON.parse(m ? m[1] : t).result;
+  if (wynik?._meta?.karta) wynik.structuredContent = wynik._meta.karta;
+  return wynik;
 }
 
-test("MCP Apps: każde narzędzie wskazuje kartę (klucz zagnieżdżony i starszy), a pomocnicze jest ukryte przed modelem", async () => {
+test("MCP Apps: kartę otwierają wybór miejsca i bramka, pięć odczytów pozostaje tekstowych", async () => {
   const { tools } = await rpc("tools/list");
   for (const t of tools) {
-    assert.equal(t._meta?.ui?.resourceUri, KARTA, `${t.name}: _meta.ui.resourceUri`);
-    assert.equal(t._meta?.["ui/resourceUri"], KARTA, `${t.name}: _meta["ui/resourceUri"] (starsi klienci)`);
+    if (["miejsce_szukaj", "operacja_wykonaj"].includes(t.name)) {
+      assert.equal(t._meta?.ui?.resourceUri, KARTA, `${t.name}: _meta.ui.resourceUri`);
+      assert.equal(t._meta?.["ui/resourceUri"], KARTA, `${t.name}: starsi klienci`);
+    } else {
+      assert.equal(t._meta?.ui?.resourceUri, undefined, t.name);
+      assert.equal(t._meta?.["ui/resourceUri"], undefined, t.name);
+    }
   }
-  const ukryte = tools.filter((t: any) => t._meta.ui.visibility?.length === 1 && t._meta.ui.visibility[0] === "app");
-  assert.deepEqual(ukryte.map((t: any) => t.name), ["ui_kontury_parkow"]);
-  const publiczne = tools.filter((t: any) => !ukryte.includes(t)).map((t: any) => t.name).sort();
-  assert.deepEqual(publiczne, Object.keys(WIDOK).sort(), "każde narzędzie publiczne ma przypisany widok i odwrotnie");
+  const ukryte = tools.filter((t: any) => t._meta?.ui?.visibility?.length === 1 && t._meta.ui.visibility[0] === "app");
+  assert.deepEqual(ukryte, []);
+  assert.deepEqual(tools.map((t: any) => t.name).sort(), [...PUBLICZNE].sort());
 });
 
 test("MCP Apps: każdy widok z WIDOK ma kartę w paczce UI", () => {

@@ -9,8 +9,11 @@ export interface Ctx {
   /** Ponownie rysuje bieżący widok (po zmianie stanu lokalnego). */
   przerysuj(): void;
   otworz(url: string): void;
+  /** Przekazuje plik hostowi MCP albo pobiera lokalnie przez Blob. Rzuca błąd przy odmowie/braku obsługi. */
+  pobierz?(nazwa: string, mime: string, dane: Uint8Array): Promise<void>;
   czyMoznaWolac: boolean;
   pelnyEkran?: () => void;
+  wybierzMiejsce?: (tekst: string) => Promise<void>;
 }
 
 export interface Widok {

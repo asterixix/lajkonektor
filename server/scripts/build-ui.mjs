@@ -19,12 +19,14 @@ const fontFace = fontsMeta.map((f) => {
 
 const logo = readFileSync(rel("../../brand/znak-128.png")).toString("base64");
 const css = readFileSync(rel("../ui/src/styles.css"), "utf-8");
+const licencjaFontu = readFileSync(rel("../ui/fonts/OFL.txt"), "utf-8").replaceAll("--", "—");
 const html = `<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lajkonektor</title><style>:root{--lk-logo:url(data:image/png;base64,${logo})}\n${fontFace}\n${css}</style></head><body><div id="app"></div><script>${js}</script></body></html>`;
 
 mkdirSync(rel("../src/ui/"), { recursive: true });
 mkdirSync(rel("../ui/dist/"), { recursive: true });
 // Zapisujemy tylko przy zmianie treści: wrangler obserwuje ten plik i w przeciwnym razie budowałby się w pętli.
 const zapisz = (sciezka, tresc) => { if (!existsSync(sciezka) || readFileSync(sciezka, "utf-8") !== tresc) writeFileSync(sciezka, tresc); };
-zapisz(rel("../src/ui/karta.generated.ts"), `// Plik generowany przez scripts/build-ui.mjs. Nie edytować ręcznie.\nexport const KARTA_HTML = ${JSON.stringify(html)};\n`);
-zapisz(rel("../ui/dist/karta.html"), html);
+const htmlZLicencja = html.replace("<head>", `<!-- Lato: licencja fontu\n${licencjaFontu}\n--><head>`);
+zapisz(rel("../src/ui/karta.generated.ts"), `// Plik generowany przez scripts/build-ui.mjs. Nie edytować ręcznie.\nexport const KARTA_HTML = ${JSON.stringify(htmlZLicencja)};\n`);
+zapisz(rel("../ui/dist/karta.html"), htmlZLicencja);
 console.log(`karta.html: ${(html.length / 1024).toFixed(0)} KB (js ${(js.length / 1024).toFixed(0)} KB, czcionki ${(fontFace.length / 1024).toFixed(0)} KB)`);

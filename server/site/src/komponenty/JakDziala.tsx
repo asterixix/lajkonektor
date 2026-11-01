@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { ArrowCounterClockwise, Pause, Play } from "@phosphor-icons/react";
-import odjazdy from "../../../test/fixtury/odjazdy.json" with { type: "json" };
+import parki from "../../../test/fixtury/tabela_parki.json" with { type: "json" };
 import { TRESC } from "../tresc.ts";
 
 const ZRODLA = ["Otwarte Dane UMK", "MSIP", "GUS BDL", "dane.gov.pl", "ZTP GTFS-RT", "OpenStreetMap"];
-const WYBRANE = "ZTP GTFS-RT";
+const WYBRANE = "Otwarte Dane UMK";
 const OSTATNI = TRESC.jak.kroki.length - 1;
 const KROK_MS = 2400;
 
 // Dane do szczegółów pochodzą z nagranej odpowiedzi narzędzia, nie z wymyślonych liczb.
-const wiersze = odjazdy.odjazdy.slice(0, 3);
-const opozniony = odjazdy.odjazdy.find((o) => o.opoznienie_s) ?? odjazdy.odjazdy[0];
-const odpowiedz = `Linia ${opozniony.linia} w stronę ${opozniony.kierunek} odjeżdża za ${opozniony.za_min} min${opozniony.opoznienie_s ? `, z opóźnieniem ok. ${Math.round(opozniony.opoznienie_s / 60)} min` : ""}.`;
+const ha = (n: number) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 1 }).format(n);
+const wiersze = parki.wiersze.slice(0, 3);
+const [pierwszy, drugi] = parki.wiersze;
+const odpowiedz = `Najwięcej parków miejskich ma ${pierwszy.Dzielnica}: ${ha(pierwszy.ha)} ha w ${pierwszy.parki} parkach. Dalej ${drugi.Dzielnica}: ${ha(drugi.ha)} ha.`;
 
 function Szczegol({ i }: { i: number }) {
   if (i === 0) return <p>{TRESC.jak.pytanie}</p>;
@@ -28,7 +29,7 @@ function Szczegol({ i }: { i: number }) {
     return (
       <table className="jak-wiersze">
         <tbody>
-          {wiersze.map((o, k) => <tr key={k}><th scope="row">{o.linia}</th><td>{o.kierunek}</td><td>za {o.za_min} min</td></tr>)}
+          {wiersze.map((w) => <tr key={w.Dzielnica}><th scope="row">{w.Dzielnica}</th><td>{ha(w.ha)} ha</td><td>{w.parki} parków</td></tr>)}
         </tbody>
       </table>
     );
@@ -91,7 +92,6 @@ export function JakDziala() {
             </li>
           ))}
         </ol>
-        <p className="jak-przyklad">{TRESC.jak.przyklad}</p>
       </div>
     </section>
   );

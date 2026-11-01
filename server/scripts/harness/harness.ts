@@ -7,6 +7,7 @@ const szer = document.getElementById("szer") as HTMLSelectElement;
 const scena = document.getElementById("scena")!;
 const log = document.getElementById("log")!;
 const FIXTURY = ["odjazdy", "odjazdy_puste", "trasa", "przystanki", "parki_jordana", "parki_wszystkie", "tabela_parki", "plik_xlsx", "szereg", "prognoza", "katalog", "opis_zbioru", "bdl_lista", "dane_gov", "adres", "komunikaty", "status", "blad_522", "mapa_msip", "widok_zlozony", "katalog_brak", "trasa_pociag", "trasa_wies", "odjazdy_pociagi", "wskaznik_dzielnic", "profil_dzielnicy", "dostepnosc_standardy", "dostepnosc_apteki", "dostepnosc_punkt", "obiekty_apteki", "statystyka_korelacja", "planowanie_telimeny", "planowanie_rynek"];
+FIXTURY.push("miejsca", "operacje", "raport_rodziny", "eksport_dane");
 const stanyDodatkowe = ["ladowanie"];
 for (const f of [...FIXTURY, ...stanyDodatkowe]) lista.add(new Option(f, f));
 
@@ -30,12 +31,13 @@ async function pokaz(nazwa: string) {
   iframe.srcdoc = html;
   scena.appendChild(iframe);
 
-  const bridge = new AppBridge(null, { name: "Harness", version: "1.0.0" }, { openLinks: {}, serverTools: {}, logging: {} }, {
+  const bridge = new AppBridge(null, { name: "Harness", version: "1.0.0" }, { openLinks: {}, serverTools: {}, logging: {}, message: { text: {} } }, {
     hostContext: { theme: "light", displayMode: "inline", availableDisplayModes: ["inline"], toolInfo: { id: "t1", tool: { name: nazwa === "ladowanie" ? "odjazdy" : nazwa, inputSchema: { type: "object" } } } } as any,
   });
   bridge.onsizechange = (rozmiar) => { dz(`rozmiar ${JSON.stringify(rozmiar)}`); if (rozmiar.height) iframe.style.height = `${Math.ceil(rozmiar.height)}px`; };
   bridge.oncalltool = async (params: any) => { dz(`app → ${params.name} ${JSON.stringify(params.arguments).slice(0, 80)}`); return await mcp(params.name, params.arguments); };
   bridge.onopenlink = async ({ url }: any) => { dz(`openLink ${url}`); return {}; };
+  bridge.onmessage = async ({ content }: any) => { dz(`wybrano: ${content.map((x: any) => x.text ?? "").join(" ")}`); return {}; };
   bridge.oninitialized = async () => {
     dz(`zainicjowano: ${nazwa}`);
     bridge.sendToolInput({ arguments: {} });

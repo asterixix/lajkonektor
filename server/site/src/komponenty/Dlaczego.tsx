@@ -4,9 +4,7 @@ import { Pojawia } from "./Pojawia.tsx";
 export function Dlaczego() {
   const t = TRESC.dlaczego;
   return (
-    <section id="dlaczego" className="sekcja" aria-labelledby="dlaczego-tytul">
-      <div className="wnetrze">
-        <h2 id="dlaczego-tytul">{t.naglowek}</h2>
+    <div className="rozwiniecie">
         <Pojawia>
           <table className="porownanie">
             <thead>
@@ -32,7 +30,6 @@ export function Dlaczego() {
             </Pojawia>
           ))}
         </ul>
-      </div>
-    </section>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ZAKLADKI, brakujacePole, podpisWywolania } from "../../site/src/playground.ts";
-import { TRESC } from "../../site/src/tresc.ts";
+import { PULA, losuj } from "../../site/src/pytania.ts";
 import { WIDOK } from "../../src/server.ts";
 
 test("każda zakładka wskazuje narzędzie z rejestru, a fixtura ma pasujący widok", () => {
@@ -30,10 +30,17 @@ test("argumenty trasy mają postać {tekst}, a podpis pokazuje wywołanie", () =
   assert.match(podpisWywolania(trasa, { z: "AGH", do: "Rynek Główny" }), /^trasa\(\{/);
 });
 
-test("kafle mieszkańców mają pytanie do czatu i wskazują istniejące narzędzie", () => {
-  for (const k of TRESC.mieszkancy.kafle) {
-    assert.ok(k.pytanieAi.length > 15 && k.pytanieAi.length < 200, k.pytanie);
-    assert.ok(k.narzedzie in WIDOK, `brak narzędzia ${k.narzedzie}`);
-    assert.doesNotMatch(k.pytanieAi, /[–—]/);
+test("pula pytań: unikalne, krótkie, wskazują istniejące narzędzie, losowanie bez powtórzeń", () => {
+  assert.ok(PULA.length >= 15);
+  assert.equal(new Set(PULA.map((p) => p.tekst)).size, PULA.length);
+  for (const p of PULA) {
+    assert.ok(p.tekst.length > 15 && p.tekst.length < 120, p.tekst);
+    assert.ok(p.narzedzie in WIDOK, `brak narzędzia ${p.narzedzie}`);
+    assert.doesNotMatch(p.tekst, /[–—]/);
   }
+  const wylosowane = losuj(PULA, 3);
+  assert.equal(new Set(wylosowane).size, 3);
+  assert.deepEqual(losuj([1, 2], 5).sort(), [1, 2]);
+  // Skrajne wartości generatora nie wychodzą poza listę.
+  assert.deepEqual(losuj([1, 2, 3], 3, () => 0.999999).sort(), [1, 2, 3]);
 });

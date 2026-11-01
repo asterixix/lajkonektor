@@ -5,3 +5,22 @@ dist/
 *.log
 server/src/ui/karta.generated.ts
 server/ui/dist/
+server/test/ewaluacja/wyniki/
+
+# Prywatne materiały zespołu: zostają na dysku, poza publicznym repozytorium.
+AGENTS.local.md
+.claude/
+.playwright-mcp/
+.superpowers/
+docs/00-intake/
+docs/01-discovery/*
+!docs/01-discovery/argumenty-dla-miasta.md
+docs/02-strategy/
+docs/07-plan/
+docs/08-zgloszenie/
+docs/09-wdrozenie/*
+!docs/09-wdrozenie/polityka-czatu-2026-10-25.json
+docs/10-walidacja/*
+!docs/10-walidacja/2026-10-25/
+docs/PROGRESS.md
+docs/superpowers/

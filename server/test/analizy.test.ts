@@ -1,3 +1,4 @@
+import { PUBLICZNE } from "../src/kontrakt.ts";
 // Narzędzia analityczne (offline, na migawkach): wskaźniki dzielnic, standardy dostępności, statystyka i błędy wejścia.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -7,10 +8,12 @@ import { createServer } from "../src/server.ts";
 const handler = createMcpHandler(() => createServer());
 let id = 0;
 async function narzedzie(name: string, args: unknown): Promise<any> {
-  const r = await handler.fetch(new Request("https://lajkonektor.test/mcp", { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method: "tools/call", params: { name, arguments: args } }) }));
+  const r = await handler.fetch(new Request("https://lajkonektor.test/mcp", { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method: "tools/call", params: { name: "operacja_wykonaj", arguments: { operacja: name, argumenty: args } } }) }));
   const t = await r.text();
   const m = t.match(/data: (\{.*\})/);
-  return JSON.parse(m ? m[1] : t).result;
+  const wynik = JSON.parse(m ? m[1] : t).result;
+  if (wynik?._meta?.karta) wynik.structuredContent = wynik._meta.karta;
+  return wynik;
 }
 
 test("wskaznik_dzielnic: dzieci 3–6 na 100 mieszkańców, 18 dzielnic, mapa i ranking z miejscami", async () => {

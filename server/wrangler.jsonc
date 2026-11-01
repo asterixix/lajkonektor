@@ -9,6 +9,19 @@
   "placement": { "region": "gcp:europe-central2" },
   "assets": { "directory": "./site/dist" },
   "build": { "command": "node scripts/build-ui.mjs && vite build --config site/vite.config.ts" },
+  // Budżet czatu w USD: Durable Object w jurysdykcji UE (src/budzet.ts), tworzony w kodzie przez namespace.jurisdiction("eu").
+  "durable_objects": { "bindings": [{ "name": "BUDZET", "class_name": "Budzet" }, { "name": "NOMINATIM", "class_name": "Nominatim" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Budzet"] }, { "tag": "v2", "new_sqlite_classes": ["Nominatim"] }],
+  "r2_buckets": [{ "binding": "MIGAWKI", "bucket_name": "lajkonektor-migawki-eu", "jurisdiction": "eu" }],
+  "vars": {
+    "CZAT_MODEL": "vertex/claude-haiku-5-5@eu",
+    "EDEN_AI_URL": "https://api.eu.edenai.run/v3/chat/completions",
+    "CZAT_LIMIT_USD": "9",
+    "CZAT_DEMO_BEZ_BUDZETU": "1",
+    "CZAT_POLITYKA": "{\"model\":\"vertex/claude-haiku-5-5@eu\",\"endpoint\":\"https://api.eu.edenai.run/v3/chat/completions\",\"kontekst\":1048576,\"wyjscie\":4000,\"wejscieMikroZaMilion\":1200000,\"wyjscieMikroZaMilion\":3000000,\"oplataMikro\":1000,\"europaPotwierdzona\":true,\"przedplata10BezDoladowania\":true,\"zakres\":\"Treść inferencji UE/ZDR. Zgoda użytkownika 25.10.2026 na prototyp bez gwarancji europejskiej lokalizacji wszystkich metadanych operacyjnych. Nie oznacza pełnej regionalizacji infrastruktury.\",\"dowod\":\"docs/09-wdrozenie/eden-ai-przeglad-2026-10-25.md; ustawienia konta UE/ZDR i 9 USD; katalog modeli UE; jawna zgoda użytkownika na ograniczony zakres 25.10.2026. Stawki rezerwacji powyżej katalogowych, z zapasem na opłatę pośrednika.\",\"waznaDo\":\"2026-11-06T00:00:00Z\",\"zapasowy\":{\"model\":\"azure/gpt-6-luna@eu\",\"endpoint\":\"https://api.eu.edenai.run/v3/chat/completions\",\"kontekst\":1048576,\"wyjscie\":4000,\"wejscieMikroZaMilion\":400000,\"wyjscieMikroZaMilion\":1000000,\"oplataMikro\":1000,\"europaPotwierdzona\":true,\"zdrPotwierdzone\":true,\"dowod\":\"Katalog Eden AI: azure/gpt-6-luna@eu, UE/ZDR; ustawienia organizacji Europe i ZDR; model zapasowy zatwierdzony przez użytkownika 25.10.2026. Zakres jak dla modelu głównego.\",\"waznaDo\":\"2026-11-06T00:00:00Z\"}}"
+  },
   "triggers": { "crons": ["*/30 * * * *"] },
-  "observability": { "enabled": true }
+  // Prototyp UE/ZDR: nie utrwalamy nowych logów aplikacji i śladów.
+  // Nie oznacza to usunięcia wcześniejszych logów ani pełnej regionalizacji metadanych platformy.
+  "observability": { "enabled": false, "logs": { "enabled": false, "invocation_logs": false, "persist": false }, "traces": { "enabled": false, "persist": false } }
 }

@@ -43,7 +43,8 @@ test("koszt jest wyraźnie oznaczony jako szacunek, bez przypisywania go prototy
   const blok = TRESC.dlaMiasta.bloki.find((b) => b.etykieta === "Koszt");
   assert.ok(blok);
   assert.match(blok.tekst, /szacunek, nie pomiar/i);
-  assert.match(blok.tekst, /30 ms CPU/);
+  assert.match(blok.tekst, /całej typowej odpowiedzi/);
+  assert.match(blok.tekst, /nie potwierdziliśmy pomiarem/);
   assert.doesNotMatch(blok.tekst, /koszt prototypu/i);
 });
 
@@ -57,8 +58,6 @@ test("bez niezweryfikowanych cytatów osób publicznych i wycofanych twierdzeń"
   }
 });
 
-test("każdy dowód i kafel mieszkańca ma źródło lub akcję", () => {
+test("każdy dowód ma źródło", () => {
   for (const d of TRESC.dlaczego.dowody) assert.match(d.zrodlo.url, /^https:\/\//);
-  assert.match(TRESC.mieszkancy.zrodlo.url, /^https:\/\//);
-  for (const k of TRESC.mieszkancy.kafle) assert.ok(k.narzedzie in WIDOK, `brak narzędzia ${k.narzedzie}`);
 });

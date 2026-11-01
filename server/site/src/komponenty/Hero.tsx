@@ -1,11 +1,14 @@
 import { TRESC } from "../tresc.ts";
-import { Demo, type TrybDemo } from "./Demo.tsx";
+import { Demo } from "./Demo.tsx";
 import type { Pytanie } from "./Czat.tsx";
+import { useState } from "react";
+import { MiastoAnimacja, PolaczenieAnimacja } from "./MiastoAnimacja.tsx";
 
-export function Hero({ tryb, onTryb, pytanie }: { tryb: TrybDemo; onTryb: (t: TrybDemo) => void; pytanie: Pytanie | null }) {
+export function Hero({ pytanie }: { pytanie: Pytanie | null }) {
+  const [pauza, setPauza] = useState(false);
   return (
-    <section id="demo" className="hero" aria-labelledby="hero-tytul">
-      <div className="hero-mapa" aria-hidden="true" />
+    <section id="demo" className={`hero${pauza ? " animacja-pauza" : ""}`} aria-labelledby="hero-tytul">
+      <MiastoAnimacja />
       <div className="hero-siatka">
         <div className="hero-tekst">
           <h1 id="hero-tytul">{TRESC.hero.naglowek}</h1>
@@ -14,8 +17,10 @@ export function Hero({ tryb, onTryb, pytanie }: { tryb: TrybDemo; onTryb: (t: Tr
             <a className="przycisk przycisk-glowny" href="#podlaczenie">{TRESC.hero.cta}</a>
             <a className="przycisk przycisk-jasny" href="#jak">{TRESC.hero.cta2}</a>
           </div>
+          <PolaczenieAnimacja />
+          <button type="button" className="ruch-pauza" aria-pressed={pauza} onClick={() => setPauza(!pauza)}>{pauza ? "Wznów animację" : "Wstrzymaj animację"}</button>
         </div>
-        <Demo tryb={tryb} onTryb={onTryb} pytanie={pytanie} />
+        <Demo pytanie={pytanie} />
       </div>
     </section>
   );

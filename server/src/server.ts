@@ -11,7 +11,7 @@ import { daneZapytaj, zbiorOpis } from "./zapytanie.ts";
 import { statusZrodel } from "./status.ts";
 import { plikOdczyt } from "./plik.ts";
 import { prognoza } from "./prognoza.ts";
-import { geokodujOsm, kandydaciOsm, kandydaciPara } from "./osm.ts";
+import { kandydaciOsm, kandydaciPara, szukajMiejsc, wybierzMiejsce } from "./osm.ts";
 import { dotyczace, pobierzKomunikaty } from "./komunikaty.ts";
 import { odleglosc, odjazdyZPrzystankow, opisPrzystanku, planuj, przystankiBlisko, uzupelnijNaZywo, wczytajSiec } from "./transport.ts";
 import { bdlDane, bdlSzukaj, daneGovSzukaj, daneGovZasoby } from "./zewnetrzne.ts";
@@ -19,6 +19,15 @@ import { czyZtp } from "./siec.ts";
 import { planowanieWPunkcie } from "./planowanie.ts";
 import { NAZWY_RODZAJOW, NAZWY_WSKAZNIKOW, dostepnosc, najblizszeObiekty, statystyka, wskaznikDzielnic } from "./analizy.ts";
 import { WERSJA } from "./wersja.ts";
+import { analizaSchema, wykonajAnalize } from "./raport.ts";
+import { BladDomeny } from "./bledy.ts";
+import { PUBLICZNE, stanOdpowiedzi, stronaOdpowiedzi } from "./kontrakt.ts";
+import { KATEGORIE_OSM, osmObiekty } from "./overpass.ts";
+import { runtime } from "./runtime.ts";
+import { schematWyniku } from "./schematy.ts";
+import { prezentacjaWyniku } from "../shared/prezentacja.ts";
+import { ZASADY_ODPOWIEDZI } from "./instrukcje.ts";
+import { eksportDanychSchema, eksportujDane } from "./eksport-danych.ts";
 
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true };
 
@@ -28,13 +37,16 @@ async function run(fn: () => Promise<Record<string, unknown>>) {
     const data = await fn();
     return { content: [{ type: "text" as const, text: JSON.stringify(data) }], structuredContent: data };
   } catch (e) {
-    return { isError: true, content: [{ type: "text" as const, text: `Błąd: ${(e as Error).message}` }] };
+    if (e instanceof BladDomeny && e.kod === "wybor") return { content: [{ type: "text" as const, text: e.message }], structuredContent: { status: "wymaga_wyboru", ...e.dane } };
+    return { isError: true, _blad: e, content: [{ type: "text" as const, text: `Błąd: ${(e as Error).message}` }] };
   }
 }
 
-// Karta MCP Apps wspólna dla wszystkich narzędzi: widok wybiera pole `_widok` w wyniku.
-const KARTA_URI = "ui://lajkonektor/karta.html";
+// Wspólny zasób dla wyboru miejsca i bramki operacji. Odczyty nie otwierają własnych apletów.
+const KARTA_URI = "ui://lajkonektor/karta-v2.html";
 export const WIDOK: Record<string, string> = {
+  miejsce_szukaj: "miejsca", osm_obiekty: "miejsca", operacje_szukaj: "operacje", operacja_wykonaj: "zlozony",
+  analiza: "zlozony", dane_eksportuj: "eksport",
   katalog_szukaj: "katalog", zbior_opis: "opis_zbioru", dane_zapytaj: "tabela", adres_na_punkt: "adres", parki_geometria: "parki",
   bdl_szukaj: "bdl_lista", bdl_dane: "szereg", dane_gov: "dane_gov", przystanki_w_poblizu: "przystanki", odjazdy: "odjazdy",
   trasa: "trasa", utrudnienia: "komunikaty", status_zrodel: "status", prognoza: "prognoza", plik_odczyt: "plik", widok: "zlozony", wskaznik_dzielnic: "zlozony", dostepnosc: "zlozony", obiekty_w_poblizu: "zlozony", statystyka: "zlozony", planowanie_w_punkcie: "zlozony",
@@ -44,15 +56,28 @@ export const WIDOK: Record<string, string> = {
 const ZE_KATALOGU = new Set(["katalog_szukaj", "zbior_opis", "dane_zapytaj"]);
 
 // Kontury i przebiegi do rysowania map są potrzebne karcie (structuredContent), a nie modelowi: w tekście wyniku ich nie powtarzamy.
-const bezKonturow = (k: string, v: unknown) => (k === "kontury" || k === "linie_geom" ? undefined : v);
+const bezKonturow = (k: string, v: unknown) => {
+  if (k === "kontury" || k === "linie_geom" || k === "_geometria") return undefined;
+  if (k === "raport" && v && typeof v === "object") {
+    const r = v as any;
+    return { ...r, tabele: r.tabele.map((t: any) => ({ ...t, wiersze: t.wiersze.slice(0, 20), wierszy_ogolem: t.wiersze.length, podglad: t.wiersze.length > 20 })), uwaga_tekstu: "Tekst pokazuje do 20 wierszy na tabelę. Pełne tabele i eksport są w structuredContent karty." };
+  }
+  return v;
+};
 
 const INSTRUKCJE = `Lajkonektor: otwarte dane Krakowa (Otwarte Dane i MSIP Urzędu Miasta, GUS BDL, dane.gov.pl, rozkłady i pozycje pojazdów ZTP na żywo, OpenStreetMap). Tylko odczyt.
+
+${ZASADY_ODPOWIEDZI}
+
+Interfejs hybrydowy: dostępnych jest siedem narzędzi. Bezpośrednio używaj katalog_szukaj, zbior_opis, dane_zapytaj, miejsce_szukaj, osm_obiekty. Pozostałe nazwy w opisie oznaczają operacje: odkryj najwyżej trzy schematy przez operacje_szukaj(temat), a potem wywołaj operacja_wykonaj({operacja,argumenty}). Statusy: poprawna, czesciowa, pusta, niedostepna. Przy wielu trafieniach miejsca narzędzie bierze najlepsze i podaje je w uwadze; powiedz użytkownikowi, które przyjęto. Dalsze strony: powtórz to samo wywołanie z kursor_odpowiedzi=nastepny_kursor; fragmenty_json wskazują ścieżki pól. Geometria prezentacyjna jest wyłącznie w _meta karty.
+
+Warsztat analityka: dla wieloźródłowego raportu użyj analiza. Najpierw odkryj źródła i pola; przedstaw pytanie, definicje, daty i metody. Wywołaj tryb sprawdz, pokaż plan i jego ograniczenia człowiekowi, zaczekaj na zatwierdzenie w rozmowie. Tryb wykonaj przyjmuje identyczny plan, id_planu oraz treść zatwierdzenia. Nie wpisuj zatwierdzenia za człowieka. Jeśli użytkownik prosi tylko o plan lub wyraźnie wstrzymuje pobranie danych i obliczenia, nie wywołuj trybu wykonaj ani narzędzi pobierających dane. Jest to procedura współpracy, bez uwierzytelniania zgody przez serwer. Raport i pakiet HTML/CSV/JSON pobiera się z karty; PDF przez wydruk samodzielnego HTML. Źródła, obliczenia i ograniczenia są oddzielone od interpretacji. Nie wnioskuj o wolnych miejscach z liczby miejsc, o popycie z liczby placówek, o oszczędnościach bez kosztów ani o przyczynowości z korelacji. GUS dla całego miasta nie opisuje 18 dzielnic. Brak obsługiwanej metody lub danych wymaga jawnego ograniczenia wyniku.
 
 Zakres: źródło faktów o Krakowie, które zmieniają się w czasie albo wymagają dokładnej liczby, adresu, godziny lub przebiegu: liczby mieszkańców, placówki, ceny, plany miejscowe, hałas, odjazdy i utrudnienia, trasy, wskaźniki GUS. Wiedza modelu o tych sprawach bywa nieaktualna, a dane z narzędzi mają datę pobrania w polu _dowod.
 
 Zbiory danych: katalog_szukaj szuka po temacie i zwraca id; zbior_opis opisuje pola i słowniki; dane_zapytaj filtruje, sortuje, grupuje i agreguje (sum/count/avg/min/max) — także filtr przestrzenny dla warstw MSIP ({punkt,promien_m}, {bbox} albo {z:{id,bufor_m}}). Pokrycie obejmuje parki, plany miejscowe, pozwolenia na budowę, hałas, działki, ludność i cudzoziemców, ceny nieruchomości, żłobki, przedszkola, szkoły, szpitale, apteki, muzea, teatry, biblioteki, parkingi i strefę płatnego parkowania, infrastrukturę rowerową, policję i wybory. Tematów bez danych (odpady i PSZOK, kina, targowiska, wypadki drogowe) katalog_szukaj nie znajdzie i zwraca je w polu brak_w_katalogu.
 
-Adresy i miejsca: adres_na_punkt geokoduje adres i podaje dzielnicę; nazwę miejsca przyjmują trasa i przystanki_w_poblizu przez pole {tekst}.
+Adresy i miejsca: adres_na_punkt geokoduje adres i podaje dzielnicę; nazwę miejsca przyjmują trasa i przystanki_w_poblizu przez pole {tekst}. Gdy nazwa lub adres pasuje do kilku lokalizacji, narzędzie przyjmuje najlepsze trafienie i podaje je w uwadze; nie pytaj o wybór, tylko wskaż przyjęte miejsce.
 
 Komunikacja: przystanki_w_poblizu, odjazdy (GTFS-RT na żywo), trasa (z i do: adres, nazwa miejsca albo współrzędne; dojście piesze po sieci OSM, jedna przesiadka) oraz utrudnienia. Obejmuje ZTP (autobusy, tramwaje, linie aglomeracyjne do gmin wokół Krakowa) i pociągi (Koleje Małopolskie, PolRegio, Intercity — dokładne godziny z rozkładu PKP PLK, bez opóźnień). Miejsca poza Krakowem podawaj jako {tekst}, np. 'Staniątki 15'. Czasy trasy są szacunkami (oczekiwanie z częstotliwości kursów, jazda z mediany rozkładu). Gdy źródło zwraca błąd 522, status_zrodel pokazuje colo, kraj i dostępność każdego źródła.
 
@@ -60,9 +85,9 @@ Szeregi GUS: bdl_szukaj znajduje wskaźnik, bdl_dane zwraca szereg; prognoza rob
 
 Analizy: wskaznik_dzielnic (ranking, mapa koropletowa i profil dzielnicy), dostepnosc (standardy dostępności z planu ogólnego, pokrycie ludności usługą, białe plamy), obiekty_w_poblizu (najbliższe apteki, szkoły, toalety itd.), planowanie_w_punkcie (plan, strefa planu ogólnego i działka dla adresu), statystyka (korelacja, trend, nierówność, odstające); liczby liczy serwer.
 
-Karty: każde narzędzie zwraca kartę w klientach z MCP Apps (mapa OSM, tabela, wykres) i pełny wynik tekstowy z polskim podsumowaniem w pozostałych. widok składa własną kartę z bloków (tekst, metryki, tabela, wykres, mapa, lista, oś czasu), gdy odpowiedź łączy dane z kilku źródeł.
+Karty: odczyty katalogu, opisu, danych, OSM i schematów nie otwierają własnych apletów. Wybór miejsca i bramka operacji obsługują MCP Apps. Wyniki pomocnicze bramki są zwinięte; wybór i plan do zatwierdzenia pozostają widoczne. Gdy wizualizacja pomaga, odkryj widok i użyj cel=odpowiedz z najwyżej jednym blokiem wizualnym oraz źródłem z. Nie twórz dodatkowych kart dla etapów pracy. Raport i pobranie danych to oddzielne czynności wyłącznie na prośbę: analiza tworzy raport, dane_eksportuj tworzy ZIP z CSV/JSON i pochodzeniem bez narracyjnego raportu. Odczyt eksportowy ponawia zapytania; nie obiecuj identyczności z wcześniejszym wynikiem. Po przeliczeniach użyj zatwierdzonego planu, jego id i rzeczywistej deklaracji człowieka.
 
-Nie podawaj liczb, których narzędzia nie zwróciły. Podawaj źródło, datę danych (_dowod.pobrano, odswiezono) i pokrycie (np. geometria jest tylko dla części parków).
+Nie podawaj liczb, których narzędzia nie zwróciły. Podawaj źródło, datę stanu danych tylko wtedy, gdy podaje ją źródło, oraz pokrycie (np. geometria jest tylko dla części parków). Pole _dowod.pobrano oznacza czas pobrania odpowiedzi, a odswiezono czas odświeżenia publikacji; żadna z tych wartości sama w sobie nie potwierdza daty stanu danych. Nie pisz „stan na” na podstawie daty pobrania ani migawki katalogu.
 
 Granice wyniku: kompletne=false znaczy, że wiersze są tylko częścią wyniku (sum i liczności nie podawaj jako pełnych). Zero wierszy albo brak_pelnego_dopasowania nie dowodzi, że zjawiska nie ma: to znak, by sprawdzić filtr lub słownik w zbior_opis. Gdy dane przeczą założeniu pytania, wynik mówi o założeniu, nie o oczekiwaniu rozmówcy; przy sprzeciwie warto ponownie sprawdzić dane, a nie zmieniać liczby.`;
 
@@ -84,41 +109,47 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     contents: [{ uri: KARTA_URI, mimeType: RESOURCE_MIME_TYPE, text: KARTA_HTML, _meta: { ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: origin ? [origin] : [] } } } }],
   }));
 
-  // Każde narzędzie ma kartę UI (klienci z MCP Apps) i pełny wynik tekstowy (pozostali). Do wyniku dokładamy widok,
+  // Wyniki zachowują dane karty i wynik tekstowy. Do wyniku dokładamy widok,
   // zapytanie (do odświeżania) i krótkie podsumowanie po polsku dla klientów bez UI.
   // Rejestr surowych handlerów: narzędzie `widok` wykonuje przez niego zapytania wskazane w blokach (`z`).
-  const rejestr = new Map<string, { schema: z.ZodType; handler: (args: any) => Promise<any> }>();
+  const rejestr = new Map<string, { schema: z.ZodType; cfg: any; handler: (args: any) => Promise<any> }>();
   // Wynik narzędzia dostaje widok, zapytanie i podsumowanie. Tę samą ścieżkę używa MCP i /api/wywolaj.
   const otocz = (nazwa: string, args: unknown, sc: Record<string, unknown>) => {
     // _dowod: skąd i kiedy; w tekście dla modelu, więc da się na nim oprzeć odpowiedź o datę i pochodzenie liczb.
-    const dane = { podsumowanie: podsumuj(nazwa, sc), _dowod: { pobrano: new Date().toISOString(), ...(ZE_KATALOGU.has(nazwa) ? { migawka_katalogu: migawkaKatalogu } : {}) }, ...sc };
-    return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png` } : {}), ...dane } };
+    const warstwy = runtime.getStore()?.warstwy;
+    const dane = { status: stanOdpowiedzi(sc), podsumowanie: podsumuj(nazwa, sc), _dowod: { pobrano: new Date().toISOString(), ...(ZE_KATALOGU.has(nazwa) ? { migawka_katalogu: migawkaKatalogu } : {}) }, ...(warstwy?.length ? { warstwy: [...warstwy], uwaga_migawek: warstwy.some(w => w.archiwalne) ? "Wynik korzysta z archiwalnej migawki awaryjnej. Datę stanu i wiek sprawdź przy każdej warstwie." : undefined } : {}), ...sc };
+    return { content: [{ type: "text" as const, text: JSON.stringify(dane, bezKonturow) }], structuredContent: { _widok: WIDOK[nazwa], _zapytanie: args, ...(origin ? { _kafelki: `${origin}/kafelki/{z}/{x}/{y}.png`, _raport_url: `${origin}/?raport=1` } : {}), ...dane, _prezentacja: prezentacjaWyniku(nazwa, args, dane) } };
   };
   const narzedzie = (nazwa: string, cfg: any, handler: (args: any) => Promise<any>) => {
-    rejestr.set(nazwa, { schema: cfg.inputSchema, handler });
-    return registerAppTool(server, nazwa, { ...cfg, _meta: { ui: { resourceUri: KARTA_URI } } }, async (args: any) => {
-      try {
-        const r = await handler(args);
-        // Błąd wraca modelowi jako isError; ten wpis zostawia ślad po stronie serwera,
-        // żeby odróżnić „źródło padło" od „mój błąd" (wrangler tail).
-        if (r?.isError) console.error(JSON.stringify({ narzedzie: nazwa, blad: String(r.content?.[0]?.text ?? "(bez komunikatu)").replace(/^Błąd:\s*/, "") }));
-        if (!r.structuredContent) return r;
-        return otocz(nazwa, args, r.structuredContent);
-      } catch (e) {
-        console.error(JSON.stringify({ narzedzie: nazwa, blad: e instanceof Error ? e.message : String(e) }));
-        throw e;
-      }
-    });
+    rejestr.set(nazwa, { schema: cfg.inputSchema, cfg: { ...cfg, outputSchema: schematWyniku(nazwa) }, handler });
   };
-  const wywolaj = async (nazwa: string, argumenty: unknown) => {
+  const wywolaj = async (nazwa: string, argumenty: unknown): Promise<any> => {
+    if (!runtime.getStore()?.warstwy) return runtime.run({ ...runtime.getStore(), warstwy: [] }, () => wywolaj(nazwa, argumenty));
     const t = rejestr.get(nazwa);
-    if (!t) throw new Error(`nieznane narzędzie ${nazwa}`);
+    if (!t) throw new BladDomeny("wejscie", `nieznane narzędzie ${nazwa}`);
     const p = t.schema.safeParse(argumenty);
-    if (!p.success) throw new Error(`argumenty ${nazwa}: ${p.error.issues.map((i) => `${i.path.join(".") || "(korzeń)"}: ${i.message}`).join("; ")}`);
+    if (!p.success) throw new BladDomeny("wejscie", `argumenty ${nazwa}: ${p.error.issues.map((i) => `${i.path.join(".") || "(korzeń)"}: ${i.message}`).join("; ")}`);
     const r = await t.handler(p.data);
-    if (r.isError) throw new Error(String(r.content[0].text).replace(/^Błąd:\s*/, ""));
-    return otocz(nazwa, p.data, r.structuredContent).structuredContent;
+    if (r.isError) throw r._blad ?? new BladDomeny("niedostepne", String(r.content[0].text).replace(/^Błąd:\s*/, ""));
+    const overeny = t.cfg.outputSchema.safeParse({ ...r.structuredContent, status: stanOdpowiedzi(r.structuredContent) });
+    if (!overeny.success) throw new BladDomeny("niedostepne", "Operacja zwróciła dane niezgodne ze schematem wyjścia.");
+    const dane = otocz(nazwa, p.data, r.structuredContent).structuredContent;
+    return r.structuredContent.status === "wymaga_wyboru" ? { ...dane, _widok: "miejsca" } : dane;
   };
+
+  narzedzie("analiza", {
+    title: "Sprawdź plan badania i wykonaj raport",
+    description: "Uniwersalna analiza na dostępnych źródłach: zatwierdzany plan, łączenie tabel, agregacje, wskaźniki, statystyka, projekcje i raport z pełnymi tabelami, metodami oraz pochodzeniem. Najpierw odkryj zbiory przez katalog_szukaj i zbior_opis. W trybie sprawdz uzyskasz id_planu i plan do przedstawienia człowiekowi. Po rzeczywistym zatwierdzeniu w rozmowie użyj wykonaj z identycznym planem i treścią zatwierdzenia. Maks. 8 źródeł, 12 operacji, 5000 wierszy we wszystkich tabelach i 1 MiB wyniku. Bez zapisu raportów na serwerze. Eksport z karty: HTML, CSV, JSON; HTML drukuje się do PDF. Zatwierdzenie jest deklaracją, nie uwierzytelnionym dowodem zgody.",
+    inputSchema: analizaSchema,
+    annotations: readOnly,
+  }, (args) => run(() => wykonajAnalize(args, wywolaj)));
+
+  narzedzie("dane_eksportuj", {
+    title: "Pobierz dane i opis pochodzenia",
+    description: "Wyłącznie na wyraźną prośbę o pobranie danych. Tworzy pakiet CSV/JSON z odczytanymi tabelami i pochodzeniem, bez narracyjnego raportu. Prosty odczyt: z wskazuje obsługiwane źródło. Przeliczenia: podaj plan, jego id_planu i rzeczywiste zatwierdzenie, jak w analiza. Ponawia odczyt; dane mogą różnić się od wcześniejszej odpowiedzi. Wymaga kompletnego wyniku, maks. 5000 wierszy wszystkich tabel i 1 MiB. Plik ZIP pobiera się z karty; gdy host nie obsługuje pobierania, można skopiować JSON.",
+    inputSchema: eksportDanychSchema,
+    annotations: readOnly,
+  }, (args) => run(() => eksportujDane(args, wywolaj)));
 
   narzedzie(
     "katalog_szukaj",
@@ -236,7 +267,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Szukaj wskaźników GUS (BDL)",
       description:
-        "Szukaj zmiennych w Banku Danych Lokalnych GUS (bezrobocie, ludność, wynagrodzenia, mieszkania, edukacja, środowisko i inne) dostępnych dla Krakowa. Zwraca id do bdl_dane. Użyj do pytań o sytuację makro i trendy w czasie.",
+        "Szukaj w BDL po samej nazwie wskaźnika lub wąskiej frazie (np. „ludność ogółem” albo „stopa bezrobocia rejestrowanego”); nie doklejaj nazwy miasta, „GUS” ani „BDL” do frazy, bo wyszukiwanie może zwrócić luźno powiązane zmienne. Wynik pokazuje temat, nazwę zmiennej i jednostkę oraz zwraca id do bdl_dane. Wybierz wyłącznie zmienną, której nazwa, temat i jednostka odpowiadają pytaniu. Jeśli pierwszy wynik jest luźno powiązany, wykonaj najwyżej jedną precyzyjniejszą próbę; nie używaj innych wskaźników jako zastępstwa. Dla bezrobocia odróżniaj stopę rejestrowaną od BAEL i od liczby bezrobotnych na ofertę pracy. Zmienne miesięczne mogą mieć osobne id dla każdego miesiąca.",
       inputSchema: z.object({
         nazwa: z.string().min(3).describe("np. 'stopa bezrobocia', 'bezrobotni zarejestrowani', 'przeciętne wynagrodzenie', 'ludność ogółem'"),
         limit: z.number().int().min(1).max(50).default(15),
@@ -251,7 +282,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Dane GUS (BDL) dla Krakowa",
       description:
-        "Wartości zmiennych BDL w czasie dla Krakowa (domyślnie powiat m. Kraków). Zwraca wiersze {zmienna, rok, wartość} gotowe do analizy trendu i prognozy.",
+        "Pobiera wartości wybranych zmiennych BDL w czasie dla Krakowa (domyślnie powiat m. Kraków); bez parametru lata pobiera wszystkie dostępne okresy. Zwraca temat, nazwę, jednostkę, rok i wartość. Przed analizą sprawdź, czy szereg ma wystarczająco dużo porównywalnych punktów. Dla zmiennej miesięcznej (np. osobne id dla stycznia–grudnia) pobierz to samo id w kolejnych latach, aby porównać ten sam miesiąc; nie łącz różnych miesięcy ani definicji wskaźnika w jeden trend.",
       inputSchema: z.object({
         zmienne: z.array(z.number().int()).min(1).max(20).describe("id z bdl_szukaj"),
         jednostka: z.string().default("powiat").describe("'powiat' (m. Kraków), 'gmina', 'podregion' albo surowe id jednostki BDL"),
@@ -278,7 +309,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     ({ q, zbior_id, limit }) =>
       run(async () => {
         if (zbior_id) return daneGovZasoby(zbior_id);
-        if (!q) throw new Error("Podaj 'q' (fraza) albo 'zbior_id'.");
+        if (!q) throw new BladDomeny("wejscie", "Podaj 'q' (fraza) albo 'zbior_id'.");
         return daneGovSzukaj(q, limit);
       }),
   );
@@ -292,19 +323,23 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
   const rozwiaz = async (m: z.infer<typeof miejsce>) => {
     if ("lat" in m) return { lat: m.lat, lon: m.lon, etykieta: `${m.lat.toFixed(5)}, ${m.lon.toFixed(5)}`, zrodlo: "współrzędne podane" };
     if ("tekst" in m) {
-      const g = await geokodujOsm(m.tekst);
-      if (!g) throw new Error(`Nie znaleziono miejsca w Krakowie ani w Małopolsce: ${m.tekst}. Spróbuj z nazwą miejscowości, np. 'Staniątki 15'.`);
-      return { lat: g.lat, lon: g.lon, etykieta: g.nazwa, zrodlo: "OpenStreetMap (Nominatim)" };
+      const g = await szukajMiejsc(m.tekst);
+      if (!g.length) throw new BladDomeny("wejscie", `Nie znaleziono miejsca w Krakowie ani w Małopolsce: ${m.tekst}. Spróbuj z nazwą miejscowości, np. 'Staniątki 15'.`);
+      const w = wybierzMiejsce(m.tekst, g.map((x) => ({ ...x, etykieta: x.nazwa })));
+      return { lat: w.lat, lon: w.lon, etykieta: w.etykieta, zrodlo: "OpenStreetMap (Nominatim)" };
     }
     const r = await addressToPoint(m);
     if (!r.liczba) {
       // Poza Krakowem punktów adresowych MSIP nie ma: próbujemy OSM.
-      const g = await geokodujOsm(`${m.ulica} ${m.numer}`);
-      if (g) return { lat: g.lat, lon: g.lon, etykieta: g.nazwa, zrodlo: "OpenStreetMap (Nominatim); adres spoza punktów adresowych MSIP" };
-      throw new Error(`Nie znaleziono adresu: ${m.ulica} ${m.numer}. ${r.uwaga}`);
+      const g = await szukajMiejsc(`${m.ulica} ${m.numer}`);
+      const w = wybierzMiejsce(`${m.ulica} ${m.numer}`, g.map((x) => ({ ...x, etykieta: x.nazwa })));
+      if (w) return { lat: w.lat, lon: w.lon, etykieta: w.etykieta, zrodlo: "OpenStreetMap (Nominatim); adres spoza punktów adresowych MSIP" };
+      throw new BladDomeny("wejscie", `Nie znaleziono adresu: ${m.ulica} ${m.numer}. ${r.uwaga}`);
     }
-    const k = r.kandydaci[0];
-    return { lat: k.lat as number, lon: k.lon as number, etykieta: `${k.ulica} ${k.numer}, ${k.kod_pocztowy} (${k.dzielnica})`, zrodlo: "MSIP Kraków (punkty adresowe)" };
+    // Ta sama ulica i numer w różnych dzielnicach lub kodach pocztowych to różne miejsca; powtórki tego samego adresu pomijamy.
+    const rozne = r.kandydaci.filter((k: any, i: number, t: any[]) => t.findIndex((o) => o.ulica === k.ulica && o.numer === k.numer && o.lat === k.lat && o.lon === k.lon) === i);
+    const k = wybierzMiejsce(`${m.ulica} ${m.numer}`, rozne.map((k: any) => ({ lat: k.lat as number, lon: k.lon as number, etykieta: `${k.ulica} ${k.numer}, ${k.kod_pocztowy} (${k.dzielnica})` })));
+    return { ...k, zrodlo: "MSIP Kraków (punkty adresowe)" };
   };
 
   narzedzie(
@@ -343,7 +378,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     },
     ({ nazwa, miejsce: m, promien_m, limit }) =>
       run(async () => {
-        if (!nazwa && !m) throw new Error("Podaj 'nazwa' przystanku albo 'miejsce'.");
+        if (!nazwa && !m) throw new BladDomeny("wejscie", "Podaj 'nazwa' przystanku albo 'miejsce'.");
         const S = await wczytajSiec();
         const norm = (x: string) => x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
         let idxs: number[];
@@ -351,7 +386,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
           const p = await rozwiaz(m);
           idxs = przystankiBlisko(S, p.lat, p.lon, promien_m, 40).map((x) => x.idx).filter((i) => !nazwa || norm(S.przystanki[i][2]).includes(norm(nazwa)));
         } else idxs = S.przystanki.flatMap((p, i) => (norm(p[2]).includes(norm(nazwa!)) ? [i] : []));
-        if (!idxs.length) throw new Error("Nie znaleziono przystanków dla podanych kryteriów.");
+        if (!idxs.length) throw new BladDomeny("wejscie", "Nie znaleziono przystanków dla podanych kryteriów.");
         const uzyte = idxs.slice(0, 60);
         const wynik = await odjazdyZPrzystankow(S, uzyte, limit);
         const feedy = [...new Set(uzyte.map((i) => S.przystanki[i][0]))];
@@ -538,6 +573,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
         x: z.array(z.number().nullable()).max(5000).optional(),
         y: z.array(z.number().nullable()).max(5000).optional().describe("Druga zmienna (korelacja), ta sama długość co x"),
         etykiety: z.array(z.union([z.string(), z.number()])).max(5000).optional().describe("Podpisy obserwacji (dzielnice, lata)"),
+        czas: z.array(z.number().finite()).max(5000).optional().describe("Ściśle rosnąca numeryczna oś czasu dla trendu; nachylenie na jej jednostkę"),
         z: z.object({ narzedzie: z.enum(["dane_zapytaj", "plik_odczyt", "bdl_dane"]), argumenty: z.record(z.string(), z.unknown()) }).optional().describe("Zamiast x i y: serwer pobierze wiersze tym narzędziem"),
         kolumna_x: z.string().optional(), kolumna_y: z.string().optional(), kolumna_etykiet: z.string().optional(),
         klasy: z.number().int().min(2).max(10).optional(), metoda: z.enum(["kwantyle", "rowne", "jenks"]).optional(),
@@ -547,21 +583,22 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     },
     (args) =>
       run(async () => {
-        let { x, y, etykiety } = args;
+        let { x, y, etykiety, czas } = args;
         if (args.z) {
           const r: any = await wywolaj(args.z.narzedzie, args.z.argumenty);
           const w: Record<string, any>[] = r.wiersze ?? [];
-          if (!w.length) throw new Error("zapytanie z nie zwróciło wierszy");
+          if (!w.length) throw new BladDomeny("wejscie", "zapytanie z nie zwróciło wierszy");
           const bdl = args.z.narzedzie === "bdl_dane";
           const kx = args.kolumna_x ?? (bdl ? "wartosc" : undefined);
-          if (!kx || !(kx in w[0])) throw new Error(`Podaj kolumna_x z listy: ${Object.keys(w[0]).filter((k) => k !== "_geometria").join(", ")}`);
+          if (!kx || !(kx in w[0])) throw new BladDomeny("wejscie", `Podaj kolumna_x z listy: ${Object.keys(w[0]).filter((k) => k !== "_geometria").join(", ")}`);
           x = w.map((v) => (typeof v[kx] === "number" ? v[kx] : null));
           if (args.kolumna_y) y = w.map((v) => (typeof v[args.kolumna_y!] === "number" ? v[args.kolumna_y!] : null));
           const ke = args.kolumna_etykiet ?? (bdl ? "rok" : undefined);
           if (ke) etykiety = w.map((v) => v[ke]);
+          if (bdl && args.operacja === "trend" && !czas) czas = w.map((v) => Number(v.rok));
         }
-        if (!x) throw new Error("Podaj x albo z.");
-        return statystyka({ operacja: args.operacja, x, y: y ?? undefined, etykiety, nazwa_x: args.kolumna_x, nazwa_y: args.kolumna_y, klasy: args.klasy, metoda: args.metoda, lata: args.lata });
+        if (!x) throw new BladDomeny("wejscie", "Podaj x albo z.");
+        return statystyka({ operacja: args.operacja, x, y: y ?? undefined, etykiety, czas, nazwa_x: args.kolumna_x, nazwa_y: args.kolumna_y, klasy: args.klasy, metoda: args.metoda, lata: args.lata });
       }),
   );
 
@@ -570,7 +607,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     {
       title: "Złóż własną kartę z danych",
       description:
-        "Składa jedną kartę o Krakowie z gotowych komponentów: tekst, metryki (duże liczby), tabela, wykres (linia/słupki), mapa OSM (punkty, linie, obszary), lista, oś czasu. Nadaje się na własny układ odpowiedzi: porównanie, zestawienie z kilku źródeł, mapa z kilkoma warstwami, podsumowanie dla urzędnika lub badacza. Każde pojedyncze narzędzie renderuje własną kartę, więc to narzędzie dodaje wartość przy składaniu wyników z wielu źródeł. Dane w blokach tabela/wykres/mapa podaj wprost albo wskaż polem z zapytanie (dane_zapytaj, plik_odczyt, bdl_dane), które serwer wykona sam — wtedy liczby nie są przepisywane. Mapa z poligonami: dane_zapytaj z kontury=true i limit ≤ 200. Blok zrodlo opisuje zbiory, daty i pokrycie.",
+        "Końcowa wizualizacja odpowiedzi: użyj cel=odpowiedz, najwyżej jeden blok wizualny; dodatkowy tekst może opisać ograniczenia. Tabela, wykres i mapa wymagają z ze źródłem dane_zapytaj, plik_odczyt lub bdl_dane: liczby pobiera serwer. Nowy tryb odrzuca ręczne metryki. Mapa z poligonami: dane_zapytaj z kontury=true, limit ≤ 200. Wynik zachowuje pochodzenie i kompletność odczytu. Bez celu dostępny pozostaje starszy wieloblokowy format, przeznaczony do zgodności. Nie wywołuj widok dla etapów pomocniczych ani gdy tekst wystarcza.",
       inputSchema: widokSchema,
       annotations: { ...readOnly, openWorldHint: false },
     },
@@ -578,8 +615,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
   );
 
   // Tylko dla aplikacji (niewidoczne dla modelu): uproszczone kontury parków do narysowania mapy, żeby nie zalewać kontekstu.
-  registerAppTool(
-    server,
+  narzedzie(
     "ui_kontury_parkow",
     {
       title: "Kontury parków dla mapy",
@@ -595,6 +631,60 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     async (args: any) => run(async () => konturyParkow(args)) as any,
   );
 
-  // wywolaj: ta sama ścieżka co w MCP (walidacja zod, wzbogacenie wyniku); używa jej trasa /api/wywolaj.
+  narzedzie("miejsce_szukaj", {
+    title: "Znajdź miejsce i wybierz lokalizację", description: "Wyszukuje nazwy i adresy w Krakowie i okolicach. Przy wielu trafieniach zwraca najlepsze i podaje je w uwadze, żeby odpowiedź mówiła, które miejsce przyjęto. Zachowuje tożsamość OSM, adres i kategorię.",
+    inputSchema: z.object({ tekst: z.string().min(2).max(300).describe("Nazwa miejsca lub pełny adres") }), annotations: readOnly,
+  }, ({ tekst }) => run(async () => {
+    const kandydaci = await szukajMiejsc(tekst);
+    return { zrodlo: "© OpenStreetMap contributors, ODbL; Nominatim", status: kandydaci.length ? "poprawna" : "pusta", kandydaci: kandydaci.map(x => ({ ...x, etykieta: x.nazwa })), wymaga_wyboru: false, uwaga: kandydaci.length > 1 ? `Kilka trafień; przyjęto pierwsze (najlepsze): ${kandydaci[0].nazwa}. Użyj jego lat/lon i podaj w odpowiedzi, które miejsce przyjęto.` : "Współrzędne WGS84." };
+  }));
+  narzedzie("osm_obiekty", {
+    title: "Obiekty OpenStreetMap w pobliżu", description: "Szuka kategorii OSM przez Overpass w promieniu do 5 km, do 100 wyników; Kraków i okolice. Pokrycie OSM nie jest pełnym rejestrem usług.",
+    inputSchema: z.object({ kategoria: z.enum(Object.keys(KATEGORIE_OSM) as [keyof typeof KATEGORIE_OSM, ...Array<keyof typeof KATEGORIE_OSM>]), miejsce, promien_m: z.number().int().min(1).max(5000).default(1000), limit: z.number().int().min(1).max(100).default(50) }), annotations: readOnly,
+  }, args => run(async () => osmObiekty({ ...args, ...await rozwiaz(args.miejsce) })));
+  const schematOperacji = (nazwa: string, t: { cfg: any; schema: z.ZodType }) => ({ nazwa, tytul: t.cfg.title, opis: t.cfg.description, inputSchema: z.toJSONSchema(t.schema), outputSchema: z.toJSONSchema(t.cfg.outputSchema) });
+  narzedzie("operacje_szukaj", {
+    title: "Znajdź operację i jej schemat", description: "Wyszukuje operacje obliczeniowe, transportowe i prezentacyjne. Zwraca najwyżej trzy pełne schematy wejścia i wyjścia. Potem użyj operacja_wykonaj.",
+    inputSchema: z.object({ temat: z.string().min(2).max(300).describe("Cel, kategoria lub nazwa operacji po polsku"), offset: z.number().int().min(0).default(0) }), annotations: readOnly,
+  }, ({ temat, offset }) => run(async () => {
+    const slowa: string[] = temat.toLocaleLowerCase("pl").split(/\s+/).filter((s: string) => s.length > 2 && !["jak", "czy", "dla", "oraz", "jest", "przy", "się"].includes(s));
+    const tagi: Record<string, string> = {
+      trasa: "transport dojazd dojech podróż autobus tramwaj kolej", odjazdy: "transport autobus tramwaj odjazd przystanek", przystanki_w_poblizu: "transport przystanek autobus tramwaj", utrudnienia: "transport utrudnienia komunikacja",
+      planowanie_w_punkcie: "planowanie działka mpzp zabudowa plan", dostepnosc: "dostępność usługi zieleń park szkoła", wskaznik_dzielnic: "porównanie dzielnice ranking mieszkańcy zieleń",
+      dane_eksportuj: "eksport pobierz pobranie danych dane csv json zip tabele źródła przekształcenia", widok: "końcowa wizualizacja wykres tabela mapa odpowiedź", analiza: "raport badanie plan analiza zatwierdzenie",
+    };
+    const pasujace = [...rejestr].filter(([n]) => !["operacja_wykonaj", "operacje_szukaj", "ui_kontury_parkow"].includes(n)).map(([n,t]) => ({ n, t, score: slowa.reduce((s,w) => s + (n.includes(w) ? 10 : 0) + ((tagi[n] ?? "").includes(w) ? 5 : 0) + (`${t.cfg.title} ${t.cfg.description}`.toLocaleLowerCase("pl").includes(w) ? 1 : 0), 0) })).filter(x => x.score > 0).sort((a,b) => b.score - a.score || a.n.localeCompare(b.n));
+    return { operacje: pasujace.slice(offset, offset + 3).map(x => schematOperacji(x.n, x.t)), razem: pasujace.length, nastepny_offset: offset + 3 < pasujace.length ? offset + 3 : null };
+  }));
+  narzedzie("operacja_wykonaj", {
+    title: "Wykonaj zarejestrowaną operację", description: "Wykonuje wyłącznie operację z rejestru, walidując jej argumenty. Najpierw odkryj schemat przez operacje_szukaj. Nie przyjmuje kodu, URL funkcji ani dowolnych instrukcji.",
+    inputSchema: z.object({ operacja: z.string().min(1).max(100), argumenty: z.record(z.string(), z.unknown()).default({}) }), annotations: readOnly,
+  }, args => run(async () => {
+    if (["operacja_wykonaj", "operacje_szukaj"].includes(args.operacja)) throw new BladDomeny("wejscie", "Nie można zagnieżdżać bramki operacji.");
+    return wywolaj(args.operacja, args.argumenty);
+  }));
+  for (const nazwa of PUBLICZNE) {
+    const t = rejestr.get(nazwa)!;
+    const schema = (t.schema as z.ZodObject).extend({ kursor_odpowiedzi: z.string().max(1000).optional().describe("nastepny_kursor odpowiedzi podzielonej na fragmenty JSON; powtórz to samo zapytanie") });
+    const handler = async (args: any) => {
+      try {
+        const { kursor_odpowiedzi, ...wejscie } = args;
+        const karta = await wywolaj(nazwa, wejscie);
+        const dane = await stronaOdpowiedzi(karta, (nazwa === "operacje_szukaj" ? 32 : 24) * 1024, kursor_odpowiedzi);
+        return { content: [{ type: "text" as const, text: JSON.stringify(dane) }], structuredContent: dane, _meta: { karta } };
+      } catch (e) {
+        const b = e instanceof BladDomeny ? e : new BladDomeny("niedostepne", "Operacja lub źródło danych są niedostępne.");
+        console.error(JSON.stringify({ narzedzie: nazwa, blad: b.kod }));
+        const dane = { status: b.kod === "wybor" ? "wymaga_wyboru" : b.kod === "niepelne" ? "czesciowa" : "niedostepna", komunikat: b.message, ...b.dane };
+        return { isError: b.kod !== "wybor", content: [{ type: "text" as const, text: JSON.stringify(dane) }], structuredContent: dane };
+      }
+    };
+    if (nazwa === "miejsce_szukaj" || nazwa === "operacja_wykonaj") {
+      registerAppTool(server, nazwa, { ...t.cfg, inputSchema: schema, outputSchema: t.cfg.outputSchema, _meta: { ui: { resourceUri: KARTA_URI } } }, handler);
+    } else {
+      server.registerTool(nazwa, { ...t.cfg, inputSchema: schema, outputSchema: t.cfg.outputSchema }, handler);
+    }
+  }
+  // wywolaj: wspólny rejestr operacji także dla /api/wywolaj i planów analitycznych.
   return Object.assign(server, { wywolaj });
 }

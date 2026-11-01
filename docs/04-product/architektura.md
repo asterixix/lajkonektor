@@ -1,3 +1,5 @@
+> Aktualizacja 25.10.2026: publiczny kontrakt opisuje [mcp-hybrydowy.md](mcp-hybrydowy.md), a aktualną architekturę [dokumentacja techniczna](../dokumentacja-techniczna.md). Poniższe wcześniejsze diagramy nie są aktualną inwentaryzacją narzędzi.
+
 # Architektura Lajkonektora
 
 **Data:** 2026-10-19 · **Faza:** 6 (Produkt) · **Pewność:** wysoka dla tego, co uruchomiono (szkielet + 4 testy na żywych API), niska dla MCP Apps, Tasks, Skills i klientów (Claude Pro) — jeszcze niesprawdzone.
@@ -81,7 +83,7 @@ SDK: `@modelcontextprotocol/server` 2.3.1 (`createMcpHandler` obsługuje rewizj�
 - Limity: Cloudflare Rate Limiting na `/mcp`; ostrzeżenie o niskich limitach darmowego planu Workers (CPU na parsowanie XLSX/SHP) [Knowledge-Based, zweryfikować cennik].
 
 ## Wdrożenie i koszt
-- `wrangler deploy` → `*.workers.dev`; później własna domena (`lajkonektor.dev` jest wolna, patrz PROGRESS).
+- `wrangler deploy` → `*.workers.dev`.
 - Docelowo: ten sam handler na infrastrukturze miejskiej (Deno/Node) po umowie z UM.
 - Koszt: hosting rzędu 0–5 USD/mies. + domena ~8 USD/rok [Estimate]; LLM po stronie użytkownika.
 

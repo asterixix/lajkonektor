@@ -33,3 +33,13 @@ test("pusty IP i brak cache nigdy nie blokują", async () => {
   assert.equal(await limitMinutowy("test", "", 0, atrapaCache()), false);
   assert.equal(await limitMinutowy("test", "1.1.1.1", 0, undefined), false);
 });
+
+test("limitDzienny: blokuje po przekroczeniu limitu dobowego, osobno dla każdego klucza", async () => {
+  const { limitDzienny } = await import("../src/limit.ts");
+  const cache = atrapaCache();
+  const wyniki: boolean[] = [];
+  for (let i = 0; i < 4; i++) wyniki.push(await limitDzienny("t", "wszyscy", 3, cache));
+  assert.deepEqual(wyniki, [false, false, false, true]);
+  assert.equal(await limitDzienny("t", "inny", 3, cache), false);
+  assert.equal(await limitDzienny("t", "", 3, cache), false, "pusty klucz wyłącza licznik zamiast blokować wszystkich");
+});

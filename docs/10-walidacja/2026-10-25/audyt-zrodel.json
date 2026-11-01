@@ -1,0 +1,330 @@
+{
+  "pobrano": "2026-10-25T01:03:58.453Z",
+  "ms": 7308,
+  "migawka_katalogu": "2026-10-19",
+  "wyniki": [
+    {
+      "nazwa": "zlobki_publiczne",
+      "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/0",
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/0",
+      "ms": 207,
+      "pobrano": "2026-10-25T01:03:51.352Z",
+      "ok": true,
+      "kompletne": true,
+      "wierszy": 35,
+      "sumy": {
+        "l_miejsc": {
+          "suma": 3246,
+          "braki": 0
+        }
+      },
+      "dzielnice": [
+        "II Grzegórzki",
+        "IV Prądnik Biały",
+        "\t IV Biały Prądnik",
+        "XII Bieżanów -Prokocim",
+        "\t III Prądnik Czerwony",
+        "XV Mistrzejowice",
+        "IV Prądnik Czerwony",
+        "I Stare Miasto",
+        "V Krowodrza",
+        "XVIII Nowa Huta",
+        "XIV Czyżyny",
+        "XII Prokocim",
+        "VIII Dębniki",
+        "XV Bieńczyce",
+        "XII Bieżanów Prokocim",
+        "III Prądnik Czerwony",
+        "XI Podgórze Duchackie",
+        "\t II Grzegórzki",
+        "\t VIII Dębniki",
+        "\t XIII Podgórze",
+        "VI Bronowice",
+        "\t XIV Czyżyny"
+      ],
+      "rodzaje": [],
+      "daty_importu": [
+        "2026-10-22"
+      ],
+      "uwagi": []
+    },
+    {
+      "nazwa": "zlobki_niepubliczne",
+      "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/1",
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/1",
+      "ms": 193,
+      "pobrano": "2026-10-25T01:03:51.402Z",
+      "ok": true,
+      "kompletne": false,
+      "wierszy": 81,
+      "sumy": {
+        "l_miejsc": {
+          "suma": 2164,
+          "braki": 2
+        }
+      },
+      "dzielnice": [
+        "X SWOSZOWICE",
+        "VIII DĘBNIKI",
+        "VIII Dębniki",
+        "V Krowodrza",
+        "XI Podgórze Duchackie",
+        "VI Bronowice",
+        "X  Swoszowice",
+        "II Grzegórzki",
+        "IV Prądnik Biały",
+        "XIV Czyżyny",
+        "XI  Podgórze Duchackie",
+        "I Stare Miasto",
+        "III  Prądnik Czerwony",
+        "XI  Podgórze  Duchackie",
+        "XII Bieżanów -Prokocim",
+        "Dębniki",
+        "XIII Podgórze",
+        "III Prądnik Czerwony",
+        "XV Mistrzejowice",
+        "XVIII Nowa Huta",
+        "V Bronowice",
+        "XVI BIEŃCZYCE",
+        "IX Łagiewniki - Borek Fałęcki",
+        "IX Łagiewniki -\n\nBorek Fałęcki",
+        "X Swoszowice",
+        "XIII PODGÓRZE",
+        "Dębniki VIII"
+      ],
+      "rodzaje": [],
+      "daty_importu": [
+        "2026-10-22"
+      ],
+      "uwagi": [
+        "Odpowiedź przycięta do 81 wierszy ze względu na rozmiar; zawęź pola lub filtr albo użyj agregacji."
+      ]
+    },
+    {
+      "nazwa": "kluby_rodzica",
+      "id": "msip:Zdrowie/Zlobki_Kluby_rodzicow/2",
+      "url": "https://msip3.um.krakow.pl/server/rest/services/Zdrowie/Zlobki_Kluby_rodzicow/MapServer/2",
+      "ms": 135,
+      "pobrano": "2026-10-25T01:03:51.347Z",
+      "ok": true,
+      "kompletne": true,
+      "wierszy": 51,
+      "sumy": {},
+      "dzielnice": [],
+      "rodzaje": [
+        "NGO",
+        "MIEJSKIE"
+      ],
+      "daty_importu": [],
+      "uwagi": []
+    },
+    {
+      "nazwa": "przedszkola_samorzadowe",
+      "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-samorzadowe-2025-2026",
+      "url": "https://api.um.krakow.pl/opendata-oswiata-przedszkola-liczba-dzieci/v1/liczba-dzieci-przedszkola-samorzadowe-2025-2026",
+      "ms": 707,
+      "pobrano": "2026-10-25T01:03:51.920Z",
+      "ok": true,
+      "kompletne": false,
+      "wierszy": 68,
+      "sumy": {
+        "Liczba dzieci ogółem": {
+          "suma": 8612,
+          "braki": 0
+        }
+      },
+      "dzielnice": [],
+      "rodzaje": [],
+      "daty_importu": [],
+      "uwagi": [
+        "Odpowiedź przycięta do 68 wierszy ze względu na rozmiar; zawęź pola lub filtr albo użyj agregacji."
+      ]
+    },
+    {
+      "nazwa": "przedszkola_niesamorzadowe",
+      "id": "od:OD-OswiataPrzedszkolaLiczbaDzieci/liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
+      "url": "https://api.um.krakow.pl/opendata-oswiata-przedszkola-liczba-dzieci/v1/liczba-dzieci-przedszkola-niesamorzadowe-2025-2026",
+      "ms": 977,
+      "pobrano": "2026-10-25T01:03:52.192Z",
+      "ok": true,
+      "kompletne": false,
+      "wierszy": 88,
+      "sumy": {
+        "Liczba dzieci ogółem": {
+          "suma": 4829,
+          "braki": 2
+        }
+      },
+      "dzielnice": [],
+      "rodzaje": [],
+      "daty_importu": [],
+      "uwagi": [
+        "Odpowiedź przycięta do 88 wierszy ze względu na rozmiar; zawęź pola lub filtr albo użyj agregacji."
+      ]
+    }
+  ],
+  "gus": [
+    {
+      "temat": "urodzenia żywe",
+      "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+      "uwaga": "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
+      "razem_w_bdl": 72,
+      "zwrocono": 4,
+      "zmienne": [
+        {
+          "id": 59,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Urodzenia żywe | ogółem",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 60,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Urodzenia żywe | mężczyźni",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 61,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Urodzenia żywe | kobiety",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 63216,
+          "temat": "Ruch naturalny ludności (dane półroczne)",
+          "nazwa": "1 kwartał | urodzenia żywe | ogółem",
+          "jednostka_miary": "-"
+        }
+      ]
+    },
+    {
+      "temat": "przyrost naturalny",
+      "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+      "uwaga": "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
+      "razem_w_bdl": 24,
+      "zwrocono": 4,
+      "zmienne": [
+        {
+          "id": 68,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Przyrost naturalny | ogółem",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 69,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Przyrost naturalny | mężczyźni",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 70,
+          "temat": "Ruch naturalny wg płci",
+          "nazwa": "Przyrost naturalny | kobiety",
+          "jednostka_miary": "-"
+        },
+        {
+          "id": 63204,
+          "temat": "Ruch naturalny ludności (dane półroczne)",
+          "nazwa": "1 kwartał | przyrost naturalny | ogółem",
+          "jednostka_miary": "-"
+        }
+      ]
+    },
+    {
+      "temat": "saldo migracji",
+      "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+      "uwaga": "Temat mówi o okresie danych (np. „dane miesięczne”); dla pytania o rok bierz zmienne z tematu rocznym.",
+      "razem_w_bdl": 93,
+      "zwrocono": 4,
+      "zmienne": [
+        {
+          "id": 1365234,
+          "temat": "Migracje na pobyt stały gminne wg płci migrantów, w ruchu wewnętrznym i zagranicznym",
+          "nazwa": "saldo migracji ogółem | ogółem",
+          "jednostka_miary": "osoba"
+        },
+        {
+          "id": 1365235,
+          "temat": "Migracje na pobyt stały gminne wg płci migrantów, w ruchu wewnętrznym i zagranicznym",
+          "nazwa": "saldo migracji ogółem | mężczyźni",
+          "jednostka_miary": "osoba"
+        },
+        {
+          "id": 1365236,
+          "temat": "Migracje na pobyt stały gminne wg płci migrantów, w ruchu wewnętrznym i zagranicznym",
+          "nazwa": "saldo migracji ogółem | kobiety",
+          "jednostka_miary": "osoba"
+        },
+        {
+          "id": 80125,
+          "temat": "Migracje na pobyt stały gminne wg płci migrantów, w ruchu wewnętrznym i zagranicznym",
+          "nazwa": "saldo migracji wewnętrznych | ogółem",
+          "jednostka_miary": "osoba"
+        }
+      ]
+    }
+  ],
+  "szereg_urodzen": {
+    "zrodlo": "GUS, Bank Danych Lokalnych (BDL)",
+    "jednostka": "Kraków",
+    "jednostka_id": "011212161011",
+    "uwaga": "Brak wartości w danym roku oznacza brak publikacji dla tej jednostki.",
+    "liczba": 6,
+    "wiersze": [
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2020,
+        "wartosc": 9054
+      },
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2021,
+        "wartosc": 8671
+      },
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2022,
+        "wartosc": 8265
+      },
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2023,
+        "wartosc": 7528
+      },
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2024,
+        "wartosc": 7057
+      },
+      {
+        "zmienna_id": 59,
+        "temat": "Ruch naturalny wg płci",
+        "nazwa": "Urodzenia żywe | ogółem",
+        "jednostka_miary": "-",
+        "rok": 2025,
+        "wartosc": 6980
+      }
+    ]
+  },
+  "ograniczenia": [
+    "Pojedyncza próba dostępności, nie test obciążenia ani walidacja scenariusza w kliencie AI.",
+    "Liczba miejsc nie oznacza wolnych miejsc ani popytu. Daty importu nie zastępują dat stanu danych.",
+    "Dane przedszkoli opisują dzieci uczęszczające w roku szkolnym, a nie pojemność placówek.",
+    "Brak danych o kosztach i wykorzystaniu nie pozwala oszacować oszczędności."
+  ]
+}

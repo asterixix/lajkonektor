@@ -1,0 +1,186 @@
+{
+  "_widok": "eksport",
+  "_zapytanie": {
+    "z": {
+      "narzedzie": "ludnosc_dzielnic",
+      "argumenty": {
+        "pola": [
+          "r_ogolem"
+        ]
+      }
+    },
+    "tytul": "Ludność dzielnic"
+  },
+  "status": "poprawna",
+  "podsumowanie": "Dane „Ludność dzielnic”: 1 tabel. Ponowiono odczyt źródeł. ZIP zawiera CSV, JSON i opis pochodzenia; plik pobierzesz z karty.",
+  "_dowod": {
+    "pobrano": "2026-10-31T11:03:51.200Z"
+  },
+  "tytul": "Ludność dzielnic",
+  "zrodlo": "MSIP, Demografia/Elud_Dz (zameldowani na pobyt stały), stan na 2026-09-30",
+  "kompletne": true,
+  "pakiet_danych": {
+    "format": "lajkonektor-dane",
+    "wersja": "1",
+    "tytul": "Ludność dzielnic",
+    "utworzono": "2026-10-31T11:03:51.197Z",
+    "odczyt": "ponowiony",
+    "tabele": [
+      {
+        "id": "dane",
+        "tytul": "dane",
+        "kolumny": [
+          "id",
+          "nazwa",
+          "data",
+          "r_ogolem"
+        ],
+        "wiersze": [
+          {
+            "id": 1,
+            "nazwa": "Stare Miasto",
+            "data": "2026-09-30",
+            "r_ogolem": 26632
+          },
+          {
+            "id": 2,
+            "nazwa": "Grzegórzki",
+            "data": "2026-09-30",
+            "r_ogolem": 29605
+          },
+          {
+            "id": 3,
+            "nazwa": "Prądnik Czerwony",
+            "data": "2026-09-30",
+            "r_ogolem": 44359
+          },
+          {
+            "id": 4,
+            "nazwa": "Prądnik Biały",
+            "data": "2026-09-30",
+            "r_ogolem": 74996
+          },
+          {
+            "id": 5,
+            "nazwa": "Krowodrza",
+            "data": "2026-09-30",
+            "r_ogolem": 28755
+          },
+          {
+            "id": 6,
+            "nazwa": "Bronowice",
+            "data": "2026-09-30",
+            "r_ogolem": 24813
+          },
+          {
+            "id": 7,
+            "nazwa": "Zwierzyniec",
+            "data": "2026-09-30",
+            "r_ogolem": 20402
+          },
+          {
+            "id": 8,
+            "nazwa": "Dębniki",
+            "data": "2026-09-30",
+            "r_ogolem": 66722
+          },
+          {
+            "id": 9,
+            "nazwa": "Łagiewniki-Borek Fałęcki",
+            "data": "2026-09-30",
+            "r_ogolem": 15184
+          },
+          {
+            "id": 10,
+            "nazwa": "Swoszowice",
+            "data": "2026-09-30",
+            "r_ogolem": 29396
+          },
+          {
+            "id": 11,
+            "nazwa": "Podgórze Duchackie",
+            "data": "2026-09-30",
+            "r_ogolem": 53725
+          },
+          {
+            "id": 12,
+            "nazwa": "Bieżanów-Prokocim",
+            "data": "2026-09-30",
+            "r_ogolem": 62347
+          },
+          {
+            "id": 13,
+            "nazwa": "Podgórze",
+            "data": "2026-09-30",
+            "r_ogolem": 43442
+          },
+          {
+            "id": 14,
+            "nazwa": "Czyżyny",
+            "data": "2026-09-30",
+            "r_ogolem": 35047
+          },
+          {
+            "id": 15,
+            "nazwa": "Mistrzejowice",
+            "data": "2026-09-30",
+            "r_ogolem": 49885
+          },
+          {
+            "id": 16,
+            "nazwa": "Bieńczyce",
+            "data": "2026-09-30",
+            "r_ogolem": 35234
+          },
+          {
+            "id": 17,
+            "nazwa": "Wzgórza Krzesławickie",
+            "data": "2026-09-30",
+            "r_ogolem": 20282
+          },
+          {
+            "id": 18,
+            "nazwa": "Nowa Huta",
+            "data": "2026-09-30",
+            "r_ogolem": 44930
+          }
+        ],
+        "zrodla": [
+          "dane"
+        ],
+        "uwagi": [],
+        "rodzaj": "odczytana",
+        "kompletne": true
+      }
+    ],
+    "zrodla": [
+      {
+        "id": "dane",
+        "nazwa": "MSIP, Demografia/Elud_Dz (zameldowani na pobyt stały), stan na 2026-09-30",
+        "narzedzie": "ludnosc_dzielnic",
+        "argumenty": {
+          "pola": [
+            "r_ogolem"
+          ]
+        },
+        "pobrano": "2026-10-31T11:03:51.196Z",
+        "data_stanu": "2026-09-30",
+        "url": "https://msip3.um.krakow.pl/server/rest/services/Demografia/Elud_Dz/MapServer/0",
+        "definicja": "Zameldowani na pobyt stały; liczba osób według grup wieku, nie wszyscy faktyczni mieszkańcy.",
+        "jednostka": "osób",
+        "poziom": "dzielnica",
+        "kompletne": true,
+        "uwagi": []
+      }
+    ],
+    "metody": [
+      "dane: odczyt ludnosc_dzielnic, 18 wierszy; paginację źródeł tabelarycznych zakończono przed obliczeniami. Argumenty odczytu zachowano w bibliografii."
+    ],
+    "ograniczenia": [
+      "Eksport ponawia pobranie źródeł lub odczyt zaufanej migawki. Nie jest kopią ani potwierdzeniem identyczności wcześniejszej odpowiedzi."
+    ]
+  },
+  "_prezentacja": {
+    "rola": "koncowa"
+  }
+}

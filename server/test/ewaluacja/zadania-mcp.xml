@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Stan: 31.10.2026. Model nie został uruchomiony; nie wykonano płatnych wywołań.
+  Nie jest to wynik ewaluacji jakości LLM ani dowód skuteczności instrukcji.
+  To 10 niezależnych scenariuszy rozpoznawania celu, procedury i granic zakresu.
+  Oczekiwane odpowiedzi wynikają z uzgodnionego kontraktu, nie z dynamicznych faktów miejskich.
+  Każde pytanie zawiera cały potrzebny kontekst. Oceniane są decyzje, a nie aktualne liczby i adresy.
+  Przed benchmarkiem pracy z rzeczywistymi narzędziami trzeba odrębnie sprawdzić przebiegi i wyniki.
+-->
+<evaluation>
+  <qa_pair id="domyslne-miasto">
+    <question>W nowej rozmowie z Lajkonektorem użytkownik pyta: „Znajdź biblioteki przy Rynku Podgórskim”. Nie wskazuje innego miasta i nie ma wcześniejszego kontekstu. Jakie miasto należy przyjąć jako zakres wyszukiwania przed rozstrzygnięciem ewentualnej niejednoznaczności miejsca? Odpowiedz wyłącznie nazwą miasta.</question>
+    <answer>Kraków</answer>
+  </qa_pair>
+  <qa_pair id="cel-a-punkt-odniesienia">
+    <question>W jednej rozmowie użytkownik najpierw pytał o parki, a następnie zadał nowe samodzielne pytanie: „Znajdź licea przy Parku Wodnym w Krakowie”. Rozdziel cel wyszukiwania od punktu odniesienia. Jaki typ obiektów należy teraz wyszukiwać? Odpowiedz jednym słowem w mianowniku liczby mnogiej.</question>
+    <answer>licea</answer>
+  </qa_pair>
+  <qa_pair id="doprecyzowanie-celu">
+    <question>W przedstawionej rozmowie użytkownik poprosił o licea w pobliżu Parku Wodnego w Krakowie. Po ustaleniu tego celu dopisał: „A w promieniu kilometra?”. Nie podał nowej kategorii ani nowego miejsca. Jak sklasyfikować tę drugą wiadomość: nowe samodzielne zadanie czy doprecyzowanie bieżącego celu? Odpowiedz wyłącznie „nowe zadanie” albo „doprecyzowanie”.</question>
+    <answer>doprecyzowanie</answer>
+  </qa_pair>
+  <qa_pair id="rzeczywista-niejednoznacznosc">
+    <question>Użytkownik chce znaleźć apteki obok miejsca o podanej nazwie w Krakowie. Narzędzie zwróciło dwa różne obiekty pasujące do tej nazwy, z różnymi adresami i tożsamościami. Żaden nie ma dodatkowego uzasadnienia w rozmowie. Kto ma rozstrzygnąć wybór punktu odniesienia przed szukaniem aptek? Odpowiedz wyłącznie „użytkownik” albo „model”.</question>
+    <answer>użytkownik</answer>
+  </qa_pair>
+  <qa_pair id="najblizsze-bez-odleglosci">
+    <question>Użytkownik pyta o najbliższe liceum. Wynik narzędzia zawiera nazwy kilku placówek i dzielnice, ale nie ma współrzędnych, obliczonych odległości ani potwierdzonego pokrycia całego miasta. Którą procedurę wybrać: „pierwszy rekord” czy „uzupełnij odległość i pokrycie”? Odpowiedz dokładnie nazwą jednej z tych procedur.</question>
+    <answer>uzupełnij odległość i pokrycie</answer>
+  </qa_pair>
+  <qa_pair id="jedna-koncowa-prezentacja">
+    <question>Użytkownik poprosił o krótkie porównanie dzielnic. Model ma już dane potrzebne do odpowiedzi, opisy zbiorów i wyniki pośrednie. Jedna wspólna mapa pomoże wyjaśnić porównanie. Jaka istniejąca operacja służy do świadomego przygotowania tej jednej końcowej prezentacji przez bramkę, zamiast automatycznego pokazania ostatniej karty? Odpowiedz wyłącznie nazwą operacji.</question>
+    <answer>widok</answer>
+  </qa_pair>
+  <qa_pair id="krotka-odpowiedz-bez-plikow">
+    <question>Użytkownik prosi: „Krótko wyjaśnij różnicę między liczbą placówek a liczbą zarejestrowanych miejsc; możesz dodać hipotezę z podstawą w danych i zaznaczyć, co oceni badacz”. Nie prosi o raport ani pobranie danych. Czy należy automatycznie tworzyć raport lub eksport? Odpowiedz wyłącznie „tak” albo „nie”.</question>
+    <answer>nie</answer>
+  </qa_pair>
+  <qa_pair id="eksport-to-osobna-potrzeba">
+    <question>Po omówieniu wyników użytkownik mówi: „Chcę pobrać dane odczytane ze źródeł i tabele po przeliczeniach, z datami, definicjami i opisem przekształceń. Nie chcę raportu”. Jaką potrzebę należy obsłużyć lub jawnie wskazać jako niedostępną, bez zastępowania jej raportem? Odpowiedz wyłącznie „eksport danych” albo „raport”.</question>
+    <answer>eksport danych</answer>
+  </qa_pair>
+  <qa_pair id="zmiana-zatwierdzonego-planu">
+    <question>Badacz zatwierdził konkretny plan porównania usług publicznych w dzielnicach. Przed wykonaniem model zmienił w nim źródło oraz definicję mianownika, więc zmienił się identyfikator planu. Jaka decyzja jest teraz potrzebna: „wykonanie na starej zgodzie” czy „ponowne zatwierdzenie”? Odpowiedz dokładnie nazwą jednej z tych decyzji.</question>
+    <answer>ponowne zatwierdzenie</answer>
+  </qa_pair>
+  <qa_pair id="kalendarz-a-instytucje-kultury">
+    <question>Użytkownik pyta o aktualne koncerty. W tej wersji Lajkonektora dostępny jest katalog instytucji kultury, ale nie kalendarz wydarzeń, a odczyt jednego źródła zwrócił błąd. Co uzasadnia brak odpowiedzi o repertuarze: „brak koncertów” czy „brak obsługi kalendarza”? Odpowiedz dokładnie jednym z tych dwóch określeń; nie dopisuj wydarzeń z wiedzy modelu.</question>
+    <answer>brak obsługi kalendarza</answer>
+  </qa_pair>
+</evaluation>

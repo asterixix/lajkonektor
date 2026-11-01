@@ -5,6 +5,7 @@ import { mapa, type LiniaMapy, type Poligon, type PunktMapy } from "../mapa.ts";
 import { wykres, punktowy } from "../wykres.ts";
 import { obiektyZWierszy } from "./dane.ts";
 import type { Widok } from "./typy.ts";
+import { bezpiecznyURL, plikRaportu, raportJSON, trescRaportu, wczytajRaport } from "../../../shared/eksport-raportu.ts";
 
 const komorka = (v: unknown) => (typeof v === "number" ? liczba(v, Number.isInteger(v) ? 0 : 2) : v == null ? "" : String(v));
 const tytul = (b: any) => (b.tytul ? `<h3 class="blok-tyt">${esc(b.tytul)}</h3>` : "");
@@ -58,8 +59,50 @@ const KOMPONENTY: Record<string, (b: any) => string> = {
 
 export const zlozony: Widok = {
   render(d) {
+    if (d.raport) {
+      try {
+        const r = wczytajRaport(raportJSON(d.raport));
+        let czytnik = bezpiecznyURL(d._raport_url);
+        if (!czytnik && typeof d._kafelki === "string") {
+          const adres = bezpiecznyURL(d._kafelki);
+          if (adres) czytnik = new URL("/?raport=1", adres).href;
+        }
+        return kafel({ id: "analiza", tytul: r.tytul, znacznik: { tekst: "RAPORT", rodzaj: "obrys" },
+          tresc: `<div class="raport-akcje" role="group" aria-label="Pobierz raport"><button class="przycisk zolty" data-raport="zip">Pobierz pakiet ZIP</button><button class="przycisk obrys" data-raport="html">HTML / PDF</button><button class="przycisk obrys" data-raport="json">JSON</button></div><p class="raport-komunikat" role="status" aria-live="polite" data-raport-status></p><div class="raport-awaryjny" data-raport-awaryjny hidden><p>Możesz skopiować JSON i zapisać go jako plik .json, a następnie otworzyć w czytniku raportów.</p><button class="przycisk obrys" data-raport-kopiuj>Kopiuj JSON</button><label>JSON raportu<textarea data-raport-json readonly rows="6" spellcheck="false" aria-label="JSON raportu do skopiowania"></textarea></label>${czytnik ? `<p><button class="przycisk obrys" data-raport-czytnik="${esc(czytnik)}">Otwórz czytnik raportów</button></p>` : ""}</div><div class="raport-karta">${trescRaportu(r)}</div>`,
+          zrodlo: zrodlo("Źródła i daty opisano osobno dla każdej tabeli.", "Raport możesz zachować lokalnie, bez konta i zapisu na serwerze."),
+        });
+      } catch (e) {
+        return kafel({ id: "analiza", tytul: "Niepoprawny raport", tresc: `<p class="blad" role="alert">${esc(e instanceof Error ? e.message : "Nie można odczytać raportu.")}</p>` });
+      }
+    }
     const bloki: any[] = d.bloki ?? [];
     const tresc = `${d.podtytul ? `<div class="podtytul">${esc(d.podtytul)}</div>` : ""}${bloki.map((b) => `<section class="blok">${(KOMPONENTY[b.typ] ?? (() => ""))(b)}</section>`).join("")}`;
     return kafel({ id: "widok", tytul: d.tytul ?? "Zestawienie", znacznik: { tekst: "ZESTAWIENIE", rodzaj: "obrys" }, tresc, zrodlo: zrodlo(d.zrodlo ?? "źródło nieznane", "Karta złożona z danych narzędzi Lajkonektora.") });
+  },
+  podlacz(root, d, c) {
+    if (!d.raport) return;
+    const status = root.querySelector<HTMLElement>("[data-raport-status]");
+    if (!status) return;
+    const awaryjny = root.querySelector<HTMLElement>("[data-raport-awaryjny]")!;
+    const pole = root.querySelector<HTMLTextAreaElement>("[data-raport-json]")!;
+    const awaria = (komunikat: string) => { status.textContent = komunikat; awaryjny.hidden = false; pole.value = raportJSON(d.raport); };
+    root.querySelectorAll<HTMLButtonElement>("[data-raport]").forEach((b) => b.addEventListener("click", async () => {
+      b.disabled = true; status.textContent = "Przygotowywanie pliku…";
+      try {
+        if (!c.pobierz) throw new Error("Ten klient nie obsługuje pobierania plików.");
+        const plik = plikRaportu(d.raport, b.dataset.raport as "zip" | "html" | "json");
+        await c.pobierz(plik.nazwa, plik.mime, plik.dane);
+        status.textContent = "Przekazano plik do pobrania. Sprawdź pobrane pliki w kliencie.";
+      } catch (e) { awaria(`Nie udało się pobrać raportu.${e instanceof Error ? " " + e.message : ""}`); }
+      finally { b.disabled = false; }
+    }));
+    root.querySelector("[data-raport-kopiuj]")?.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(pole.value); status.textContent = "Skopiowano JSON raportu."; }
+      catch { pole.focus(); pole.select(); status.textContent = "Zaznaczono JSON. Skopiuj go skrótem Ctrl+C lub poleceniem Kopiuj."; }
+    });
+    root.querySelector<HTMLButtonElement>("[data-raport-czytnik]")?.addEventListener("click", (e) => {
+      const adres = bezpiecznyURL((e.currentTarget as HTMLButtonElement).dataset.raportCzytnik);
+      if (adres) c.otworz(adres);
+    });
   },
 };

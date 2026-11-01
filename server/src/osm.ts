@@ -1,28 +1,70 @@
 // OpenStreetMap: geokodowanie nazw miejsc (Nominatim) i czasy dojścia pieszo (OSRM, profil foot).
-// Usługi publiczne mają limity uczciwego użycia, więc pytamy oszczędnie: 1 zapytanie geokodujące na miejsce
+// Usługi publiczne mają limity uczciwego użycia, więc pytamy oszczędnie: zapytania geokodujące idą kolejką, z cache
 // i jedno zapytanie "table" na całą trasę (start i cel razem) o kilku najbliższych przystankach.
 import type { Kand, Punkt, Siec } from "./transport.ts";
 import { dojscieMin, przystankiBlisko } from "./transport.ts";
+import { zCache } from "./sources.ts";
+import { runtime } from "./runtime.ts";
+import { BladDomeny } from "./bledy.ts";
 
 import { WERSJA } from "./wersja.ts";
 const UA = `lajkonektor/${WERSJA} (+https://lajkonektor.sendyka.workers.dev)`;
 // Ramki (zach, pln, wsch, pld): najpierw sam Kraków, potem Małopolska (gminy aglomeracji i okolice stacji kolejowych).
-const VIEWBOX = "19.78,50.13,20.13,49.95";
 const VIEWBOX_REGION = "18.9,50.5,21.5,49.2";
 const SZACUNEK = "szacunek (linia prosta x1,3)";
 const OSRM = "OSM (OSRM, pieszo)";
 
-async function nominatim(q: string, viewbox: string) {
-  const p = new URLSearchParams({ q, format: "jsonv2", limit: "1", countrycodes: "pl", viewbox, bounded: "1" });
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?${p}`, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(12_000) });
-  if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
-  const j: any[] = await res.json();
-  return j[0] ? { lat: +j[0].lat, lon: +j[0].lon, nazwa: String(j[0].display_name).split(",").slice(0, 3).join(",") } : null;
+// Produkcja korzysta ze wspólnego DO w UE. Poniższa kolejka jest lokalną osłoną
+// i adapterem testowym poza Workerem; nie zastępuje globalnego koordynatora.
+const NOMINATIM_PAUZA_MS = 1100;
+let kolejka: Promise<unknown> = Promise.resolve();
+function wKolejce<T>(f: () => Promise<T>): Promise<T> {
+  const wynik = kolejka.then(f);
+  kolejka = wynik.catch(() => {}).then(() => new Promise((r) => setTimeout(r, NOMINATIM_PAUZA_MS)));
+  return wynik;
 }
 
-// Najpierw w Krakowie (nazwa bez miasta znaczy Kraków), a gdy tam nic nie ma, w całej Małopolsce (np. „Staniątki 15”, „Niepołomice rynek”).
-export async function geokodujOsm(tekst: string): Promise<{ lat: number; lon: number; nazwa: string } | null> {
-  return (await nominatim(`${tekst}, Kraków`, VIEWBOX)) ?? (await nominatim(tekst, VIEWBOX_REGION));
+export interface Miejsce { lat: number; lon: number; nazwa: string; osm_id?: number; osm_typ?: string; adres?: Record<string, string>; kategoria?: string }
+
+function nominatim(q: string, viewbox: string): Promise<Miejsce[]> {
+  return zCache(`nominatim:${viewbox}:${q.toLowerCase()}`, 86_400, () => wKolejce(async () => {
+    const p = new URLSearchParams({ q, format: "jsonv2", limit: "10", addressdetails: "1", countrycodes: "pl", viewbox, bounded: "1" });
+    const rt = runtime.getStore();
+    rt?.sygnal?.throwIfAborted();
+    if (rt?.produkcja && !rt.nominatim) throw new BladDomeny("niedostepne", "Brak wspólnego koordynatora Nominatim.");
+    // Termin po stronie Workera: zawieszony koordynator nie może wstrzymywać odpowiedzi do limitu narzędzia.
+    const res = rt?.nominatim ? await rt.nominatim.fetch(new Request(`https://nominatim.internal/?${p}`, { signal: rt.sygnal ? AbortSignal.any([rt.sygnal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000) })) : await fetch(`https://nominatim.openstreetmap.org/search?${p}`, { headers: { "user-agent": UA }, signal: rt?.sygnal ? AbortSignal.any([rt.sygnal, AbortSignal.timeout(12_000)]) : AbortSignal.timeout(12_000) });
+    if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
+    const j: any[] = await res.json();
+    return j.map((x) => ({ lat: +x.lat, lon: +x.lon, nazwa: String(x.display_name), osm_id: x.osm_id, osm_typ: x.osm_type, adres: x.address, kategoria: `${x.category ?? x.class ?? ""}/${x.type ?? ""}` }));
+  }));
+}
+
+// Deduplikujemy po typie i ID OSM. Odległość nie dowodzi tożsamości miejsca.
+export function rozne(lista: Miejsce[]): Miejsce[] {
+  const out: Miejsce[] = [];
+  for (const m of lista) if (!out.some(o => m.osm_id !== undefined && m.osm_typ ? o.osm_id === m.osm_id && o.osm_typ === m.osm_typ : o.nazwa === m.nazwa && o.lat === m.lat && o.lon === m.lon)) out.push(m);
+  return out;
+}
+
+// Jedno zapytanie na całą Małopolskę (każde przez wspólną kolejkę kosztuje ≥1,1 s). Trafienia w Krakowie mają pierwszeństwo
+// (nazwa bez miasta znaczy Kraków), a gdy ich nie ma, zostają miejsca z regionu (np. „Staniątki 15”, „Niepołomice rynek”).
+const wKrakowie = (m: Miejsce) => m.lat >= 49.95 && m.lat <= 50.13 && m.lon >= 19.78 && m.lon <= 20.13;
+export async function szukajMiejsc(tekst: string): Promise<Miejsce[]> {
+  // Nominatim nie znajduje „ulica Karmelicka”, a znajduje „Karmelicka”: słowo „ulica/ul.” tylko przeszkadza.
+  const wszystkie = rozne(await nominatim(tekst.replace(/(^|[\s,])(ulica|ul\.)\s*/gi, "$1").trim() || tekst, VIEWBOX_REGION));
+  const krakow = wszystkie.filter(wKrakowie);
+  return krakow.length ? krakow : wszystkie;
+}
+
+export async function geokodujOsm(tekst: string): Promise<Miejsce | null> {
+  return (await szukajMiejsc(tekst))[0] ?? null;
+}
+
+// Przy kilku trafieniach bierzemy pierwsze (najlepsze) i mówimy to w etykiecie. Nie pytamy o wybór: w testach UX pytanie wypadało nienaturalnie.
+export function wybierzMiejsce<T extends { etykieta: string; lat: number; lon: number }>(tekst: string, lista: T[]): T {
+  if (lista.length < 2) return lista[0];
+  return { ...lista[0], etykieta: `${lista[0].etykieta} (wybrano automatycznie najlepsze z ${lista.length} trafień dla „${tekst}”)` };
 }
 
 type Dojscie = { m: number; min: number };

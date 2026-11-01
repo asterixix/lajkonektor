@@ -35,6 +35,7 @@ const ZESTAW = {
   statystyka_korelacja: ["statystyka", { operacja: "korelacja", z: { narzedzie: "dane_zapytaj", argumenty: { id: "msip:Rejestr_cen/Rc_Lokale_m_Rp_Mapa/12", limit: 20 } }, kolumna_x: "med_wart_m2", kolumna_y: "lkl_count", kolumna_etykiet: "nazwa_dz" }],
   planowanie_telimeny: ["planowanie_w_punkcie", { miejsce: { ulica: "Telimeny", numer: "11" } }],
   planowanie_rynek: ["planowanie_w_punkcie", { miejsce: { tekst: "Rynek Główny" } }],
+  eksport_dane: ["dane_eksportuj", { z: { narzedzie: "ludnosc_dzielnic", argumenty: { pola: ["r_ogolem"] } }, tytul: "Ludność dzielnic" }],
   katalog: ["katalog_szukaj", { temat: "przedszkola", limit: 6 }],
   katalog_brak: ["katalog_szukaj", { temat: "kina w Krakowie", limit: 4 }],
   trasa_pociag: ["trasa", { z: { tekst: "Dworzec Główny" }, do: { tekst: "Wieliczka Rynek" } }],

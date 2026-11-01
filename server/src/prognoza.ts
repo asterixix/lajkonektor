@@ -1,3 +1,4 @@
+import { BladDomeny } from "./bledy.ts";
 // Deterministyczna projekcja szeregu czasowego z przedziałami niepewności i opisem metody.
 // Metody: trend liniowy (OLS), wzrost wykładniczy (OLS na logarytmach), Holt (wygładzanie wykładnicze z trendem).
 // Dla "auto" wybieramy metodę o najmniejszym błędzie MAE w backteście z przesuwanym początkiem (na ostatnich punktach).
@@ -117,10 +118,10 @@ export function prognoza(opts: { serie: Punkt[]; horyzont: number; metoda?: Meto
   const wszystkich = pts.length;
   // Ucięcie historii do ostatnich N punktów (np. po załamaniu trendu), nie mniej niż 3.
   if (opts.ostatnie_punkty && opts.ostatnie_punkty >= 3 && opts.ostatnie_punkty < pts.length) pts = pts.slice(-opts.ostatnie_punkty);
-  if (pts.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw new Error("Seria zawiera wartości nieliczbowe (NaN/Infinity).");
-  if (new Set(pts.map((p) => p.x)).size !== pts.length) throw new Error("Seria ma powtórzone okresy (x).");
-  if (pts.length < 3) throw new Error("Za krótka seria: potrzeba co najmniej 3 punktów (zalecane ≥ 6).");
-  if (!Number.isInteger(opts.horyzont) || opts.horyzont < 1 || opts.horyzont > 20) throw new Error("Horyzont musi być liczbą całkowitą 1-20 kroków.");
+  if (pts.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw new BladDomeny("wejscie", "Seria zawiera wartości nieliczbowe (NaN/Infinity).");
+  if (new Set(pts.map((p) => p.x)).size !== pts.length) throw new BladDomeny("wejscie", "Seria ma powtórzone okresy (x).");
+  if (pts.length < 3) throw new BladDomeny("wejscie", "Za krótka seria: potrzeba co najmniej 3 punktów (zalecane ≥ 6).");
+  if (!Number.isInteger(opts.horyzont) || opts.horyzont < 1 || opts.horyzont > 20) throw new BladDomeny("wejscie", "Horyzont musi być liczbą całkowitą 1-20 kroków.");
 
   const dx = pts.slice(1).map((p, i) => p.x - pts[i].x);
   const krok = opts.krok ?? mediana(dx);
@@ -138,7 +139,7 @@ export function prognoza(opts: { serie: Punkt[]; horyzont: number; metoda?: Meto
   const porownanie = dostepne.map((m) => ({ metoda: m, ...backtest(m, pts, krok, m === "holt" ? 4 : minTrening) }));
   let wybrana: Metoda;
   if (opts.metoda && opts.metoda !== "auto") {
-    if (!dostepne.includes(opts.metoda)) throw new Error(`Metoda '${opts.metoda}' niedostępna dla tej serii (dostępne: ${dostepne.join(", ")}).`);
+    if (!dostepne.includes(opts.metoda)) throw new BladDomeny("wejscie", `Metoda '${opts.metoda}' niedostępna dla tej serii (dostępne: ${dostepne.join(", ")}).`);
     wybrana = opts.metoda;
   } else {
     const kand = porownanie.filter((p) => Number.isFinite(p.mae));

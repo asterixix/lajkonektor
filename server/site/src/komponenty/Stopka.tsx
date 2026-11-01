@@ -17,6 +17,7 @@ export function Stopka() {
           <h2>Lajkonektor</h2>
           <p>{t.opis}</p>
           <p>{t.osm}</p>
+          <p><a href="https://commons.wikimedia.org/wiki/File:Krak%C3%B3w_dzielnice_blank.svg">{t.tlo}</a></p>
         </div>
         <div>
           <h2>{t.zrodla}</h2>
@@ -26,8 +27,8 @@ export function Stopka() {
           <h2>Na stronie</h2>
           <ul>
             <li><a href="#podlaczenie">Podłączenie</a></li>
-            <li><a href="#dla-miasta">Dla miasta</a></li>
-            <li><a href="#ograniczenia">Ograniczenia prototypu</a></li>
+            <li><a href="#zrodla">Źródła i ograniczenia</a></li>
+            <li><a href="#dalej">Rozwój</a></li>
           </ul>
         </div>
       </div>

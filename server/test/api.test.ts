@@ -51,3 +51,17 @@ test("502 gdy źródło rzuca nieoczekiwany błąd, komunikat po polsku", async 
   const j = await r.json() as any;
   assert.match(j.blad, /Źródło/);
 });
+
+test("422 z komunikatem narzędzia, gdy błąd dotyczy pytania (np. brak przystanku), a nie źródła", async () => {
+  const r = await obsluzWywolanie(zadanie({ nazwa: "odjazdy", argumenty: { nazwa: "Basztowa" } }), opcje({ wywolaj: async () => { throw new Error("Nie znaleziono przystanków dla podanych kryteriów."); } }));
+  assert.equal(r.status, 502);
+  assert.match(((await r.json()) as any).blad, /Źródło/);
+});
+
+test("błędy techniczne i wyjątki programu nie wyciekają do użytkownika", async () => {
+  for (const msg of ["ArcGIS: Invalid query (X)", "Nominatim HTTP 429", "The operation was aborted", "Cannot read properties of undefined (reading 'x')"]) {
+    const r = await obsluzWywolanie(zadanie({ nazwa: "katalog_szukaj", argumenty: { temat: "x" } }), opcje({ wywolaj: async () => { throw new Error(msg); } }));
+    assert.equal(r.status, 502, msg);
+    assert.match(((await r.json()) as any).blad, /Źródło/);
+  }
+});

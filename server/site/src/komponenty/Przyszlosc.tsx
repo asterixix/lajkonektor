@@ -1,5 +1,7 @@
 import { TRESC } from "../tresc.ts";
 import { Pojawia } from "./Pojawia.tsx";
+import { Dlaczego } from "./Dlaczego.tsx";
+import { DlaMiasta } from "./DlaMiasta.tsx";
 
 export function Przyszlosc() {
   const t = TRESC.przyszlosc;
@@ -13,16 +15,22 @@ export function Przyszlosc() {
             <Pojawia key={k.etykieta} jako="li" className="kafel" opoznienie={(i % 2) * 0.08}>
               <p className="kafel-etykieta">{k.etykieta}</p>
               <h3>{k.naglowek}</h3>
-              <span className="kafel-plan">{t.plan}</span>
               <p>{k.tekst}</p>
               {k.zrodla.length > 0 && <p className="kafel-zrodla">Źródło: {k.zrodla.map((z) => <a key={z.url} href={z.url}>{z.tekst}</a>)}</p>}
             </Pojawia>
           ))}
         </ul>
+        <details className="reszta">
+          <summary>{TRESC.dlaczego.naglowek}</summary>
+          <Dlaczego />
+        </details>
+        <details className="reszta">
+          <summary>{TRESC.dlaMiasta.naglowek}</summary>
+          <DlaMiasta />
+        </details>
         <Pojawia className="zamkniecie">
           <h3>{t.teza.naglowek}</h3>
           <p>{t.teza.tekst}</p>
-          <p className="zrodlo">{t.uwaga}</p>
         </Pojawia>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { limitMinutowy } from "./limit.ts";
+import { BladDomeny } from "./bledy.ts";
 
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
 const JSON_HDR = { ...CORS, "content-type": "application/json; charset=utf-8" };
@@ -10,6 +11,8 @@ export interface OpcjeApi {
   // Wstrzykiwany licznik: w Node nie ma `caches`, więc testy podają własny.
   licznik?: (ip: string, limit: number) => Promise<boolean>;
 }
+
+// Komunikaty techniczne: HTTP źródła, ArcGIS, OSM, przerwane połączenie i wyjątki JS (nie pokazujemy ich użytkownikowi).
 
 const blad = (status: number, komunikat: string, extra: Record<string, string> = {}) =>
   new Response(JSON.stringify({ blad: komunikat }), { status, headers: { ...JSON_HDR, ...extra } });
@@ -32,8 +35,11 @@ export async function obsluzWywolanie(request: Request, { wywolaj, ip, limit = 6
   } catch (e) {
     const tekst = e instanceof Error ? e.message : String(e);
     // Błędy walidacji z wywolaj (zod, nieznana nazwa) to wina klienta, nie źródła.
-    if (tekst.startsWith("nieznane narzędzie") || tekst.startsWith("argumenty ")) return blad(400, tekst);
-    console.error("api/wywolaj", tekst);
+    if (e instanceof BladDomeny && e.kod === "wejscie") return blad(400, tekst);
+    if (e instanceof BladDomeny && e.kod === "wybor") return Response.json({ status: "wymaga_wyboru", ...e.dane }, { headers: JSON_HDR });
+    // Pozostałe komunikaty narzędzi ("Nie znaleziono przystanków...", "Podaj nazwę...") to błąd pytania, a nie awaria: pokazujemy je, żeby dało się poprawić zapytanie.
+    // Awarie źródeł i błędy programu (komunikaty techniczne) zostają pod ogólnym 502.
+    // Nieznany wyjątek jest awarią. O kwalifikacji nie decyduje treść komunikatu.
     return blad(502, "Źródło danych nie odpowiedziało. Spróbuj ponownie albo wybierz nagrane pytanie.");
   }
 }

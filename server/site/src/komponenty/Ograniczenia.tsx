@@ -1,30 +1,23 @@
 import { TRESC } from "../tresc.ts";
-import { SESJE } from "../sesje.ts";
-import { KartaMostek } from "./KartaMostek.tsx";
-import { Pojawia } from "./Pojawia.tsx";
+import { PasekLiczb } from "./PasekLiczb.tsx";
+import { KatalogNarzedzi } from "./TabelaNarzedzi.tsx";
 
-const prognoza = SESJE.find((s) => s.id === "prognoza")!;
-
+// Część 2 strony: skąd są dane i czego prototyp nie robi. Szczegóły są zwinięte, żeby nie przeładować pierwszego czytania.
 export function Ograniczenia() {
   const t = TRESC.ograniczenia;
   return (
-    <section id="ograniczenia" className="sekcja" aria-labelledby="ograniczenia-tytul">
+    <section id="zrodla" className="sekcja t-szare" aria-labelledby="zrodla-tytul">
       <div className="wnetrze">
-        <h2 id="ograniczenia-tytul">{t.naglowek}</h2>
-        <div className="czego-siatka">
-          <div>
-            <p className="lead">{t.opis}</p>
-            <ul className="limity">
-              {t.limity.map((l) => <li key={l}>{l}</li>)}
-            </ul>
-          </div>
-          <Pojawia>
-            <p className="karta-tytul">{t.przyklad}</p>
-            <div className="karta-ramka" role="region" aria-label={prognoza.pytanie}>
-              <KartaMostek dane={prognoza.wynik} />
-            </div>
-          </Pojawia>
-        </div>
+        <h2 id="zrodla-tytul">{t.naglowek}</h2>
+        <p className="lead">{t.opis}</p>
+        <PasekLiczb />
+        <ul className="limity">
+          {t.limity.map((l) => <li key={l}>{l}</li>)}
+        </ul>
+        <details className="reszta">
+          <summary>{TRESC.rozkladNarzedzi.reszta}</summary>
+          <KatalogNarzedzi />
+        </details>
       </div>
     </section>
   );

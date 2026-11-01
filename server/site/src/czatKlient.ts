@@ -47,9 +47,14 @@ export function domknij(w: Wiadomosc, przerwano: boolean): Wiadomosc {
   };
 }
 
-/** Do modelu idzie sama treść rozmowy: bez kart, błędów i pustych odpowiedzi. */
+/** Do modelu idzie sama treść rozmowy: bez kart, błędów i pustych odpowiedzi.
+ *  Wyjątek: plan analizy czekający na zatwierdzenie, bo tryb wykonaj wymaga identycznego planu i jego id. */
 export function historiaDoApi(w: Wiadomosc[]): { rola: string; tresc: string }[] {
-  return w.filter((m) => m.tresc.trim() && !m.laduje).map((m) => ({ rola: m.rola, tresc: m.tresc }));
+  const plan = w.flatMap((m) => m.karty).reverse().find((k) => k.dane?.tryb === "sprawdz" && k.dane?.plan && k.dane?.id_planu)?.dane;
+  return w.filter((m) => m.tresc.trim() && !m.laduje).map((m) => ({
+    rola: m.rola,
+    tresc: plan && m.karty.some((k) => k.dane === plan) ? `${m.tresc}\n\n[Plan do zatwierdzenia, id_planu ${plan.id_planu}]\n${JSON.stringify(plan.plan)}` : m.tresc,
+  }));
 }
 
 /** Czyta strumień NDJSON linia po linii. Uszkodzone linie są pomijane, żeby jedna nie psuła rozmowy. */
@@ -96,4 +101,15 @@ export async function wyslijCzat(
   }
   for await (const z of czytajZdarzenia(res)) naZdarzenie(z);
   return { status: 200 };
+}
+
+/** Jednolinijkowy skrót argumentów wywołania narzędzia, np. `serie: [11], horyzont: 3`. Pełna wartość jest w rozwijanym podglądzie. */
+export function skrotArgumentow(args: unknown, maks = 90): string {
+  if (!args || typeof args !== "object") return "";
+  const czesci = Object.entries(args as Record<string, unknown>).map(([k, v]) => {
+    const w = typeof v === "string" ? `"${v.length > 28 ? `${v.slice(0, 27)}…` : v}"` : Array.isArray(v) ? `[${v.length}]` : v && typeof v === "object" ? "{…}" : String(v);
+    return `${k}: ${w}`;
+  });
+  const t = czesci.join(", ");
+  return t.length > maks ? `${t.slice(0, maks - 1)}…` : t;
 }
