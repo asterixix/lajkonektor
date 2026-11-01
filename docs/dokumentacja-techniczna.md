@@ -165,7 +165,7 @@ Przechowywanie danych: Worker wykonuje się w Warszawie, R2 i Durable Objects dz
 
 ### 3.7. Jakość i testy
 
-Repozytorium zawiera 347 testów uruchamianych poleceniem `npm test`. Obejmują one kontrakt MCP rzeczywistego handlera, schematy wszystkich operacji, obliczenia analiz i statystyk, stronicowanie i limity, eksport CSV i ZIP, karty wyników, stronę oraz klienta czatu. Przebieg z 1 listopada 2026 roku: 326 testów zaliczonych, 0 błędów, 21 pominiętych. Pominięte są testy na rzeczywistych API, uruchamiane osobno zmienną `NA_ZYWO=1`. `npm run typecheck` sprawdza typy serwera, kart i strony. Zestaw 50 pytań w `server/test/ewaluacja/` służy do oceny odpowiedzi modelu; ten przebieg wymaga klucza i generuje koszt.
+Repozytorium zawiera 351 testów uruchamianych poleceniem `npm test`. Obejmują one kontrakt MCP rzeczywistego handlera, schematy wszystkich operacji, obliczenia analiz i statystyk, stronicowanie i limity, eksport CSV i ZIP, karty wyników, stronę oraz klienta czatu. Przebieg z 1 listopada 2026 roku: 330 testów zaliczonych, 0 błędów, 21 pominiętych. Pominięte są testy na rzeczywistych API, uruchamiane osobno zmienną `NA_ZYWO=1`. `npm run typecheck` sprawdza typy serwera, kart i strony. Zestaw 50 pytań w `server/test/ewaluacja/` służy do oceny odpowiedzi modelu; ten przebieg wymaga klucza i generuje koszt.
 
 Testy offline potwierdzają logikę i kontrakt, ale nie dostępność źródeł. Odtworzenie nagranej demonstracji nie potwierdza świeżości danych.
 
