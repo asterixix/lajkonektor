@@ -32,7 +32,7 @@ export const NARZEDZIA: NarzedzieWiersz[] = [
   { grupa: "Dane", nazwa: "wskaznik_dzielnic", opis: "Porównuje 18 dzielnic wskaźnikiem z rankingiem, medianą i mapą.", swiezosc: "migawka danych", glowne: false },
   { grupa: "Dane", nazwa: "statystyka", opis: "Liczy średnie, korelacje, trendy i nierówności na liczbach z danych.", swiezosc: "liczone przy zapytaniu", glowne: false },
   { grupa: "Miejsca", nazwa: "adres_na_punkt", opis: "Zamienia adres w punkt na mapie i podaje dzielnicę.", swiezosc: "punkty adresowe MSIP", glowne: false },
-  { grupa: "Miejsca", nazwa: "miejsce_szukaj", opis: "Wyszukuje miejsce i wymaga wyboru przy wielu trafieniach.", swiezosc: "OSM, cache do 24 godzin", glowne: false },
+  { grupa: "Miejsca", nazwa: "miejsce_szukaj", opis: "Wyszukuje miejsce; przy wielu trafieniach przyjmuje najlepsze i podaje, które wybrano.", swiezosc: "OSM, cache do 24 godzin", glowne: false },
   { grupa: "Miejsca", nazwa: "osm_obiekty", opis: "Szuka kategorii obiektów OSM w promieniu do 5 km.", swiezosc: "Overpass, cache do godziny", glowne: false },
   { grupa: "Dane", nazwa: "operacje_szukaj", opis: "Wyszukuje najwyżej trzy pełne opisy operacji.", swiezosc: "rejestr serwera", glowne: false },
   { grupa: "Dane", nazwa: "operacja_wykonaj", opis: "Wykonuje operację po sprawdzeniu argumentów.", swiezosc: "zależnie od operacji", glowne: false },

@@ -1,5 +1,6 @@
 // Pula przykładowych pytań do czatu i własnego klienta AI; strona losuje kilka przy każdym wejściu.
-// Każde pytanie sprawdzono 31.10.2026 wywołaniem wskazanego narzędzia na lokalnym MCP, bez modelu.
+// Każde pytanie sprawdzono 31.10.2026 wywołaniem wskazanego narzędzia na lokalnym MCP, bez modelu; pytania o apteki i biblioteki
+// przeniesiono 1.11.2026 z osm_obiekty na obiekty_w_poblizu (rejestr MSIP), bo publiczne serwery Overpass nie odpowiadały.
 // Pytania o niejednoznaczne miejsca są celowe: pokazują wybór lokalizacji zamiast zgadywania.
 export interface PrzykladPytania { tekst: string; narzedzie: string }
 
@@ -8,12 +9,12 @@ export const PULA: PrzykladPytania[] = [
   { tekst: "Które dzielnice mają największą powierzchnię parków miejskich?", narzedzie: "dane_zapytaj" },
   { tekst: "Kiedy najbliższy tramwaj spod Teatru Słowackiego?", narzedzie: "odjazdy" },
   { tekst: "Jak dojechać z ulicy Basztowej 20 na Łojasiewicza 4?", narzedzie: "trasa" },
-  { tekst: "Znajdź apteki w promieniu 800 metrów od placu Centralnego.", narzedzie: "osm_obiekty" },
+  { tekst: "Które apteki są najbliżej placu Centralnego?", narzedzie: "obiekty_w_poblizu" },
   { tekst: "Jak zmieniała się stopa bezrobocia w Krakowie i co pokazuje prognoza?", narzedzie: "prognoza" },
   { tekst: "Pokaż ranking dzielnic według liczby mieszkańców.", narzedzie: "wskaznik_dzielnic" },
   { tekst: "Jakie informacje planistyczne są dostępne dla adresu Telimeny 11?", narzedzie: "planowanie_w_punkcie" },
   { tekst: "Czy są teraz utrudnienia w komunikacji miejskiej?", narzedzie: "utrudnienia" },
-  { tekst: "Jakie biblioteki są w pobliżu Rynku Podgórskiego?", narzedzie: "osm_obiekty" },
+  { tekst: "Która biblioteka jest najbliżej Rynku Podgórskiego?", narzedzie: "obiekty_w_poblizu" },
   { tekst: "Jakie zbiory o cenach mieszkań w Krakowie są na dane.gov.pl?", narzedzie: "dane_gov" },
   { tekst: "W których dzielnicach jest najmniej szkół podstawowych na dzieci w wieku 7-14 lat?", narzedzie: "wskaznik_dzielnic" },
   { tekst: "Które dzielnice mają najwięcej aptek na 10 tysięcy mieszkańców?", narzedzie: "wskaznik_dzielnic" },
