@@ -303,6 +303,15 @@ export async function agent(o: {
       return { kroki: krok, narzedzia: uzyte, tokeny };
     }
     messages.push({ role: "assistant", content: tekstZOdpowiedzi(msg.content) || null, tool_calls: wywolania });
+    // Odpowiedź ucięta limitem max_tokens: argumenty wywołań mogą być niepełne (np. {"operacja":"analiza"} bez planu), więc ich nie wykonujemy.
+    if (odp?.choices?.[0]?.finish_reason === "length") {
+      for (const [i, w] of wywolania.entries()) {
+        const id = String(w.id ?? `${krok}-${i}`);
+        messages.push({ role: "tool", tool_call_id: w.id ?? id, content: "Błąd: odpowiedź modelu przekroczyła limit długości, więc argumenty wywołania zostały ucięte i go nie wykonano. Przygotuj krótsze argumenty: mniej źródeł lub operacji, definicje i uzasadnienia w jednym krótkim zdaniu, bez powtarzania tekstu." });
+        o.emit({ t: "wynik", id, nazwa: String(w.function?.name ?? ""), blad: "Argumenty ucięte limitem długości odpowiedzi modelu; poproszono o krótszą wersję." });
+      }
+      continue;
+    }
     for (let i = 0; i < wywolania.length; i++) {
       const w = wywolania[i];
       const id = String(w.id ?? `${krok}-${i}`);

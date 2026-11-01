@@ -89,6 +89,16 @@ test("agent: niepoprawny JSON argumentów i nieznane narzędzie nie przerywają 
   assert.deepEqual(toolMsgs.map((m: any) => m.tool_call_id), ["c1", "c2"], "każde wywołanie modelu dostaje odpowiedź");
 });
 
+test("agent: wywołanie ucięte limitem max_tokens nie jest wykonywane, a model dostaje prośbę o krótsze argumenty", async () => {
+  const uciete = { choices: [{ finish_reason: "length", message: { role: "assistant", content: null, tool_calls: [wywolanie("a1", "operacja_wykonaj", { operacja: "analiza" })] } }], usage: { total_tokens: 4000 } };
+  const { zdarzenia, wywolania } = await uruchom([uciete, odpowiedz({ content: "Skrócę plan." })]);
+  assert.ok(!zdarzenia.some((z) => z.t === "narzedzie"), "uciętego wywołania nie wykonano");
+  const wynik = zdarzenia.find((z) => z.t === "wynik") as Extract<Zdarzenie, { t: "wynik" }>;
+  assert.match(String(wynik.blad), /limitem długości/);
+  const tool = wywolania[1].messages.find((m: any) => m.role === "tool");
+  assert.equal(tool.tool_call_id, "a1"); assert.match(tool.content, /krótsze argumenty/);
+});
+
 test("agent: nadmiar wywołań w jednym kroku jest pominięty, ale protokół zostaje spójny", async () => {
   const wiele = Array.from({ length: LIMIT.wywolanNaKrok + 2 }, (_, i) => wywolanie(`d${i}`, "katalog_szukaj", { temat: "parki" }));
   const { zdarzenia, wywolania } = await uruchom([odpowiedz({ content: null, tool_calls: wiele }), odpowiedz({ content: "Gotowe." })]);
