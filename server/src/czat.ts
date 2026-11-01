@@ -135,7 +135,7 @@ Zasady:
 - Data migawki katalogu i czas pobrania nie są datą stanu danych. Pole _dowod.pobrano oznacza czas pobrania odpowiedzi, a odswiezono czas odświeżenia publikacji, jeśli źródło go podaje. Użyj określenia „stan na” tylko wtedy, gdy wskazuje go zbiór lub metadane. W innym przypadku napisz, że daty stanu nie potwierdzono; datę pobrania podaj osobno, jeśli ma znaczenie.
 - Przypisuj liczby i nazwy do dokładnego identyfikatora zbioru, z którego pochodzą. Nie przenoś nazw z próbki jednego zbioru do innego i nie wnioskuj o operatorze ani publiczności z samej nazwy placówki; sprawdź jawne pola lub opis. Przedszkola niesamorządowe nie oznaczają automatycznie niepublicznych.
 - Gdy użytkownik prosi o raport, zestawienie lub analizę łączącą kilka zbiorów albo wskaźników, nie składaj raportu samodzielnie w tekście. Użyj operacji analiza: odkryj jej schemat przez operacje_szukaj („raport analiza”), sprawdź zbiory i pola przez katalog_szukaj i zbior_opis, a potem wywołaj operacja_wykonaj z analiza w trybie sprawdz. W odpowiedzi opisz plan w kilku punktach (źródła, definicje, obliczenia, ograniczenia) i poproś o zatwierdzenie, np. „Napisz: zatwierdzam”. Nie wykonuj planu w tej samej odpowiedzi.
-- Gdy w historii jest „[Plan do zatwierdzenia, id_planu …]” z JSON planu, a użytkownik go zatwierdza, wywołaj operacja_wykonaj z analiza w trybie wykonaj z dokładnie tym planem (bez zmian), tym id_planu i dosłowną treścią wiadomości użytkownika jako zatwierdzenie. Jeśli użytkownik prosi o zmianę, popraw plan i ponów tryb sprawdz. Raport z tabelami, wykresami i plikami do pobrania pojawia się na karcie; w tekście podaj tylko najważniejsze wyniki i zastrzeżenia.
+- Gdy w historii jest „[Plan do zatwierdzenia, id_planu …]” z JSON planu, a użytkownik go zatwierdza, wywołaj operacja_wykonaj z operacja „analiza” i argumentami tylko { tryb: „wykonaj”, id_planu, zatwierdzenie: dosłowna treść wiadomości użytkownika }. Nie przepisuj planu: czat uzupełni go z historii, a serwer sprawdzi zgodność z id_planu. Nie szukaj ponownie zbiorów. Jeśli użytkownik prosi o zmianę, popraw plan i ponów tryb sprawdz. Raport z tabelami, wykresami i plikami do pobrania pojawia się na karcie; w tekście podaj tylko najważniejsze wyniki i zastrzeżenia.
 - Gdy użytkownik prosi tylko o plan, zadaje pytania o wykonalność albo wyraźnie wstrzymuje pobranie danych lub obliczenia, przedstaw plan i zaczekaj. Nie wywołuj narzędzi pobierających dane ani trybu wykonaj bez wyraźnej prośby o realizację.
 - Miejsce lub adres przekaż wprost w polu {tekst} albo {ulica,numer} narzędzia, które go potrzebuje (np. trasa, przystanki_w_poblizu); nie wywołuj wcześniej miejsce_szukaj. Gdy pasuje kilka lokalizacji, narzędzie samo przyjmuje najlepsze trafienie. Nie pytaj użytkownika o wybór; w odpowiedzi jednym zdaniem podaj, które miejsce przyjęto.
 - Gdy narzędzie zwróci błąd, wyjaśnij to prostym językiem i spróbuj raz inaczej (inna nazwa, inny temat, inne narzędzie). Jeśli nadal nie działa, powiedz to wprost i zaproponuj inne pytanie.
@@ -257,6 +257,20 @@ const ogranicz = (t: string, n: number) => {
 };
 
 /** Pętla agenta: model prosi o narzędzia, my wykonujemy je przez MCP, aż da odpowiedź tekstową. Każdy krok idzie do `emit`. */
+/** Plan czekający na zatwierdzenie wraca w historii (site/src/czatKlient.ts, historiaDoApi). Przy wykonaniu model podaje tylko id_planu,
+ *  bo przepisanie całego planu przekraczało limit max_tokens; serwer i tak sprawdza zgodność planu z SHA256. */
+export function uzupelnijPlan(args: Record<string, any>, wiadomosci: { content: string }[]): Record<string, any> {
+  const a = args.argumenty;
+  if (!["analiza", "dane_eksportuj"].includes(args.operacja) || !a || typeof a.id_planu !== "string" || a.plan) return args;
+  const znacznik = `[Plan do zatwierdzenia, id_planu ${a.id_planu}]\n`;
+  for (const m of [...wiadomosci].reverse()) {
+    const i = m.content.indexOf(znacznik);
+    if (i < 0) continue;
+    try { return { ...args, argumenty: { ...a, plan: JSON.parse(m.content.slice(i + znacznik.length).split("\n")[0]) } }; } catch { return args; }
+  }
+  return args;
+}
+
 export async function agent(o: {
   wiadomosci: { role: "user" | "assistant"; content: string }[];
   mcp: KlientMcp;
@@ -328,6 +342,7 @@ export async function agent(o: {
         o.emit({ t: "wynik", id, nazwa, blad: "Model podał niepoprawne argumenty." });
         continue;
       }
+      if (nazwa === "operacja_wykonaj") args = uzupelnijPlan(args, o.wiadomosci);
       uzyte.push(nazwa);
       o.emit({ t: "narzedzie", id, nazwa, argumenty: args });
       try {

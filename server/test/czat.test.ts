@@ -99,6 +99,26 @@ test("agent: wywołanie ucięte limitem max_tokens nie jest wykonywane, a model 
   assert.equal(tool.tool_call_id, "a1"); assert.match(tool.content, /krótsze argumenty/);
 });
 
+test("agent: zatwierdzony plan z historii jest uzupełniany przy wykonaniu, model podaje tylko id_planu", async () => {
+  const plan = { tytul: "Test", pytanie: "Ludność dzielnic", zrodla: [{ id: "l", narzedzie: "ludnosc_dzielnic", argumenty: {} }], operacje: [], ograniczenia: [] };
+  const s = await mcp.wywolaj("operacja_wykonaj", { operacja: "analiza", argumenty: { tryb: "sprawdz", plan } });
+  const id = (s.strukt as any).id_planu as string;
+  const wiadomosci = [
+    { role: "user" as const, content: "Przygotuj plan." },
+    { role: "assistant" as const, content: `Plan gotowy.\n\n[Plan do zatwierdzenia, id_planu ${id}]\n${JSON.stringify(plan)}` },
+    { role: "user" as const, content: "Zatwierdzam" },
+  ];
+  const zdarzenia: Zdarzenie[] = [];
+  const { eden } = udawanyEden([
+    odpowiedz({ content: null, tool_calls: [wywolanie("w1", "operacja_wykonaj", { operacja: "analiza", argumenty: { tryb: "wykonaj", id_planu: id, zatwierdzenie: "Zatwierdzam" } })] }),
+    odpowiedz({ content: "Raport gotowy." }),
+  ]);
+  await agent({ wiadomosci, mcp, eden, emit: (z) => zdarzenia.push(z), model: "m" });
+  const wynik = zdarzenia.find((z) => z.t === "wynik") as Extract<Zdarzenie, { t: "wynik" }>;
+  assert.equal(wynik.blad, undefined, String(wynik.blad));
+  assert.equal((wynik.dane as any).tryb, "wykonaj");
+});
+
 test("agent: nadmiar wywołań w jednym kroku jest pominięty, ale protokół zostaje spójny", async () => {
   const wiele = Array.from({ length: LIMIT.wywolanNaKrok + 2 }, (_, i) => wywolanie(`d${i}`, "katalog_szukaj", { temat: "parki" }));
   const { zdarzenia, wywolania } = await uruchom([odpowiedz({ content: null, tool_calls: wiele }), odpowiedz({ content: "Gotowe." })]);
