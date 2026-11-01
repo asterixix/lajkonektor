@@ -18,6 +18,11 @@ test("bramka: odkrywa maksymalnie 3 schematy i odrzuca niezarejestrowaną operac
   assert.ok(r.structuredContent.operacje.every((o: any) => o.inputSchema && o.outputSchema));
   const e = await rpc("tools/call", { name: "operacja_wykonaj", arguments: { operacja: "eval", argumenty: {} } }); assert.equal(e.isError, true);
 });
+test("bramka: odkrywa operację analiza mimo pola raport w jej schemacie wyniku", async () => {
+  const r = await rpc("tools/call", { name: "operacje_szukaj", arguments: { temat: "analiza" } });
+  assert.notEqual(r.isError, true);
+  assert.ok(r.structuredContent.operacje.some((o: any) => o.nazwa === "analiza" && o.outputSchema.properties.raport));
+});
 test("opisy schematów zachowują pola sterujące geometrią", async () => {
   const r = await rpc("tools/call", { name: "operacje_szukaj", arguments: { temat: "dane_zapytaj" } });
   const o = r.structuredContent.operacje.find((x: any) => x.nazwa === "dane_zapytaj");

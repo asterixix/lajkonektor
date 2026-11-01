@@ -58,7 +58,8 @@ const ZE_KATALOGU = new Set(["katalog_szukaj", "zbior_opis", "dane_zapytaj"]);
 // Kontury i przebiegi do rysowania map są potrzebne karcie (structuredContent), a nie modelowi: w tekście wyniku ich nie powtarzamy.
 const bezKonturow = (k: string, v: unknown) => {
   if (k === "kontury" || k === "linie_geom" || k === "_geometria") return undefined;
-  if (k === "raport" && v && typeof v === "object") {
+  // Tylko prawdziwy raport z tabelami; klucz "raport" występuje też np. w schemacie wyniku zwracanym przez operacje_szukaj.
+  if (k === "raport" && v && typeof v === "object" && Array.isArray((v as any).tabele)) {
     const r = v as any;
     return { ...r, tabele: r.tabele.map((t: any) => ({ ...t, wiersze: t.wiersze.slice(0, 20), wierszy_ogolem: t.wiersze.length, podglad: t.wiersze.length > 20 })), uwaga_tekstu: "Tekst pokazuje do 20 wierszy na tabelę. Pełne tabele i eksport są w structuredContent karty." };
   }
