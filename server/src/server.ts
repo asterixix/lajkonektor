@@ -138,19 +138,21 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     return r.structuredContent.status === "wymaga_wyboru" ? { ...dane, _widok: "miejsca" } : dane;
   };
 
+  // Komunikaty silnika analiz opisują, co poprawić w planie; bez tego bramka zamienia je na ogólne „niedostępne”.
+  const bladSilnika = (e: unknown): never => { throw e instanceof BladDomeny ? e : new BladDomeny("niedostepne", `Analiza przerwana: ${(e as Error).message}`); };
   narzedzie("analiza", {
     title: "Sprawdź plan badania i wykonaj raport",
     description: "Uniwersalna analiza na dostępnych źródłach: zatwierdzany plan, łączenie tabel, agregacje, wskaźniki, statystyka, projekcje i raport z pełnymi tabelami, metodami oraz pochodzeniem. Najpierw odkryj zbiory przez katalog_szukaj i zbior_opis. W trybie sprawdz uzyskasz id_planu i plan do przedstawienia człowiekowi. Po rzeczywistym zatwierdzeniu w rozmowie użyj wykonaj z identycznym planem i treścią zatwierdzenia. Maks. 8 źródeł, 12 operacji, 5000 wierszy we wszystkich tabelach i 1 MiB wyniku. Bez zapisu raportów na serwerze. Eksport z karty: HTML, CSV, JSON; HTML drukuje się do PDF. Zatwierdzenie jest deklaracją, nie uwierzytelnionym dowodem zgody.",
     inputSchema: analizaSchema,
     annotations: readOnly,
-  }, (args) => run(() => wykonajAnalize(args, wywolaj)));
+  }, (args) => run(() => wykonajAnalize(args, wywolaj).catch(bladSilnika)));
 
   narzedzie("dane_eksportuj", {
     title: "Pobierz dane i opis pochodzenia",
     description: "Wyłącznie na wyraźną prośbę o pobranie danych. Tworzy pakiet CSV/JSON z odczytanymi tabelami i pochodzeniem, bez narracyjnego raportu. Prosty odczyt: z wskazuje obsługiwane źródło. Przeliczenia: podaj plan, jego id_planu i rzeczywiste zatwierdzenie, jak w analiza. Ponawia odczyt; dane mogą różnić się od wcześniejszej odpowiedzi. Wymaga kompletnego wyniku, maks. 5000 wierszy wszystkich tabel i 1 MiB. Plik ZIP pobiera się z karty; gdy host nie obsługuje pobierania, można skopiować JSON.",
     inputSchema: eksportDanychSchema,
     annotations: readOnly,
-  }, (args) => run(() => eksportujDane(args, wywolaj)));
+  }, (args) => run(() => eksportujDane(args, wywolaj).catch(bladSilnika)));
 
   narzedzie(
     "katalog_szukaj",
