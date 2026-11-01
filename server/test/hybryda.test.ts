@@ -26,9 +26,8 @@ test("bramka: odkrywa operację analiza mimo pola raport w jej schemacie wyniku"
 test("bramka: błąd silnika analiz wraca z treścią do poprawy planu, a nie jako ogólne „niedostępne”", async () => {
   const plan = { tytul: "Test", pytanie: "Ludność dzielnic", zrodla: [{ id: "l", narzedzie: "ludnosc_dzielnic", argumenty: {}, data_stanu: "do potwierdzenia" }], operacje: [], ograniczenia: [] };
   const s = await rpc("tools/call", { name: "operacja_wykonaj", arguments: { operacja: "analiza", argumenty: { tryb: "sprawdz", plan } } });
-  const w = await rpc("tools/call", { name: "operacja_wykonaj", arguments: { operacja: "analiza", argumenty: { tryb: "wykonaj", plan, id_planu: s.structuredContent.id_planu, zatwierdzenie: "test" } } });
-  assert.equal(w.isError, true);
-  assert.match(w.structuredContent.komunikat, /data stanu źródła różni się/);
+  assert.equal(s.isError, true);
+  assert.match(s.structuredContent.komunikat, /różni się od migawki ludności/);
 });
 test("opisy schematów zachowują pola sterujące geometrią", async () => {
   const r = await rpc("tools/call", { name: "operacje_szukaj", arguments: { temat: "dane_zapytaj" } });

@@ -147,10 +147,15 @@ async function sprawdzMetadane(p: PlanAnalizy, wywolaj: Wywolaj) {
         const wybrane = Array.isArray(s.argumenty.pola) ? s.argumenty.pola : [];
         const grupy = Array.isArray(s.argumenty.grupuj_po) ? s.argumenty.grupuj_po : [];
         const miary = Array.isArray(s.argumenty.agreguj) ? s.argumenty.agreguj.map((x: any) => x.pole).filter((x: unknown) => x !== "*") : [];
-        for (const f of [...wybrane, ...grupy, ...miary]) if (!pola.includes(f)) throw new Error(`${s.id}: metadane nie zawierają pola '${f}'.`);
+        for (const f of [...wybrane, ...grupy, ...miary, ...(s.dzielnica_pole ? [s.dzielnica_pole] : [])]) if (!pola.includes(f)) throw new Error(`${s.id}: metadane nie zawierają pola '${f}'. Dostępne: ${pola.join(", ")}`);
       }
       wyniki.push({ id: s.id, narzedzie: s.narzedzie, pola, url: r.url, data_stanu: s.data_stanu ?? null, uwagi: ["Data pobrania metadanych nie jest datą stanu danych."] });
-    } else wyniki.push({ id: s.id, narzedzie: s.narzedzie, data_stanu: s.narzedzie === "ludnosc_dzielnic" ? (s.argumenty.data ?? OSTATNIA_DATA) : s.data_stanu ?? null, uwagi: ["Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."] });
+    } else {
+      const migawka = s.narzedzie === "ludnosc_dzielnic" ? String(s.argumenty.data ?? OSTATNIA_DATA) : null;
+      // Ta sama kontrola co przy wykonaniu, ale przed zatwierdzeniem: plan nie może deklarować innej daty niż migawka.
+      if (migawka && s.data_stanu && s.data_stanu !== migawka) throw new Error(`${s.id}: data_stanu w planie ('${s.data_stanu}') różni się od migawki ludności (${migawka}); podaj ${migawka} albo pomiń pole.`);
+      wyniki.push({ id: s.id, narzedzie: s.narzedzie, data_stanu: migawka ?? s.data_stanu ?? null, uwagi: ["Pełną tabelę i jej kolumny sprawdzimy podczas wykonania."] });
+    }
   }
   return wyniki;
 }
