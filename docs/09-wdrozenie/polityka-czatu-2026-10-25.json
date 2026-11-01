@@ -10,7 +10,7 @@
   "przedplata10BezDoladowania": true,
   "zakres": "Treść inferencji UE/ZDR. Zgoda użytkownika 25.10.2026 na prototyp bez gwarancji europejskiej lokalizacji wszystkich metadanych operacyjnych. Nie oznacza pełnej regionalizacji infrastruktury.",
   "dowod": "docs/09-wdrozenie/eden-ai-przeglad-2026-10-25.md; ustawienia konta UE/ZDR i 9 USD; katalog modeli UE; jawna zgoda użytkownika na ograniczony zakres 25.10.2026. Stawki rezerwacji powyżej katalogowych, z zapasem na opłatę pośrednika.",
-  "waznaDo": "2026-11-06T00:00:00Z",
+  "waznaDo": "2027-01-01T00:00:00Z",
   "zapasowy": {
     "model": "azure/gpt-6-luna@eu",
     "endpoint": "https://api.eu.edenai.run/v3/chat/completions",
@@ -22,6 +22,6 @@
     "europaPotwierdzona": true,
     "zdrPotwierdzone": true,
     "dowod": "Katalog Eden AI: azure/gpt-6-luna@eu, UE/ZDR; ustawienia organizacji Europe i ZDR; model zapasowy zatwierdzony przez użytkownika 25.10.2026. Zakres jak dla modelu głównego.",
-    "waznaDo": "2026-11-06T00:00:00Z"
+    "waznaDo": "2027-01-01T00:00:00Z"
   }
 }

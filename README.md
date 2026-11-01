@@ -81,7 +81,7 @@ docs/       dokumentacja techniczna i produktowa
 | [dane.gov.pl](https://dane.gov.pl/) | Zbiory i pliki krajowe |
 | [ZTP Kraków](https://gtfs.ztp.krakow.pl/) | GTFS i GTFS-RT |
 | Rozkłady PKP PLK ([mkuran.pl](https://mkuran.pl/gtfs/)) | Rozkład kolejowy, bez opóźnień |
-| [OpenStreetMap](https://www.openstreetmap.org/) | Nominatim, Overpass, kafelki |
+| [OpenStreetMap](https://www.openstreetmap.org/) | Nominatim, migawka obiektów z ekstraktu Geofabrik, kafelki |
 
 Katalog w `server/data/katalog.json` obejmuje 1203 pozycje (migawka z 19.10.2026). Dane pozostają własnością ich wydawców i podlegają ich warunkom; licencja MIT obejmuje kod projektu.
 

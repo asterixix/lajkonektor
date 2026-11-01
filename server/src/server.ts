@@ -639,7 +639,7 @@ export function createServer(cf?: { colo?: string; country?: string }, origin?: 
     return { zrodlo: "© OpenStreetMap contributors, ODbL; Nominatim", status: kandydaci.length ? "poprawna" : "pusta", kandydaci: kandydaci.map(x => ({ ...x, etykieta: x.nazwa })), wymaga_wyboru: false, uwaga: kandydaci.length > 1 ? `Kilka trafień; przyjęto pierwsze (najlepsze): ${kandydaci[0].nazwa}. Użyj jego lat/lon i podaj w odpowiedzi, które miejsce przyjęto.` : "Współrzędne WGS84." };
   }));
   narzedzie("osm_obiekty", {
-    title: "Obiekty OpenStreetMap w pobliżu", description: "Szuka kategorii OSM przez Overpass w promieniu do 5 km, do 100 wyników; Kraków i okolice. Pokrycie OSM nie jest pełnym rejestrem usług.",
+    title: "Obiekty OpenStreetMap w pobliżu", description: "Szuka kategorii OSM w promieniu do 5 km od punktu, do 100 wyników posortowanych według odległości; migawka OSM dla Krakowa z buforem ok. 5 km, z datą stanu. Pokrycie OSM nie jest pełnym rejestrem usług.",
     inputSchema: z.object({ kategoria: z.enum(Object.keys(KATEGORIE_OSM) as [keyof typeof KATEGORIE_OSM, ...Array<keyof typeof KATEGORIE_OSM>]), miejsce, promien_m: z.number().int().min(1).max(5000).default(1000), limit: z.number().int().min(1).max(100).default(50) }), annotations: readOnly,
   }, args => run(async () => osmObiekty({ ...args, ...await rozwiaz(args.miejsce) })));
   const schematOperacji = (nazwa: string, t: { cfg: any; schema: z.ZodType }) => ({ nazwa, tytul: t.cfg.title, opis: t.cfg.description, inputSchema: z.toJSONSchema(t.schema), outputSchema: z.toJSONSchema(t.cfg.outputSchema) });

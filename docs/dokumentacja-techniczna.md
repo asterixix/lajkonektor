@@ -46,7 +46,7 @@ Wersje pochodzą z `server/package-lock.json`. Testy i skrypty uruchamia Node.js
 | dane.gov.pl | Zbiory i zasoby krajowe | Wyszukiwanie, odczyt plików CSV, XLSX, JSON, GeoJSON |
 | ZTP Kraków | Rozkład GTFS, pozycje pojazdów i komunikaty GTFS-RT | Indeks sieci co 30 minut, odczyt realtime przy zapytaniu |
 | Rozkłady PKP PLK (agregat `mkuran.pl`) | Rozkład kolejowy | GTFS, bez danych o opóźnieniach |
-| OpenStreetMap | Geokodowanie, obiekty w okolicy, podkład mapy | Nominatim, Overpass (10 kategorii, promień do 5 km), kafelki |
+| OpenStreetMap | Geokodowanie, obiekty w okolicy, podkład mapy | Nominatim, migawka obiektów z ekstraktu Geofabrik (10 kategorii, promień do 5 km), kafelki |
 
 Katalog wdrożeniowy (`server/data/katalog.json`) obejmuje 1203 pozycje Otwartych Danych UMK i MSIP według migawki z 19 października 2026 roku. Pozycja oznacza tabelę lub warstwę. Liczba pozycji nie jest liczbą niezależnych tematów. Świeżość katalogu i świeżość odczytywanych danych to dwie różne właściwości: katalog jest migawką, a dane są pobierane w chwili zapytania.
 
@@ -78,7 +78,7 @@ Pole `kompletne=false` oznacza wynik częściowy i blokuje przedstawienie sumy j
 | `dane_zapytaj` | 1000 wierszy na stronę, strona modelowa do 24 KiB, agregacja OD do 20 tys. wierszy źródłowych |
 | `plik_odczyt` | CSV, XLSX, JSON, GeoJSON; do 8 MiB i 50 tys. wierszy; pierwszy URL HTTPS w `gov.pl` lub `krakow.pl` |
 | `analiza`, `dane_eksportuj` | 8 źródeł, 12 operacji, 5000 wierszy łącznie, 1 MiB wyniku; przekroczenie odrzuca wynik zamiast go obcinać |
-| `osm_obiekty` | 10 kategorii, promień do 5 km, do 100 obiektów |
+| `osm_obiekty` | 10 kategorii, promień do 5 km, do 100 obiektów posortowanych według odległości; migawka Kraków z buforem ok. 5 km |
 
 Inne ograniczenia interpretacji: dostępność piesza używa siatki 100 m i przybliżenia drogi (odległość w linii prostej × 1,3); progi pochodzą z projektu planu ogólnego. `planowanie_w_punkcie` daje zestawienie informacyjne, a nie wypis z planu. `trasa` obejmuje połączenie bezpośrednie lub z jedną przesiadką i nie gwarantuje godziny przyjazdu. `prognoza` jest projekcją trendu (liniową, wykładniczą lub Holta, z przedziałami 80 i 95%), a nie oficjalną prognozą demograficzną.
 

@@ -9,7 +9,6 @@ const CELE: [string, string][] = [
   ["ZTP Kraków, rozkłady i pojazdy na żywo", "https://gtfs.ztp.krakow.pl/"],
   ["Rozkłady kolejowe (PKP PLK przez mkuran.pl)", "https://mkuran.pl/gtfs/"],
   ["OpenStreetMap: wyszukiwanie miejsc (Nominatim)", "https://nominatim.openstreetmap.org/status?format=json"],
-  ["OpenStreetMap: obiekty w okolicy (Overpass)", "https://overpass-api.de/api/status"],
   ["OpenStreetMap: dojścia piesze (OSRM)", "https://routing.openstreetmap.de/"],
 ];
 // Usługę planu ogólnego (Planowanie/BP_Projekt_planu_ogolnego) MSIP wycofał w X 2026, więc jej nie sprawdzamy.

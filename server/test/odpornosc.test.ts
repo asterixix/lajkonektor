@@ -32,13 +32,18 @@ test("Nominatim: zawieszony fetch nie blokuje kolejki dłużej niż termin obsł
   } finally { globalThis.fetch = orig; }
 });
 
-test("Overpass: pyta serwery równolegle i bierze pierwszą poprawną odpowiedź mimo błędu jednego", async () => {
+test("OSM: obiekty z migawki bez sieci, posortowane według odległości, z datą stanu i zasięgiem", async () => {
   const { osmObiekty } = await import("../src/overpass.ts");
-  const orig = globalThis.fetch; const hosty: string[] = [];
-  globalThis.fetch = (async (u: any) => { hosty.push(new URL(String(u)).host); return hosty.length === 1 ? new Response("", { status: 502 }) : Response.json({ elements: [{ type: "node", id: 1, lat: 50.07, lon: 20.03, tags: { name: "Apteka" } }] }); }) as typeof fetch;
+  const orig = globalThis.fetch;
+  globalThis.fetch = (async () => { throw new Error("osm_obiekty nie może wołać sieci"); }) as typeof fetch;
   try {
-    const r = await osmObiekty({ kategoria: "apteki", lat: 50.0717, lon: 20.0377, promien_m: 801, limit: 5 });
-    assert.equal(r.obiekty.length, 1); assert.equal(new Set(hosty).size, hosty.length); assert.ok(hosty.length >= 2);
+    const r = osmObiekty({ kategoria: "apteki", lat: 50.0717, lon: 20.0377, promien_m: 801, limit: 5 });
+    assert.ok(r.obiekty.length > 0 && r.obiekty.length <= 5);
+    assert.ok(r.obiekty.every((o, i, l) => o.odleglosc_m <= 801 && (i === 0 || l[i - 1].odleglosc_m <= o.odleglosc_m)));
+    assert.match(String(r.data_stanu), /^\d{4}-\d{2}-\d{2}/);
+    const daleko = osmObiekty({ kategoria: "apteki", lat: 49.62, lon: 20.69, promien_m: 1000, limit: 5 });
+    assert.equal(daleko.kompletne, false);
+    assert.ok(daleko.uwagi.some((u) => u.includes("poza zasięg")));
   } finally { globalThis.fetch = orig; }
 });
 

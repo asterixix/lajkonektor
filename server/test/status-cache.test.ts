@@ -9,7 +9,7 @@ test("diagnostyka: cache źródeł nie przenosi colo/kraju poprzedniego żądani
   try {
     const a = await statusZrodel({ colo: "WAW", country: "PL" });
     const b = await statusZrodel({ colo: "CDG", country: "FR" });
-    assert.equal(wywolania, 11); assert.equal(a.testy.length, 11);
+    assert.equal(wywolania, 10); assert.equal(a.testy.length, 10);
     assert.deepEqual(b.worker, { colo: "CDG", kraj: "FR" }); assert.deepEqual(a.testy, b.testy);
   } finally { globalThis.fetch = origFetch; if (origCache === undefined) delete (globalThis as any).caches; else (globalThis as any).caches = origCache; }
 });
